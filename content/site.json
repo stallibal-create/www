@@ -1,1 +1,464 @@
-
+{
+  "_readme": "SINGLE SOURCE OF COMPANY FACTS. Any value set to null is shown on the site as a clearly marked placeholder and listed in MISSING-INFO.md at build time. Replace null with a plain string (same for all languages) or with {\"fr\": \"…\", \"en\": \"…\", \"ar\": \"…\"}. Never enter anything that is not verified.",
+  "company": {
+    "name": "LIBALSTAL",
+    "legalName": "Libal Stal SARL",
+    "founded": 2018,
+    "address": {
+      "fr": "Centre Zaouia, GP 16, Lot n° 11, Beni Tamou, Blida",
+      "en": "Zaouia Center, GP 16, Plot 11, Beni Tamou, Blida",
+      "ar": "مركز الزاوية، GP 16، القطعة رقم 11، بني تامو، البليدة"
+    },
+    "city": {
+      "fr": "Beni Tamou, Blida",
+      "en": "Beni Tamou, Blida",
+      "ar": "بني تامو، البليدة"
+    },
+    "country": {
+      "fr": "Algérie",
+      "en": "Algeria",
+      "ar": "الجزائر"
+    },
+    "phone": "+213 776 98 00 64",
+    "phone2": "+213 553 09 82 14",
+    "whatsapp": "+213 561 63 19 42",
+    "email": "commercial@libalstal.com",
+    "hours": null,
+    "registration": null,
+    "director": null,
+    "about": {
+      "fr": "Libal Stal SARL fabrique des réseaux de gaines métalliques pour la ventilation et le désenfumage. L'entreprise est en activité depuis 2018.",
+      "en": "Libal Stal SARL manufactures metal duct systems for ventilation and smoke extraction. The company has been in operation since 2018.",
+      "ar": "تصنع شركة Libal Stal SARL أنظمة مجاري معدنية للتهوية واستخراج الدخان. تمارس الشركة نشاطها منذ 2018."
+    },
+    "facebook": "https://www.facebook.com/Libalstal/",
+    "mapUrl": "https://www.google.com/maps/search/?api=1&query=Zaouia%20Center%2C%20Beni%20Tamou%2C%20Blida%2C%20Algeria"
+  },
+  "keyFacts": [
+    {
+      "id": "founded",
+      "value": 2018
+    },
+    {
+      "id": "materials",
+      "value": null
+    },
+    {
+      "id": "standards",
+      "value": null
+    },
+    {
+      "id": "markets",
+      "value": null
+    }
+  ],
+  "heroVisual": {
+    "_note": "Set photo to a file in src/assets/img (e.g. \"workshop-hero.webp\") to replace the conceptual 3D scene with a real workshop photo.",
+    "photo": null,
+    "photoAlt": null
+  },
+  "capabilities": [
+    {
+      "id": "spiral",
+      "range": null
+    },
+    {
+      "id": "rect",
+      "range": null
+    },
+    {
+      "id": "sheet",
+      "range": null
+    },
+    {
+      "id": "fittings",
+      "range": null
+    },
+    {
+      "id": "install",
+      "offered": null
+    }
+  ],
+  "equipment": [],
+  "materials": [],
+  "products": [
+    {
+      "slug": "spiral-round-duct",
+      "cat": "duct",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "rectangular-duct",
+      "cat": "duct",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "elbows",
+      "cat": "fit",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "reducers-transitions",
+      "cat": "fit",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "tees-branches",
+      "cat": "fit",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "flanges-connectors",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "grilles-dampers",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "custom-assemblies",
+      "cat": "cus",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    }
+  ],
+  "industriesConfirmed": false,
+  "industries": [
+    "commercial",
+    "industrial",
+    "health",
+    "hospitality",
+    "logistics",
+    "infrastructure",
+    "special"
+  ],
+  "quality": [
+    {
+      "id": "traceability",
+      "evidence": null
+    },
+    {
+      "id": "dimensional",
+      "evidence": null
+    },
+    {
+      "id": "tolerances",
+      "evidence": null
+    },
+    {
+      "id": "standards",
+      "evidence": null
+    },
+    {
+      "id": "certifications",
+      "evidence": null
+    },
+    {
+      "id": "drawings",
+      "evidence": null
+    }
+  ],
+  "projects": [
+    {
+      "slug": "modele",
+      "draft": true,
+      "title": {
+        "fr": "Modèle d'étude de cas",
+        "en": "Case study template",
+        "ar": "نموذج دراسة حالة"
+      },
+      "client": null,
+      "clientPublic": false,
+      "year": null,
+      "location": null,
+      "sector": null,
+      "scope": null,
+      "materials": null,
+      "quantities": null,
+      "challenge": null,
+      "solution": null,
+      "images": []
+    }
+  ],
+  "legal": {
+    "host": null,
+    "publicationDirector": null,
+    "dataRetention": null,
+    "applicableLaw": null,
+    "privacyContact": null
+  },
+  "ductAssembly": {
+    "_readme": "DEMONSTRATION ASSEMBLY for the 3D viewer (/fr/assembly/). Every geometry value is a demo dimension (demo: true), shown under the \"Modèle de démonstration\" label, never as a LIBALSTAL specification. Verified specifications come ONLY from products[].specs through productSlug. Coordinates: mm, +Y up, origin = centre of the first part inlet. The first component is the root; connections must form a tree. Checked by scripts/assembly-validate.mjs (build + lint).",
+    "id": "demo-assembly-01",
+    "demo": true,
+    "settings": {
+      "sheetMm": 3,
+      "flangeWidthMm": 30,
+      "flangeDepthMm": 30,
+      "demo": true
+    },
+    "components": [
+      {
+        "id": "duct-1",
+        "type": "straight",
+        "productSlug": "rectangular-duct",
+        "name": {
+          "fr": "Gaine rectangulaire — tronçon 1",
+          "en": "Rectangular duct, segment 1",
+          "ar": "مجرى مستطيل — الجزء 1"
+        },
+        "geometry": {
+          "widthMm": 400,
+          "heightMm": 300,
+          "lengthMm": 1000,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 250
+        },
+        "description": null
+      },
+      {
+        "id": "elbow-1",
+        "type": "elbow90",
+        "productSlug": "elbows",
+        "name": {
+          "fr": "Coude 90°",
+          "en": "90° elbow",
+          "ar": "كوع ‎90°‎"
+        },
+        "geometry": {
+          "widthMm": 400,
+          "heightMm": 300,
+          "innerRadiusMm": 150,
+          "bendPlane": "horizontal",
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 150
+        },
+        "description": null
+      },
+      {
+        "id": "duct-2",
+        "type": "straight",
+        "productSlug": "rectangular-duct",
+        "name": {
+          "fr": "Gaine rectangulaire — tronçon 2",
+          "en": "Rectangular duct, segment 2",
+          "ar": "مجرى مستطيل — الجزء 2"
+        },
+        "geometry": {
+          "widthMm": 400,
+          "heightMm": 300,
+          "lengthMm": 800,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 150
+        },
+        "description": null
+      },
+      {
+        "id": "tee-1",
+        "type": "tee",
+        "productSlug": "tees-branches",
+        "name": {
+          "fr": "Té avec piquage",
+          "en": "Tee with take-off",
+          "ar": "وصلة T مع مأخذ"
+        },
+        "geometry": {
+          "widthMm": 400,
+          "heightMm": 300,
+          "lengthMm": 700,
+          "branchWidthMm": 250,
+          "branchHeightMm": 200,
+          "branchPositionMm": 350,
+          "branchLengthMm": 150,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 150
+        },
+        "description": null
+      },
+      {
+        "id": "reducer-1",
+        "type": "reducer",
+        "productSlug": "reducers-transitions",
+        "name": {
+          "fr": "Réduction",
+          "en": "Reducer",
+          "ar": "مُخفِّض"
+        },
+        "geometry": {
+          "inletWidthMm": 400,
+          "inletHeightMm": 300,
+          "outletWidthMm": 300,
+          "outletHeightMm": 200,
+          "lengthMm": 400,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 150
+        },
+        "description": null
+      },
+      {
+        "id": "duct-3",
+        "type": "straight",
+        "productSlug": "rectangular-duct",
+        "name": {
+          "fr": "Gaine rectangulaire — tronçon 3",
+          "en": "Rectangular duct, segment 3",
+          "ar": "مجرى مستطيل — الجزء 3"
+        },
+        "geometry": {
+          "widthMm": 300,
+          "heightMm": 200,
+          "lengthMm": 600,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 150
+        },
+        "description": null
+      },
+      {
+        "id": "flange-1",
+        "type": "flange",
+        "productSlug": "flanges-connectors",
+        "name": {
+          "fr": "Bride",
+          "en": "Flange",
+          "ar": "شفة"
+        },
+        "geometry": {
+          "widthMm": 300,
+          "heightMm": 200,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 120
+        },
+        "description": null
+      },
+      {
+        "id": "branch-1",
+        "type": "branch",
+        "productSlug": "rectangular-duct",
+        "name": {
+          "fr": "Gaine de piquage",
+          "en": "Branch duct",
+          "ar": "مجرى التفرّع"
+        },
+        "geometry": {
+          "widthMm": 250,
+          "heightMm": 200,
+          "lengthMm": 600,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 200
+        },
+        "description": null
+      }
+    ],
+    "connections": [
+      [
+        "duct-1.outlet",
+        "elbow-1.inlet"
+      ],
+      [
+        "elbow-1.outlet",
+        "duct-2.inlet"
+      ],
+      [
+        "duct-2.outlet",
+        "tee-1.inlet"
+      ],
+      [
+        "tee-1.outlet",
+        "reducer-1.inlet"
+      ],
+      [
+        "reducer-1.outlet",
+        "duct-3.inlet"
+      ],
+      [
+        "duct-3.outlet",
+        "flange-1.inlet"
+      ],
+      [
+        "tee-1.branch",
+        "branch-1.inlet"
+      ]
+    ]
+  }
+}
