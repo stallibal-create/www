@@ -1,0 +1,23 @@
+{
+  "name": "libalstal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LIBALSTAL — site vitrine FR/EN/AR (générateur statique sans dépendance + serveur Node pour les demandes de devis)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node server.mjs",
+    "dev": "node scripts/build.mjs && node server.mjs",
+    "lint": "node scripts/lint.mjs",
+    "test": "node tests/run.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "lucide": "^1.59.0",
+    "three": "^0.186.1"
+  }
+}
