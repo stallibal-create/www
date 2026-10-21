@@ -1,0 +1,492 @@
+{
+  "meta": {
+    "lang": "fr",
+    "dir": "ltr",
+    "locale": "fr_FR",
+    "langName": "Français",
+    "descriptor": "Fabrication métallique & systèmes de gaines de ventilation et de désenfumage",
+    "tagline": "L'air en mouvement",
+    "defaultDescription": "LIBALSTAL — fabrication métallique et systèmes de gaines de ventilation et de désenfumage : gaines spiralées et rectangulaires, raccords et fabrication sur mesure. Demandez un devis sur plans.",
+    "skip": "Aller au contenu",
+    "missing": "à compléter",
+    "toConfirm": "à confirmer",
+    "toProvide": "à fournir",
+    "arrow": "→",
+    "back": "←"
+  },
+  "nav": {
+    "home": "Accueil",
+    "products": "Produits",
+    "capabilities": "Savoir-faire",
+    "industries": "Secteurs",
+    "projects": "Réalisations",
+    "quality": "Qualité",
+    "company": "Entreprise",
+    "contact": "Contact",
+    "cta": "Demander un devis",
+    "menu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "main": "Navigation principale",
+    "theme": "Changer de thème",
+    "themeToLight": "Passer au thème clair",
+    "themeToDark": "Passer au thème sombre",
+    "language": "Langue",
+    "breadcrumb": "Fil d'Ariane"
+  },
+  "fields": {
+    "legalName": "Raison sociale",
+    "founded": "Année de création",
+    "address": "Adresse",
+    "city": "Ville",
+    "country": "Pays",
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "hours": "Horaires",
+    "registration": "Immatriculation (RC / identifiants fiscaux)",
+    "director": "Dirigeant",
+    "about": "Présentation de l'entreprise",
+    "mapUrl": "Lien de localisation",
+    "materials": "Matériaux travaillés",
+    "standards": "Normes appliquées",
+    "markets": "Marchés desservis",
+    "dimensions": "Dimensions",
+    "material": "Matière",
+    "thickness": "Épaisseur",
+    "finish": "Finition",
+    "standard": "Norme",
+    "range": "Gamme",
+    "client": "Client",
+    "year": "Année",
+    "location": "Lieu",
+    "sector": "Secteur",
+    "scope": "Périmètre",
+    "quantities": "Quantités",
+    "challenge": "Enjeu",
+    "solution": "Solution",
+    "evidence": "Justificatif",
+    "host": "Hébergeur",
+    "publicationDirector": "Directeur de la publication",
+    "dataRetention": "Durée de conservation",
+    "applicableLaw": "Cadre légal applicable",
+    "privacyContact": "Contact données personnelles",
+    "photo": "Photo",
+    "whatsapp": "WhatsApp"
+  },
+  "keyFacts": {
+    "founded": "Année de création",
+    "materials": "Matériaux",
+    "standards": "Normes",
+    "markets": "Marchés"
+  },
+  "home": {
+    "title": "Fabrication métallique & gaines de ventilation",
+    "eyebrow": "Gaines · Ventilation · Désenfumage",
+    "h1a": "L'air en mouvement.",
+    "h1b": "Fabrication de précision.",
+    "lead": "Gaines de ventilation et de désenfumage, raccords et pièces de tôlerie fabriqués d'après vos plans. Pensé pour les bureaux d'études, entreprises de génie climatique et acheteurs qui veulent transformer des plans en métal fiable.",
+    "cta1": "Demander un devis",
+    "cta2": "Voir les produits",
+    "heroAlt": "Visuel 3D conceptuel d'un réseau de gaines : gaine rectangulaire, coude circulaire et grille",
+    "heroTag": "Visuel 3D conceptuel — à remplacer par des photos d'atelier",
+    "heroTagStatic": "Visuel conceptuel — à remplacer par des photos d'atelier",
+    "factsLabel": "Chiffres clés",
+    "capTitle": "Savoir-faire",
+    "capIntro": "Du plan à la pièce : les familles de fabrication de Libalstal.",
+    "capMore": "Tout le savoir-faire",
+    "prodTitle": "Systèmes de gaines",
+    "prodIntro": "Gaines, raccords et accessoires — chaque fiche se complète avec les données techniques réelles.",
+    "prodMore": "Tous les produits",
+    "qualTitle": "Des preuves, pas des adjectifs.",
+    "qualIntro": "Chaque engagement qualité est publié avec le document qui le prouve. Tant qu'un justificatif manque, la ligne l'indique.",
+    "qualMore": "Ingénierie & qualité",
+    "indTitle": "Secteurs desservis",
+    "projTitle": "Réalisations",
+    "projMore": "Toutes les réalisations",
+    "bandTitle": "Envoyez vos plans. Nous chiffrons le métal.",
+    "bandText": "Formulaire en trois étapes, avec récapitulatif avant envoi. Plans PDF, DWG ou DXF acceptés.",
+    "bandCta": "Démarrer une demande de devis"
+  },
+  "products": {
+    "title": "Produits",
+    "h1": "Systèmes de gaines & accessoires",
+    "intro": "Filtrez par famille. Dimensions, matières et fiches techniques s'affichent dès que les données vérifiées sont fournies.",
+    "filterLabel": "Filtrer par famille",
+    "all": "Tous",
+    "cats": {
+      "duct": "Gaines",
+      "fit": "Raccords",
+      "acc": "Accessoires",
+      "cus": "Sur mesure"
+    },
+    "empty": "Aucun produit dans cette famille pour l'instant.",
+    "count": "{n} produit(s)",
+    "details": "Voir la fiche",
+    "quote": "Demander un devis"
+  },
+  "productItems": {
+    "spiral-round-duct": {
+      "name": "Gaine circulaire spiralée",
+      "summary": "Conduit circulaire à agrafage hélicoïdal continu, pour réseaux de soufflage, de reprise et d'extraction."
+    },
+    "rectangular-duct": {
+      "name": "Gaine rectangulaire",
+      "summary": "Sections rectangulaires formées et assemblées selon plans, pour réseaux où l'encombrement en hauteur est limité."
+    },
+    "elbows": {
+      "name": "Coudes",
+      "summary": "Coudes circulaires à segments et coudes rectangulaires pour les changements de direction du réseau."
+    },
+    "reducers-transitions": {
+      "name": "Réductions & transitions",
+      "summary": "Réductions concentriques ou excentriques et pièces de transition rond-rectangulaire."
+    },
+    "tees-branches": {
+      "name": "Piquages & tés",
+      "summary": "Tés, culottes et piquages pour les dérivations du réseau aéraulique."
+    },
+    "flanges-connectors": {
+      "name": "Brides & raccords",
+      "summary": "Éléments d'assemblage entre tronçons : brides, manchons et pièces de jonction."
+    },
+    "grilles-dampers": {
+      "name": "Grilles, registres & accessoires",
+      "summary": "Bouches, grilles, registres de réglage et accessoires de réseau."
+    },
+    "custom-assemblies": {
+      "name": "Fabrication métallique sur mesure",
+      "summary": "Pièces et assemblages de tôlerie réalisés d'après vos plans et cahiers des charges."
+    }
+  },
+  "product": {
+    "specs": "Caractéristiques techniques",
+    "specsNote": "Valeurs affichées uniquement lorsqu'elles sont vérifiées par Libalstal.",
+    "downloads": "Documents",
+    "datasheet": "Fiche technique (PDF)",
+    "noDownloads": "Fiche technique et plans types",
+    "related": "Dans la même famille",
+    "ctaTitle": "Besoin de ce produit ?",
+    "ctaText": "Joignez vos plans ou dimensions : la demande est pré-remplie avec ce produit.",
+    "imageMissing": "Photo produit"
+  },
+  "capabilities": {
+    "title": "Savoir-faire",
+    "h1": "Savoir-faire industriel",
+    "intro": "Les familles de fabrication de Libalstal. Gammes, épaisseurs et équipements s'affichent dès qu'ils sont confirmés.",
+    "items": {
+      "spiral": {
+        "title": "Gaines circulaires spiralées",
+        "text": "Conduits circulaires à agrafage continu, longueurs et diamètres selon projet."
+      },
+      "rect": {
+        "title": "Gaines rectangulaires",
+        "text": "Sections rectangulaires formées et assemblées selon plans, avec renforts adaptés."
+      },
+      "sheet": {
+        "title": "Découpe, pliage & formage",
+        "text": "Découpe de tôle, pliage et formage pour pièces de réseau et ouvrages sur mesure."
+      },
+      "fittings": {
+        "title": "Raccords & transitions",
+        "text": "Coudes, réductions, piquages et transitions fabriqués à la demande."
+      },
+      "install": {
+        "title": "Pose & accompagnement de projet",
+        "text": "Accompagnement sur chantier et mise en œuvre — rubrique publiée uniquement si le service est proposé."
+      }
+    },
+    "equipmentTitle": "Parc machines",
+    "equipmentEmpty": "Liste des équipements (type, marque, capacités)",
+    "processTitle": "Du plan à la livraison",
+    "processNote": "Déroulé type d'une commande — à valider par Libalstal.",
+    "process": [
+      {
+        "t": "Plans & besoin",
+        "d": "Vous transmettez plans, nomenclature ou dimensions."
+      },
+      {
+        "t": "Étude & chiffrage",
+        "d": "Analyse technique et proposition de prix."
+      },
+      {
+        "t": "Fabrication",
+        "d": "Découpe, formage et assemblage en atelier."
+      },
+      {
+        "t": "Contrôle & livraison",
+        "d": "Vérification puis expédition ou enlèvement."
+      }
+    ],
+    "offeredUnknown": "Service proposé ?"
+  },
+  "industries": {
+    "title": "Secteurs",
+    "h1": "Secteurs desservis",
+    "intro": "Les environnements où les réseaux aérauliques comptent. La liste sera ajustée à l'expérience réelle de Libalstal.",
+    "unconfirmed": "Liste indicative — à confirmer par Libalstal",
+    "items": {
+      "commercial": "Bâtiments commerciaux & tertiaires",
+      "industrial": "Sites industriels",
+      "health": "Santé",
+      "hospitality": "Hôtellerie & restauration",
+      "logistics": "Entrepôts & logistique",
+      "infrastructure": "Infrastructures & équipements publics",
+      "special": "Environnements spécialisés"
+    },
+    "cta": "Parlez-nous de votre projet"
+  },
+  "projects": {
+    "title": "Réalisations",
+    "h1": "Réalisations",
+    "intro": "Projets réels uniquement : périmètre, matériaux et chiffres vérifiés, nom du client publié seulement avec son accord.",
+    "empty": "Aucune réalisation publiée pour l'instant.",
+    "emptyHint": "Les études de cas apparaîtront ici dès que des projets vérifiés, avec photos et accord des clients, seront fournis.",
+    "read": "Lire l'étude de cas",
+    "draftBanner": "MODÈLE — page non publiée, non indexée. Elle montre la structure d'une étude de cas.",
+    "clientPrivate": "Client confidentiel",
+    "facts": "Fiche projet",
+    "challenge": "Enjeu",
+    "solution": "Notre réponse",
+    "gallery": "Photos du chantier",
+    "photosMissing": "Photos du projet"
+  },
+  "quality": {
+    "title": "Ingénierie & qualité",
+    "h1": "Ingénierie & qualité",
+    "lead": "Des preuves, pas des adjectifs.",
+    "intro": "Toute affirmation qualité est publiée avec le document qui la soutient : certificat, procédure, rapport de contrôle. Sans justificatif, la ligne reste marquée.",
+    "items": {
+      "traceability": {
+        "t": "Traçabilité des matières",
+        "d": "Origine et certificats matière des tôles utilisées."
+      },
+      "dimensional": {
+        "t": "Contrôle dimensionnel",
+        "d": "Méthode et fréquence des contrôles en atelier."
+      },
+      "tolerances": {
+        "t": "Tolérances de fabrication",
+        "d": "Tolérances garanties par famille de produits."
+      },
+      "standards": {
+        "t": "Normes applicables",
+        "d": "Normes de conception et d'étanchéité réellement appliquées."
+      },
+      "certifications": {
+        "t": "Certifications",
+        "d": "Certificats en cours de validité, avec autorisation d'utiliser les logos."
+      },
+      "drawings": {
+        "t": "Plans & documentation technique",
+        "d": "Plans d'exécution, notices et fiches techniques fournis aux clients."
+      }
+    },
+    "evidenceMissing": "justificatif à fournir",
+    "evidenceLink": "Voir le justificatif"
+  },
+  "company": {
+    "title": "Entreprise",
+    "h1": "L'entreprise",
+    "intro": "LIBALSTAL — fabrication métallique & systèmes de gaines de ventilation et de désenfumage.",
+    "aboutTitle": "Qui sommes-nous",
+    "factsTitle": "Informations légales",
+    "findUs": "Nous trouver",
+    "social": "Réseaux",
+    "map": "Ouvrir la localisation"
+  },
+  "contact": {
+    "title": "Contact & devis",
+    "h1": "Demande de devis",
+    "intro": "Trois étapes courtes, avec un récapitulatif avant tout envoi. Vos plans sont stockés de façon privée et ne servent qu'à établir le devis.",
+    "direct": "Contact direct"
+  },
+  "rfq": {
+    "formLabel": "Formulaire de demande de devis",
+    "steps": [
+      "Contact",
+      "Besoin",
+      "Récapitulatif"
+    ],
+    "stepOf": "Étape {n} sur 3",
+    "name": "Nom complet",
+    "company": "Société",
+    "email": "E-mail professionnel",
+    "phone": "Téléphone (facultatif)",
+    "country": "Pays / lieu de livraison",
+    "category": "Famille de produit",
+    "choose": "Choisir…",
+    "timeline": "Délai souhaité",
+    "timelines": [
+      "Pas encore défini",
+      "Moins d'un mois",
+      "1 à 3 mois",
+      "Plus de 3 mois"
+    ],
+    "material": "Matière & épaisseur (si connues)",
+    "quantity": "Quantité",
+    "requirements": "Dimensions & exigences techniques",
+    "files": "Plans (PDF, DWG, DXF — {max} fichiers, {mb} Mo chacun maximum)",
+    "filesHint": "Facultatif. Les fichiers sont vérifiés à la réception.",
+    "consent": "J'accepte que mes données soient utilisées pour traiter ma demande, conformément à la politique de confidentialité.",
+    "privacyLink": "politique de confidentialité",
+    "required": "obligatoire",
+    "next": "Continuer",
+    "back": "Retour",
+    "review": "Vérifiez votre demande",
+    "edit": "Modifier",
+    "submit": "Envoyer la demande",
+    "sending": "Envoi en cours…",
+    "none": "—",
+    "noFiles": "Aucun fichier",
+    "errRequired": "Ce champ est obligatoire.",
+    "errEmail": "Saisissez une adresse e-mail valide.",
+    "errConsent": "Votre accord est nécessaire pour traiter la demande.",
+    "errFileType": "« {f} » : format non accepté (PDF, DWG ou DXF uniquement).",
+    "errFileSize": "« {f} » dépasse {mb} Mo.",
+    "errFileCount": "{max} fichiers maximum.",
+    "errSummary": "Corrigez les champs signalés pour continuer.",
+    "ok": "Demande envoyée. Référence : {ref}. Conservez-la pour tout échange avec nous.",
+    "okTitle": "Merci, votre demande est bien arrivée.",
+    "failTitle": "La demande n'a pas été envoyée.",
+    "failGeneric": "Le service d'envoi est indisponible pour le moment. Rien n'a été transmis. Réessayez plus tard ou contactez-nous directement.",
+    "failNotConfigured": "Le service de réception des devis n'est pas encore activé sur ce site. Rien n'a été transmis.",
+    "failRate": "Trop de demandes envoyées depuis cette connexion. Réessayez dans quelques minutes.",
+    "failInvalid": "Certaines informations ont été refusées par le serveur. Vérifiez le formulaire.",
+    "failCaptcha": "La vérification anti-robot a échoué. Rechargez la page et réessayez.",
+    "honeypot": "Ne pas remplir ce champ",
+    "productPrefill": "Produit concerné : {p}"
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "h1": "Politique de confidentialité",
+    "updated": "Dernière mise à jour",
+    "sections": [
+      {
+        "h": "Responsable du traitement",
+        "p": "LIBALSTAL ({legalName}), {address}. Contact : {privacyContact}."
+      },
+      {
+        "h": "Données collectées",
+        "p": "Via le formulaire de devis uniquement : nom, société, e-mail, téléphone (facultatif), pays de livraison, description du besoin et plans joints. Aucune donnée n'est collectée à des fins publicitaires."
+      },
+      {
+        "h": "Finalité",
+        "p": "Étudier votre demande, établir un devis et vous recontacter à ce sujet."
+      },
+      {
+        "h": "Conservation",
+        "p": "Durée de conservation : {dataRetention}."
+      },
+      {
+        "h": "Destinataires & stockage",
+        "p": "Les demandes et fichiers sont stockés de façon privée et ne sont accessibles qu'aux personnes de Libalstal chargées des devis. Hébergement : {host}."
+      },
+      {
+        "h": "Cookies & stockage local",
+        "p": "Le site ne dépose pas de cookie de suivi. Votre préférence de thème (clair/sombre) peut être mémorisée dans votre navigateur. Si la protection anti-robot Cloudflare Turnstile est activée, elle peut traiter des données techniques de connexion."
+      },
+      {
+        "h": "Vos droits",
+        "p": "Vous pouvez demander l'accès, la rectification ou la suppression de vos données en écrivant à {privacyContact}. Cadre légal : {applicableLaw}."
+      }
+    ]
+  },
+  "legalNotice": {
+    "title": "Mentions légales",
+    "h1": "Mentions légales",
+    "sections": [
+      {
+        "h": "Éditeur",
+        "p": "{legalName} — LIBALSTAL. {address}. Téléphone : {phone}. E-mail : {email}. Immatriculation : {registration}."
+      },
+      {
+        "h": "Directeur de la publication",
+        "p": "{publicationDirector}."
+      },
+      {
+        "h": "Hébergement",
+        "p": "{host}."
+      },
+      {
+        "h": "Propriété intellectuelle",
+        "p": "Le logo LIBALSTAL, les textes et les visuels de ce site sont la propriété de leurs titulaires respectifs. Toute reproduction sans autorisation est interdite."
+      },
+      {
+        "h": "Visuels",
+        "p": "Le visuel 3D de la page d'accueil est une illustration conceptuelle et ne représente pas une réalisation précise."
+      }
+    ]
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "h1": "Cette page n'existe pas.",
+    "text": "Le lien est peut-être ancien ou mal saisi.",
+    "home": "Retour à l'accueil",
+    "contact": "Demander un devis"
+  },
+  "footer": {
+    "nav": "Navigation",
+    "legal": "Informations",
+    "languages": "Langues",
+    "privacy": "Confidentialité",
+    "legalNotice": "Mentions légales",
+    "rights": "Tous droits réservés.",
+    "facebook": "Facebook",
+    "newTab": "(nouvel onglet)"
+  },
+  "assembly": {
+    "title": "Assemblage de gaines en 3D",
+    "eyebrow": "Modèle 3D",
+    "h1": "Assemblage de gaines rectangulaires",
+    "intro": "Faites pivoter l'assemblage, sélectionnez une pièce et consultez sa fiche. Les dimensions sont celles d'un modèle de démonstration ; les caractéristiques vérifiées proviennent des fiches produits.",
+    "demoLabel": "Modèle de démonstration",
+    "demoNote": "Géométrie de démonstration : ces dimensions illustrent le modèle et ne sont pas des spécifications LIBALSTAL.",
+    "pending": "Spécification à confirmer",
+    "previewAlt": "Dessin isométrique de l'assemblage de démonstration : gaines rectangulaires, coude à 90°, té avec piquage, réduction et bride.",
+    "viewLabel": "Vue 3D interactive de l'assemblage de démonstration. La liste des pièces donne accès aux mêmes informations.",
+    "loading": "Chargement de la vue 3D…",
+    "unavailable": "La vue 3D n'est pas disponible sur cet appareil. Le dessin et la liste des pièces restent consultables.",
+    "lost": "Le navigateur a interrompu la vue 3D. Le dessin reste affiché pendant la reprise.",
+    "saveData": "Mode économie de données : la vue 3D n'est pas chargée. Le dessin et la liste des pièces restent consultables.",
+    "help": "Glisser pour faire pivoter, pincer ou molette pour zoomer, toucher une pièce pour ouvrir sa fiche.",
+    "toolbar": "Commandes de la vue 3D",
+    "rotateLeft": "Pivoter vers la gauche",
+    "rotateRight": "Pivoter vers la droite",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "reset": "Réinitialiser la vue",
+    "panelTitle": "Fiche de la pièce",
+    "selectPrompt": "Sélectionnez une pièce dans la vue 3D ou dans la liste.",
+    "close": "Fermer la fiche",
+    "listTitle": "Pièces de l'assemblage",
+    "geometryTitle": "Géométrie de démonstration",
+    "productTitle": "Caractéristiques produit",
+    "productLink": "Fiche produit",
+    "description": "Description",
+    "cta": "Demander un devis",
+    "geo": {
+      "section": "Section (l × h)",
+      "inlet": "Section d'entrée (l × h)",
+      "outlet": "Section de sortie (l × h)",
+      "branch": "Section du piquage (l × h)",
+      "length": "Longueur",
+      "branchLength": "Longueur du piquage",
+      "innerRadius": "Rayon intérieur",
+      "angle": "Angle",
+      "flangeWidth": "Largeur de l'aile de bride",
+      "flangeDepth": "Profondeur de bride"
+    },
+    "types": {
+      "straight": "Gaine droite",
+      "elbow90": "Coude 90°",
+      "reducer": "Réduction",
+      "tee": "Té",
+      "branch": "Gaine de piquage",
+      "flange": "Bride"
+    },
+    "explode": "Éclater les pièces",
+    "reassemble": "Réassembler",
+    "replay": "Revoir l'animation",
+    "skip": "Passer l'animation",
+    "playing": "Présentation de l'assemblage en cours. Vous pouvez la passer ou interagir directement."
+  }
+}

@@ -1,0 +1,492 @@
+{
+  "meta": {
+    "lang": "en",
+    "dir": "ltr",
+    "locale": "en_US",
+    "langName": "English",
+    "descriptor": "Metal fabrication & ventilation and smoke-extraction duct systems",
+    "tagline": "Air in motion",
+    "defaultDescription": "LIBALSTAL — metal fabrication and ventilation and smoke-extraction duct systems: spiral and rectangular ductwork, fittings and custom sheet-metal work. Request a quote from your drawings.",
+    "skip": "Skip to content",
+    "missing": "to be completed",
+    "toConfirm": "to be confirmed",
+    "toProvide": "to be provided",
+    "arrow": "→",
+    "back": "←"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "capabilities": "Capabilities",
+    "industries": "Industries",
+    "projects": "Projects",
+    "quality": "Quality",
+    "company": "Company",
+    "contact": "Contact",
+    "cta": "Request a quote",
+    "menu": "Open menu",
+    "closeMenu": "Close menu",
+    "main": "Main navigation",
+    "theme": "Change theme",
+    "themeToLight": "Switch to light theme",
+    "themeToDark": "Switch to dark theme",
+    "language": "Language",
+    "breadcrumb": "Breadcrumb"
+  },
+  "fields": {
+    "legalName": "Legal name",
+    "founded": "Year founded",
+    "address": "Address",
+    "city": "City",
+    "country": "Country",
+    "phone": "Phone",
+    "email": "Email",
+    "hours": "Opening hours",
+    "registration": "Company registration / tax IDs",
+    "director": "Managing director",
+    "about": "Company introduction",
+    "mapUrl": "Location link",
+    "materials": "Materials processed",
+    "standards": "Standards applied",
+    "markets": "Markets served",
+    "dimensions": "Dimensions",
+    "material": "Material",
+    "thickness": "Thickness",
+    "finish": "Finish",
+    "standard": "Standard",
+    "range": "Range",
+    "client": "Client",
+    "year": "Year",
+    "location": "Location",
+    "sector": "Sector",
+    "scope": "Scope",
+    "quantities": "Quantities",
+    "challenge": "Challenge",
+    "solution": "Solution",
+    "evidence": "Evidence",
+    "host": "Hosting provider",
+    "publicationDirector": "Publication director",
+    "dataRetention": "Retention period",
+    "applicableLaw": "Applicable legal framework",
+    "privacyContact": "Personal data contact",
+    "photo": "Photo",
+    "whatsapp": "WhatsApp"
+  },
+  "keyFacts": {
+    "founded": "Founded",
+    "materials": "Materials",
+    "standards": "Standards",
+    "markets": "Markets"
+  },
+  "home": {
+    "title": "Metal fabrication & ventilation ductwork",
+    "eyebrow": "Ductwork · Ventilation · Smoke extraction",
+    "h1a": "Air in motion.",
+    "h1b": "Precision fabrication.",
+    "lead": "Ventilation and smoke-extraction ducts, fittings and sheet-metal parts made to your drawings. Built for engineering firms, HVAC contractors and buyers who need drawings turned into dependable metal.",
+    "cta1": "Request a quote",
+    "cta2": "View products",
+    "heroAlt": "Conceptual 3D visual of a duct run: rectangular duct, round elbow and grille",
+    "heroTag": "Conceptual 3D visual — to be replaced with workshop photos",
+    "heroTagStatic": "Conceptual visual — to be replaced with workshop photos",
+    "factsLabel": "Key facts",
+    "capTitle": "Capabilities",
+    "capIntro": "From drawing to part: Libalstal's fabrication families.",
+    "capMore": "All capabilities",
+    "prodTitle": "Duct systems",
+    "prodIntro": "Ducts, fittings and accessories — each sheet is completed with verified technical data.",
+    "prodMore": "All products",
+    "qualTitle": "Evidence, not adjectives.",
+    "qualIntro": "Every quality commitment is published with the document that proves it. Until evidence is supplied, the line says so.",
+    "qualMore": "Engineering & quality",
+    "indTitle": "Industries served",
+    "projTitle": "Projects",
+    "projMore": "All projects",
+    "bandTitle": "Send your drawings. We price the metal.",
+    "bandText": "A three-step form with a review before sending. PDF, DWG or DXF drawings accepted.",
+    "bandCta": "Start a quote request"
+  },
+  "products": {
+    "title": "Products",
+    "h1": "Duct systems & accessories",
+    "intro": "Filter by family. Dimensions, materials and datasheets appear as soon as verified data is supplied.",
+    "filterLabel": "Filter by family",
+    "all": "All",
+    "cats": {
+      "duct": "Ducts",
+      "fit": "Fittings",
+      "acc": "Accessories",
+      "cus": "Custom"
+    },
+    "empty": "No products in this family yet.",
+    "count": "{n} product(s)",
+    "details": "View details",
+    "quote": "Request a quote"
+  },
+  "productItems": {
+    "spiral-round-duct": {
+      "name": "Spiral round duct",
+      "summary": "Round duct with a continuous helical lock seam, for supply, return and extract systems."
+    },
+    "rectangular-duct": {
+      "name": "Rectangular duct",
+      "summary": "Rectangular sections formed and assembled to drawings, for runs where ceiling depth is limited."
+    },
+    "elbows": {
+      "name": "Elbows",
+      "summary": "Segmented round elbows and rectangular bends for changes of direction."
+    },
+    "reducers-transitions": {
+      "name": "Reducers & transitions",
+      "summary": "Concentric or eccentric reducers and round-to-rectangular transition pieces."
+    },
+    "tees-branches": {
+      "name": "Tees & branches",
+      "summary": "Tees, Y-branches and take-offs for branching the air distribution network."
+    },
+    "flanges-connectors": {
+      "name": "Flanges & connectors",
+      "summary": "Joining components between duct sections: flanges, couplings and connectors."
+    },
+    "grilles-dampers": {
+      "name": "Grilles, dampers & accessories",
+      "summary": "Diffusers, grilles, balancing dampers and network accessories."
+    },
+    "custom-assemblies": {
+      "name": "Custom metal fabrication",
+      "summary": "Sheet-metal parts and assemblies made to your drawings and specifications."
+    }
+  },
+  "product": {
+    "specs": "Technical specifications",
+    "specsNote": "Values are shown only once verified by Libalstal.",
+    "downloads": "Documents",
+    "datasheet": "Datasheet (PDF)",
+    "noDownloads": "Datasheet and standard drawings",
+    "related": "Same family",
+    "ctaTitle": "Need this product?",
+    "ctaText": "Attach your drawings or dimensions: the request is pre-filled with this product.",
+    "imageMissing": "Product photo"
+  },
+  "capabilities": {
+    "title": "Capabilities",
+    "h1": "Industrial capabilities",
+    "intro": "Libalstal's fabrication families. Ranges, gauges and equipment appear once confirmed.",
+    "items": {
+      "spiral": {
+        "title": "Spiral round ductwork",
+        "text": "Continuous lock-seam round duct, lengths and diameters to project."
+      },
+      "rect": {
+        "title": "Rectangular ductwork",
+        "text": "Rectangular sections formed and assembled to drawings, with suitable stiffening."
+      },
+      "sheet": {
+        "title": "Cutting, bending & forming",
+        "text": "Sheet cutting, press bending and forming for duct parts and custom work."
+      },
+      "fittings": {
+        "title": "Fittings & transitions",
+        "text": "Elbows, reducers, take-offs and transitions made to order."
+      },
+      "install": {
+        "title": "Installation & project support",
+        "text": "On-site support and installation — published only if the service is offered."
+      }
+    },
+    "equipmentTitle": "Equipment",
+    "equipmentEmpty": "Equipment list (type, make, capacities)",
+    "processTitle": "From drawing to delivery",
+    "processNote": "Typical order flow — to be validated by Libalstal.",
+    "process": [
+      {
+        "t": "Drawings & needs",
+        "d": "You send drawings, a bill of materials or dimensions."
+      },
+      {
+        "t": "Review & pricing",
+        "d": "Technical review and price proposal."
+      },
+      {
+        "t": "Fabrication",
+        "d": "Cutting, forming and assembly in the workshop."
+      },
+      {
+        "t": "Inspection & delivery",
+        "d": "Checks, then shipping or collection."
+      }
+    ],
+    "offeredUnknown": "Service offered?"
+  },
+  "industries": {
+    "title": "Industries",
+    "h1": "Industries served",
+    "intro": "Settings where air distribution matters. The list will be adjusted to Libalstal's actual experience.",
+    "unconfirmed": "Indicative list — to be confirmed by Libalstal",
+    "items": {
+      "commercial": "Commercial & office buildings",
+      "industrial": "Industrial sites",
+      "health": "Healthcare",
+      "hospitality": "Hospitality & food service",
+      "logistics": "Warehousing & logistics",
+      "infrastructure": "Infrastructure & public facilities",
+      "special": "Specialised environments"
+    },
+    "cta": "Tell us about your project"
+  },
+  "projects": {
+    "title": "Projects",
+    "h1": "Projects",
+    "intro": "Real projects only: verified scope, materials and figures, with the client's name published only with permission.",
+    "empty": "No projects published yet.",
+    "emptyHint": "Case studies will appear here once verified projects, with photos and client approval, are supplied.",
+    "read": "Read the case study",
+    "draftBanner": "TEMPLATE — unpublished, not indexed. Shows the structure of a case study.",
+    "clientPrivate": "Confidential client",
+    "facts": "Project facts",
+    "challenge": "Challenge",
+    "solution": "Our solution",
+    "gallery": "Site photos",
+    "photosMissing": "Project photos"
+  },
+  "quality": {
+    "title": "Engineering & quality",
+    "h1": "Engineering & quality",
+    "lead": "Evidence, not adjectives.",
+    "intro": "Every quality claim is published with the document that supports it: certificate, procedure, inspection report. Without evidence, the line stays flagged.",
+    "items": {
+      "traceability": {
+        "t": "Material traceability",
+        "d": "Origin and mill certificates of the sheet used."
+      },
+      "dimensional": {
+        "t": "Dimensional inspection",
+        "d": "Method and frequency of workshop checks."
+      },
+      "tolerances": {
+        "t": "Fabrication tolerances",
+        "d": "Guaranteed tolerances per product family."
+      },
+      "standards": {
+        "t": "Applicable standards",
+        "d": "Design and air-tightness standards actually applied."
+      },
+      "certifications": {
+        "t": "Certifications",
+        "d": "Valid certificates, with permission to use the marks."
+      },
+      "drawings": {
+        "t": "Drawings & technical documentation",
+        "d": "Shop drawings, instructions and datasheets supplied to clients."
+      }
+    },
+    "evidenceMissing": "evidence to be provided",
+    "evidenceLink": "View evidence"
+  },
+  "company": {
+    "title": "Company",
+    "h1": "The company",
+    "intro": "LIBALSTAL — metal fabrication & ventilation and smoke-extraction duct systems.",
+    "aboutTitle": "About us",
+    "factsTitle": "Legal information",
+    "findUs": "Find us",
+    "social": "Social",
+    "map": "Open location"
+  },
+  "contact": {
+    "title": "Contact & quote",
+    "h1": "Request a quote",
+    "intro": "Three short steps, with a review before anything is sent. Your drawings are stored privately and used only to prepare the quote.",
+    "direct": "Direct contact"
+  },
+  "rfq": {
+    "formLabel": "Quote request form",
+    "steps": [
+      "Contact",
+      "Requirements",
+      "Review"
+    ],
+    "stepOf": "Step {n} of 3",
+    "name": "Full name",
+    "company": "Company",
+    "email": "Work email",
+    "phone": "Phone (optional)",
+    "country": "Country / delivery location",
+    "category": "Product family",
+    "choose": "Choose…",
+    "timeline": "Target timeline",
+    "timelines": [
+      "Not defined yet",
+      "Under 1 month",
+      "1–3 months",
+      "Over 3 months"
+    ],
+    "material": "Material & thickness (if known)",
+    "quantity": "Quantity",
+    "requirements": "Dimensions & technical requirements",
+    "files": "Drawings (PDF, DWG, DXF — up to {max} files, {mb} MB each)",
+    "filesHint": "Optional. Files are checked on receipt.",
+    "consent": "I agree that my data is used to process my request, as described in the privacy policy.",
+    "privacyLink": "privacy policy",
+    "required": "required",
+    "next": "Continue",
+    "back": "Back",
+    "review": "Check your request",
+    "edit": "Edit",
+    "submit": "Send request",
+    "sending": "Sending…",
+    "none": "—",
+    "noFiles": "No files",
+    "errRequired": "This field is required.",
+    "errEmail": "Enter a valid email address.",
+    "errConsent": "Your consent is needed to process the request.",
+    "errFileType": "“{f}”: format not accepted (PDF, DWG or DXF only).",
+    "errFileSize": "“{f}” is larger than {mb} MB.",
+    "errFileCount": "{max} files maximum.",
+    "errSummary": "Fix the highlighted fields to continue.",
+    "ok": "Request sent. Reference: {ref}. Keep it for any follow-up with us.",
+    "okTitle": "Thank you — your request has arrived.",
+    "failTitle": "Your request was not sent.",
+    "failGeneric": "The sending service is unavailable right now. Nothing was transmitted. Try again later or contact us directly.",
+    "failNotConfigured": "Quote reception is not activated on this site yet. Nothing was transmitted.",
+    "failRate": "Too many requests from this connection. Try again in a few minutes.",
+    "failInvalid": "Some information was rejected by the server. Please check the form.",
+    "failCaptcha": "The anti-bot check failed. Reload the page and try again.",
+    "honeypot": "Leave this field empty",
+    "productPrefill": "Product: {p}"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "h1": "Privacy policy",
+    "updated": "Last updated",
+    "sections": [
+      {
+        "h": "Data controller",
+        "p": "LIBALSTAL ({legalName}), {address}. Contact: {privacyContact}."
+      },
+      {
+        "h": "Data collected",
+        "p": "Through the quote form only: name, company, email, phone (optional), delivery country, description of requirements and attached drawings. No data is collected for advertising."
+      },
+      {
+        "h": "Purpose",
+        "p": "To review your request, prepare a quote and contact you about it."
+      },
+      {
+        "h": "Retention",
+        "p": "Retention period: {dataRetention}."
+      },
+      {
+        "h": "Recipients & storage",
+        "p": "Requests and files are stored privately and are accessible only to the Libalstal staff who prepare quotes. Hosting: {host}."
+      },
+      {
+        "h": "Cookies & local storage",
+        "p": "The site sets no tracking cookies. Your theme preference (light/dark) may be remembered in your browser. If Cloudflare Turnstile anti-bot protection is enabled, it may process technical connection data."
+      },
+      {
+        "h": "Your rights",
+        "p": "You can request access to, correction or deletion of your data by writing to {privacyContact}. Legal framework: {applicableLaw}."
+      }
+    ]
+  },
+  "legalNotice": {
+    "title": "Legal notice",
+    "h1": "Legal notice",
+    "sections": [
+      {
+        "h": "Publisher",
+        "p": "{legalName} — LIBALSTAL. {address}. Phone: {phone}. Email: {email}. Registration: {registration}."
+      },
+      {
+        "h": "Publication director",
+        "p": "{publicationDirector}."
+      },
+      {
+        "h": "Hosting",
+        "p": "{host}."
+      },
+      {
+        "h": "Intellectual property",
+        "p": "The LIBALSTAL logo, texts and visuals on this site belong to their respective owners. Reproduction without permission is prohibited."
+      },
+      {
+        "h": "Visuals",
+        "p": "The 3D visual on the home page is a conceptual illustration and does not depict a specific project."
+      }
+    ]
+  },
+  "notFound": {
+    "title": "Page not found",
+    "h1": "This page doesn't exist.",
+    "text": "The link may be outdated or mistyped.",
+    "home": "Back to home",
+    "contact": "Request a quote"
+  },
+  "footer": {
+    "nav": "Navigation",
+    "legal": "Information",
+    "languages": "Languages",
+    "privacy": "Privacy",
+    "legalNotice": "Legal notice",
+    "rights": "All rights reserved.",
+    "facebook": "Facebook",
+    "newTab": "(opens in a new tab)"
+  },
+  "assembly": {
+    "title": "3D ductwork assembly",
+    "eyebrow": "3D model",
+    "h1": "Rectangular ductwork assembly",
+    "intro": "Rotate the assembly, select a part and read its sheet. Dimensions belong to a demonstration model; verified characteristics come from the product sheets.",
+    "demoLabel": "Demonstration model",
+    "demoNote": "Demonstration geometry: these dimensions illustrate the model and are not LIBALSTAL specifications.",
+    "pending": "Specification pending",
+    "previewAlt": "Isometric drawing of the demonstration assembly: rectangular ducts, 90° elbow, tee with take-off, reducer and flange.",
+    "viewLabel": "Interactive 3D view of the demonstration assembly. The parts list gives access to the same information.",
+    "loading": "Loading the 3D view…",
+    "unavailable": "The 3D view is not available on this device. The drawing and the parts list remain available.",
+    "lost": "The browser interrupted the 3D view. The drawing stays visible while it recovers.",
+    "saveData": "Data saver is on: the 3D view is not loaded. The drawing and the parts list remain available.",
+    "help": "Drag to rotate, pinch or scroll to zoom, tap a part to open its sheet.",
+    "toolbar": "3D view controls",
+    "rotateLeft": "Rotate left",
+    "rotateRight": "Rotate right",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "reset": "Reset view",
+    "panelTitle": "Part sheet",
+    "selectPrompt": "Select a part in the 3D view or in the list.",
+    "close": "Close the sheet",
+    "listTitle": "Parts in the assembly",
+    "geometryTitle": "Demonstration geometry",
+    "productTitle": "Product characteristics",
+    "productLink": "Product sheet",
+    "description": "Description",
+    "cta": "Request a quote",
+    "geo": {
+      "section": "Section (W × H)",
+      "inlet": "Inlet section (W × H)",
+      "outlet": "Outlet section (W × H)",
+      "branch": "Take-off section (W × H)",
+      "length": "Length",
+      "branchLength": "Take-off length",
+      "innerRadius": "Inner radius",
+      "angle": "Angle",
+      "flangeWidth": "Flange leg width",
+      "flangeDepth": "Flange depth"
+    },
+    "types": {
+      "straight": "Straight duct",
+      "elbow90": "90° elbow",
+      "reducer": "Reducer",
+      "tee": "Tee",
+      "branch": "Branch duct",
+      "flange": "Flange"
+    },
+    "explode": "Explode parts",
+    "reassemble": "Reassemble",
+    "replay": "Replay animation",
+    "skip": "Skip animation",
+    "playing": "Assembly presentation playing. You can skip or interact immediately."
+  }
+}
