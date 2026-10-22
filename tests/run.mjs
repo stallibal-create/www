@@ -8,16 +8,17 @@ import { readFileSync, readdirSync, statSync, rmSync, mkdirSync, writeFileSync, 
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
+import { socialDock, socialLinks } from '../scripts/social.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'tests/output');
 const require = createRequire(import.meta.url);
 let chromium;
 for (const m of [process.env.PLAYWRIGHT_MODULE, 'playwright', '@playwright/test'].filter(Boolean)) { try { ({ chromium } = require(m)); break; } catch { /* next */ } }
-if (!chromium) { console.error('Playwright not found. npm i -D playwright  (or set PLAYWRIGHT_MODULE)'); process.exit(2); }
+if (!chromium) { console.error('Playwright not found. run npm ci, then npx playwright install chromium  (or set PLAYWRIGHT_MODULE)'); process.exit(2); }
 
 rmSync(OUT, { recursive: true, force: true }); mkdirSync(OUT, { recursive: true });
-execFileSync(process.execPath, [join(ROOT, 'scripts/build.mjs')], { stdio: 'inherit', env: { ...process.env, SITE_URL: 'https://www.libalstal.example' } });
+execFileSync(process.execPath, [join(ROOT, 'scripts/build.mjs')], { stdio: 'inherit', env: { ...process.env, SITE_URL: 'https://www.libalstal.example', RFQ_UPLOAD_ORIGIN: 'http://127.0.0.1:4321' } });
 
 // ---------- harness ----------
 const results = []; let current = '';
@@ -29,7 +30,7 @@ async function test(name, fn) {
 
 // ---------- servers ----------
 const hooks = [];
-const mock = createServer((req, res) => { let b = ''; req.on('data', c => (b += c)); req.on('end', () => { hooks.push({ auth: req.headers.authorization, body: JSON.parse(b || '{}') }); res.end('ok'); }); });
+const mock = createServer((req, res) => { let b = ''; req.on('data', c => (b += c)); req.on('end', () => { hooks.push({ auth: req.headers.authorization, idem: req.headers['idempotency-key'], body: JSON.parse(b || '{}') }); res.end('ok'); }); });
 await new Promise(r => mock.listen(4301, '127.0.0.1', r));
 const procs = [];
 function startServer(port, extra) {
@@ -41,7 +42,12 @@ const A = 'http://127.0.0.1:4311', B = 'http://127.0.0.1:4312', C = 'http://127.
 startServer(4311, {});                                                              // RFQ not configured
 const srvB = startServer(4312, { RFQ_WEBHOOK_URL: 'http://127.0.0.1:4301/hook', RFQ_WEBHOOK_TOKEN: 'tkn', RFQ_RATE_MAX: '50' });
 startServer(4313, { RFQ_WEBHOOK_URL: 'http://127.0.0.1:4301/hook', RFQ_RATE_MAX: '2' });
-for (const base of [A, B, C]) for (let i = 0; i < 50; i++) { try { if ((await fetch(base + '/healthz')).ok) break; } catch { /* wait */ } await new Promise(r => setTimeout(r, 100)); }
+// D: Cloudflare Pages + private R2 stand-in running the real functions/ (tests/pages-sim.mjs), S3 endpoint on 4321
+const D = 'http://127.0.0.1:4314';
+{ const p = spawn(process.execPath, [join(ROOT, 'tests/pages-sim.mjs')], { env: { ...process.env, PORT: '4314', S3_PORT: '4321', HOOK: 'http://127.0.0.1:4301/hook' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  let log = ''; p.stdout.on('data', d => (log += d)); p.stderr.on('data', d => (log += d)); p.getLog = () => log; procs.push(p); }
+const sim = async (path, init) => (await fetch(D + path, init)).json();
+for (const base of [A, B, C, D]) for (let i = 0; i < 50; i++) { try { if ((await fetch(base + '/healthz')).ok) break; } catch { /* wait */ } await new Promise(r => setTimeout(r, 100)); }
 
 const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
 const DIST = join(ROOT, 'dist');
@@ -118,7 +124,8 @@ await test('root redirects by Accept-Language; unknown paths 404 in the right la
 await test('SEO files: sitemap with hreflang, robots, canonical, no draft pages indexed', async () => {
   const sm = await (await fetch(A + '/sitemap.xml')).text();
   assert.match(sm, /hreflang="ar"/); assert.doesNotMatch(sm, /projects\/modele/);
-  assert.equal((sm.match(/<url>/g) || []).length, pages.filter(p => !p.includes('/projects/modele') && !p.includes('/assembly/')).length);
+  assert.equal((sm.match(/<url>/g) || []).length, pages.filter(p => !p.includes('/projects/modele')).length);
+  assert.match(sm, /\/fr\/assembly\//, 'v14: the 3D assembly page is public and in the sitemap');
   assert.match(await (await fetch(A + '/robots.txt')).text(), /Sitemap: https:\/\/www\.libalstal\.example\/sitemap\.xml/);
   const home = await (await fetch(A + '/en/')).text();
   assert.match(home, /<link rel="canonical" href="https:\/\/www\.libalstal\.example\/en\/">/);
@@ -197,6 +204,33 @@ await test('cross-origin POST is refused', async () => {
   assert.equal(r.status, 403);
 });
 
+await test('Pages: quote without files → recorded, then notified; same sid again → same reference, one notification', async () => {
+  hooks.length = 0;
+  const send = () => { const fd = rfqForm(); fd.append('sid', 'it-sid-0001-abcdef'); return fetch(D + '/api/rfq', { method: 'POST', body: fd, headers: { Accept: 'application/json', Origin: D } }); };
+  const a = await (await send()).json(), b = await (await send()).json();
+  assert.equal(a.ok, true); assert.equal(b.ref, a.ref);
+  assert.equal(hooks.filter(h => h.body.ref === a.ref).length, 1); assert.equal(hooks.at(-1).idem, a.ref);
+  assert.equal((await sim('/__sim/store')).records[a.ref].status, 'notified');
+  const h = await (await fetch(D + '/healthz')).json(); assert.equal(h.uploads, 'ready');
+});
+await test('Pages: 10 MB drawing via presigned URL; storage refuses a forged signature, a different size and plain PUTs', async () => {
+  hooks.length = 0;
+  const big = Buffer.alloc(10 * 1024 * 1024); PDF.copy(big);
+  const fields = Object.fromEntries([...rfqForm()].filter(([k]) => k !== 'lang'));
+  const st = await (await fetch(D + '/api/rfq/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: D }, body: JSON.stringify({ lang: 'fr', fields, files: [{ name: 'gros-plan.pdf', size: big.length }] }) })).json();
+  assert.equal(st.ok, true, JSON.stringify(st));
+  const u = st.uploads[0];
+  const forged = u.url.replace(/X-Amz-Signature=[0-9a-f]{4}/, 'X-Amz-Signature=0000');
+  assert.equal((await fetch(forged, { method: 'PUT', body: big, headers: u.headers })).status, 403);
+  assert.equal((await fetch(u.url, { method: 'PUT', body: big.subarray(0, 1000), headers: u.headers })).status, 403, 'size is part of the signature');
+  assert.equal((await fetch(u.url.split('?')[0], { method: 'PUT', body: big, headers: u.headers })).status, 403, 'bucket is private');
+  assert.equal((await fetch(u.url, { method: 'PUT', body: big, headers: u.headers })).status, 200);
+  const fin = await (await fetch(D + '/api/rfq/finish', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: D }, body: JSON.stringify({ ref: st.ref, token: st.token }) })).json();
+  assert.equal(fin.ok, true);
+  const store = await sim('/__sim/store');
+  assert.equal(store.objects[`${st.ref}/1-gros-plan.pdf`], big.length);
+  assert.equal(hooks.at(-1).body.files[0].key, `${st.ref}/1-gros-plan.pdf`); assert.ok(hooks.at(-1).body.files[0].url.includes('X-Amz-Signature='));
+});
 console.log('\nBrowser: navigation & UI');
 await test('desktop nav, language switch keeps the page, theme persists', async () => {
   const p = await newPage();
@@ -221,6 +255,26 @@ await test('mobile menu: open, Escape closes and returns focus, contact reachabl
   await p.keyboard.press('Escape'); assert.equal(await p.getAttribute('.burger', 'aria-expanded'), 'false');
   assert.equal(await p.evaluate(() => document.activeElement.classList.contains('burger')), true);
   await p.click('.burger'); await p.click('.nav-contact a'); await p.waitForURL('**/en/contact/');
+  await p.context().close();
+});
+await test('product renders: every card and product page shows its illustrative render, captioned in FR/EN/AR; capabilities unnumbered', async () => {
+  const p = await newPage();
+  await p.goto(A + '/fr/products/');
+  const cards = await p.$$eval('#product-grid .card-render img', imgs => imgs.map(i => i.getAttribute('srcset')));
+  assert.equal(cards.length, 8, 'a render on every product card');
+  for (const l of ['fr', 'en', 'ar']) {
+    await p.goto(`${A}/${l}/products/elbows/`);
+    await p.waitForFunction(() => { const i = document.querySelector('.drawing-render img'); return i.complete && i.naturalWidth > 0; }, null, { timeout: 10000 });
+    const fig = await p.$eval('.drawing-render img', i => ({ alt: i.alt, src: i.currentSrc, cap: i.closest('figure').querySelector('figcaption').textContent }));
+    assert.match(fig.src, /\/assets\/img\/products\/elbows-(640|1280)\.webp/, `${l}: render file (${fig.src})`);
+    assert.ok(fig.alt.length > 10 && /3D|ثلاثي/.test(fig.alt), `${l}: alt "${fig.alt}"`);
+    assert.ok(/3D|ثلاثي/.test(fig.cap), `${l}: caption says it is an illustration`);
+  }
+  await p.goto(A + '/fr/');
+  await p.locator('.cap-grid').scrollIntoViewIfNeeded();
+  await p.waitForFunction(() => [...document.querySelectorAll('.cap-fig img')].every(i => i.complete && i.naturalWidth > 0), null, { timeout: 10000 });
+  assert.equal(await p.locator('.cap-grid .n').count(), 0, 'capability families are not numbered');
+  assert.deepEqual(p.errors, []);
   await p.context().close();
 });
 await test('product filter updates cards, count and URL', async () => {
@@ -261,23 +315,137 @@ await test('reduced motion: content visible without animation', async () => {
   await p.context().close();
 });
 
-console.log('\n3D assembly (development page)');
+console.log('\nSocial dock');
+await test('social dock: on every page, Facebook only (from site.json), 48 px disc on the inline-end edge, tooltip on hover and focus', async () => {
+  for (const p of pages) {
+    const h = await (await fetch(A + p)).text();
+    assert.equal((h.match(/<nav class="social-dock/g) || []).length, 1, p);
+    assert.match(h, /<a class="sd-btn sd-facebook" href="https:\/\/www\.facebook\.com\/Libalstal\/" target="_blank" rel="noopener noreferrer">/, p);
+    assert.doesNotMatch(h, /sd-instagram|sd-tiktok|sd-toggle/, p);
+  }
+  const pg = await newPage(); await pg.goto(A + '/fr/products/');
+  const btn = pg.locator('.sd-facebook');
+  assert.equal(await btn.getAttribute('aria-label'), null);
+  assert.equal((await pg.evaluate(() => { const a = document.querySelector('.sd-facebook'); return a.textContent.trim(); })), 'Facebook (nouvel onglet)');
+  const bb = await btn.boundingBox();
+  assert.ok(bb.width >= 44 && bb.height >= 44, JSON.stringify(bb));
+  assert.ok(bb.x + bb.width > 1440 - 80 && Math.abs(bb.y + bb.height / 2 - 900 / 2) < 120, 'right edge, vertically centred ' + JSON.stringify(bb));
+  const tipOpacity = () => pg.evaluate(() => getComputedStyle(document.querySelector('.sd-facebook .sd-tip')).opacity);
+  await pg.waitForTimeout(1300); // entrance finished
+  assert.equal(await tipOpacity(), '0');
+  await btn.hover(); await pg.waitForTimeout(350);
+  assert.equal(await tipOpacity(), '1');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-facebook')).backgroundColor), 'rgb(0, 102, 204)');
+  await pg.mouse.move(10, 10); await pg.waitForTimeout(350);
+  await btn.focus(); await pg.waitForTimeout(350);
+  assert.equal(await tipOpacity(), '1', 'keyboard focus shows the tooltip too');
+  assert.deepEqual(pg.errors, []);
+  await pg.context().close();
+});
+await test('social dock in Arabic: mirrored to the left edge, tooltip toward the content, labels in Arabic', async () => {
+  const pg = await newPage(); await pg.goto(A + '/ar/');
+  assert.equal(await pg.getAttribute('.social-dock', 'aria-label'), 'LIBALSTAL على مواقع التواصل الاجتماعي');
+  const bb = await pg.locator('.sd-facebook').boundingBox();
+  assert.ok(bb.x < 80, 'left edge in RTL ' + JSON.stringify(bb));
+  await pg.waitForTimeout(1300); await pg.hover('.sd-facebook'); await pg.waitForTimeout(350);
+  const tip = await pg.locator('.sd-facebook .sd-tip').boundingBox();
+  assert.ok(tip.x > bb.x + bb.width, 'tooltip on the right of the disc in RTL');
+  await pg.context().close();
+});
+await test('social dock on phones: bottom corner above the safe area, clears the footer, hides while typing, no overflow', async () => {
+  const pg = await newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await pg.goto(A + '/fr/contact/');
+  await pg.waitForTimeout(1300); // entrance finished
+  const bb = await pg.locator('.sd-facebook').boundingBox();
+  assert.ok(bb.x + bb.width <= 390 - 12 && bb.x + bb.width > 390 - 80 && bb.y + bb.height <= 844 - 12 && bb.y > 844 - 120, JSON.stringify(bb));
+  await pg.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await pg.waitForTimeout(300);
+  const [dock, copy] = await Promise.all([pg.locator('.sd-facebook').boundingBox(), pg.locator('.site-footer .copy').boundingBox()]);
+  assert.ok(copy.y + copy.height <= dock.y || copy.x + copy.width <= dock.x, 'copyright line not covered ' + JSON.stringify({ dock, copy }));
+  await pg.evaluate(() => window.scrollTo(0, 0));
+  await pg.focus('#f-name');
+  assert.equal(await pg.evaluate(() => document.querySelector('.social-dock').classList.contains('is-typing')), true);
+  await pg.waitForTimeout(350);
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.social-dock')).visibility), 'hidden');
+  await pg.evaluate(() => document.activeElement.blur());
+  assert.equal(await pg.evaluate(() => document.querySelector('.social-dock').classList.contains('is-typing')), false);
+  assert.ok(await pg.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  assert.deepEqual(pg.errors, []);
+  await pg.context().close();
+});
+await test('social dock with three profiles (test URLs): phone toggle opens, Escape closes and returns focus; desktop shows all; reduced motion = no animation', async () => {
+  const dock = socialDock({ links: socialLinks({ facebook: 'https://www.facebook.com/Libalstal/', instagram: 'https://www.instagram.com/test-only/', tiktok: 'https://www.tiktok.com/@test-only' }),
+    t: { label: 'LIBALSTAL sur les réseaux sociaux', open: 'Afficher les réseaux sociaux', close: 'Masquer les réseaux sociaux', newTab: '(nouvel onglet)' } });
+  const serve = async ctx => ctx.route(A + '/fr/', async r => r.fulfill({ contentType: 'text/html; charset=utf-8', headers: Object.fromEntries([...(await fetch(A + '/fr/')).headers].filter(([k]) => !['content-encoding', 'content-length', 'vary'].includes(k))),
+    body: (await (await fetch(A + '/fr/')).text()).replace(/<nav class="social-dock[\s\S]*?<\/nav>/, dock) }));
+  let pg = await newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await serve(pg.context()); await pg.goto(A + '/fr/');
+  const t = pg.locator('.sd-toggle');
+  assert.equal(await t.isVisible(), true); assert.equal(await pg.isVisible('.sd-instagram'), false);
+  const tb = await t.boundingBox(); assert.ok(tb.width >= 44 && tb.height >= 44);
+  await t.click(); await pg.waitForTimeout(400);
+  assert.equal(await t.getAttribute('aria-expanded'), 'true'); assert.equal(await t.getAttribute('aria-label'), 'Masquer les réseaux sociaux');
+  for (const k of ['facebook', 'instagram', 'tiktok']) assert.equal(await pg.isVisible('.sd-' + k), true, k);
+  const ys = await Promise.all(['facebook', 'instagram', 'tiktok'].map(k => pg.locator('.sd-' + k).boundingBox().then(b => b.y)));
+  assert.ok(ys.every(y => y > 400 && y < tb.y), 'stack opens upward above the toggle ' + JSON.stringify({ ys, toggle: tb.y }));
+  assert.equal(Math.round((await t.boundingBox()).y), Math.round(tb.y), 'the toggle does not move when the stack opens');
+  await pg.keyboard.press('Escape');
+  assert.equal(await t.getAttribute('aria-expanded'), 'false'); assert.equal(await pg.evaluate(() => document.activeElement.classList.contains('sd-toggle')), true);
+  await t.click(); await pg.mouse.click(100, 300);
+  assert.equal(await t.getAttribute('aria-expanded'), 'false', 'tap outside closes');
+  assert.deepEqual(pg.errors, []); await pg.context().close();
+  pg = await newPage({ reducedMotion: 'reduce' }); await serve(pg.context()); await pg.goto(A + '/fr/');
+  assert.equal(await pg.isVisible('.sd-toggle'), false);
+  for (const k of ['facebook', 'instagram', 'tiktok']) assert.equal(await pg.isVisible('.sd-' + k), true, k);
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-list li')).animationName), 'none');
+  await pg.hover('.sd-instagram');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-instagram')).transform), 'none', 'no movement with reduced motion');
+  await pg.context().close();
+});
+
+console.log('\n3D assembly (public since v14)');
 const ASM_DEMO = { fr: 'Modèle de démonstration', en: 'Demonstration model', ar: 'نموذج توضيحي' };
 const ASM_PENDING = { fr: 'Spécification à confirmer', en: 'Specification pending', ar: 'المواصفات قيد التأكيد' };
 const asmState = p => p.evaluate(() => ({ state: document.querySelector('.asm-view').dataset.state, status: document.querySelector('.asm-status').textContent }));
-await test('assembly pages: noindex, out of sitemap and navigation, demo and pending labels in FR/EN/AR', async () => {
+await test('assembly pages (public since v14): indexable, in the sitemap, linked from the home story, demo and pending labels in FR/EN/AR', async () => {
   for (const l of ['fr', 'en', 'ar']) {
     const r = await fetch(`${A}/${l}/assembly/`); assert.equal(r.status, 200);
     const h = await r.text();
-    assert.match(h, /<meta name="robots" content="noindex, nofollow">/);
-    assert.doesNotMatch(h, /rel="canonical"/);
+    assert.doesNotMatch(h, /<meta name="robots" content="noindex/);
+    assert.match(h, new RegExp(`rel="canonical" href="https://www\\.libalstal\\.example/${l}/assembly/"`));
     assert.ok(h.includes(ASM_DEMO[l]) && h.includes(ASM_PENDING[l]), l);
     assert.match(h, /<svg class="asm-svg"[^>]*role="img" aria-labelledby="asm-svg-t"/);
     assert.equal((h.match(/class="asm-part"/g) || []).length, 8);
     assert.match(h, new RegExp(`href="/${l}/contact/\\?product=tees-branches"`));
+    assert.match(await (await fetch(`${A}/${l}/`)).text(), new RegExp(`href="/${l}/assembly/"`), `${l} home links to the 3D assembly`);
   }
-  assert.doesNotMatch(await (await fetch(A + '/sitemap.xml')).text(), /assembly/);
-  for (const p of pages.filter(p => !p.includes('/assembly/'))) assert.doesNotMatch(await (await fetch(A + p)).text(), /\/assembly\//, `${p} links to the dev page`);
+});
+await test('home story "Du plan au métal": 4 steps and 4 titled drawings in FR/EN/AR; live on scroll; readable without JS', async () => {
+  for (const l of ['fr', 'en', 'ar']) {
+    const h = await (await fetch(`${A}/${l}/`)).text();
+    assert.equal((h.match(/class="st-step"/g) || []).length, 4, l);
+    for (const t of ['st-t1', 'st-t2', 'st-t3', 'st-t4']) assert.match(h, new RegExp(`aria-labelledby="${t}"[^>]*>|aria-labelledby="${t}"`), `${l} ${t}`);
+  }
+  let p = await newPage();
+  await p.goto(A + '/fr/');
+  assert.equal(await p.evaluate(() => document.querySelector('.story').classList.contains('is-live')), true);
+  // instant: site.css scrolls smoothly, and under software WebGL that animation alone can outlast the timeout
+  await p.evaluate(() => document.querySelector('.st-step[data-step="2"]').scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await p.waitForFunction(() => document.querySelector('.st-stage').dataset.active === '2', null, { timeout: 5000 });
+  assert.match(await p.textContent('.st-count'), /3/);
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+  const ctx = await browser.newContext({ javaScriptEnabled: false }); p = await ctx.newPage(); await p.goto(A + '/fr/');
+  const vis = await p.evaluate(() => [...document.querySelectorAll('.st-fig')].map(f => getComputedStyle(f).opacity === '1' && f.getBoundingClientRect().height > 40));
+  assert.deepEqual(vis, [true, true, true, true], 'all drawings visible without JS');
+  await ctx.close();
+});
+await test('hide incomplete (site.json display.hideIncomplete): no placeholders on the home page, still listed in MISSING-INFO.md', async () => {
+  for (const l of ['fr', 'en', 'ar']) {
+    const h = await (await fetch(`${A}/${l}/`)).text();
+    const main = h.slice(h.indexOf('<main'), h.indexOf('</main>'));
+    assert.doesNotMatch(main, /class="ph"/, `${l}: placeholder on home`);
+    assert.doesNotMatch(main, /class="badge"/, `${l}: missing-evidence badge on home`);
+  }
+  const mi = readFileSync(join(ROOT, 'MISSING-INFO.md'), 'utf8');
+  assert.match(mi, /keyFacts\.materials/); assert.match(mi, /industriesConfirmed/);
 });
 await test('lazy loading: no 3D code elsewhere; on the page nothing 3D until the view approaches', async () => {
   const p = await newPage({ viewport: { width: 390, height: 200 } }); const reqs = [];
@@ -431,6 +599,26 @@ await test('3D view renders, or keeps the drawing and says why (WebGL-dependent:
   assert.deepEqual(p.errors, []);
   await p.context().close();
 });
+await test('Skip, Explode and Reassemble keep the camera on its viewing direction (never snapped overhead and close)', async () => {
+  const p = await newPage();
+  await p.goto(A + '/fr/assembly/?debug3d');
+  await p.locator('.asm-view').scrollIntoViewIfNeeded();
+  await p.waitForFunction(() => ['3d', 'fallback'].includes(document.querySelector('.asm-view').dataset.state), null, { timeout: 30000 });
+  if ((await asmState(p)).state !== '3d') { console.log('      (UNVERIFIED: no working WebGL in this browser)'); await p.context().close(); return; }
+  const cam = async () => { await p.waitForTimeout(400); const [d, h, el] = (await p.textContent('.asm-diag [data-key="camera"] dd')).match(/-?[\d.]+/g).map(Number); return { d, h, el }; };
+  await p.waitForSelector('[data-cmd="skip"]:not([hidden])', { timeout: 5000 });
+  await p.waitForTimeout(800);
+  await p.click('[data-cmd="skip"]');
+  let c = await cam();
+  assert.ok(Math.abs(c.d - c.h) < 0.01 * c.h, `after Skip: distance ${c.d} ≠ home ${c.h}`); assert.ok(c.el < 80, `after Skip: elevation ${c.el}°`);
+  await p.click('[data-cmd="explode"]'); await p.waitForFunction(() => document.querySelector('.asm-view').dataset.motion === 'idle', null, { timeout: 15000 }); c = await cam();
+  assert.ok(c.d >= c.h * 0.99, `after Explode: distance ${c.d} < home ${c.h}`); assert.ok(c.el < 80, `after Explode: elevation ${c.el}°`);
+  await p.click('[data-cmd="reassemble"]'); await p.waitForFunction(() => document.querySelector('.asm-view').dataset.motion === 'idle', null, { timeout: 15000 }); c = await cam();
+  assert.ok(Math.abs(c.d - c.h) < 0.01 * c.h, `after Reassemble: distance ${c.d} ≠ home ${c.h}`); assert.ok(c.el < 80, `after Reassemble: elevation ${c.el}°`);
+  assert.match(await p.textContent('.asm-diag'), /Camera/);
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+});
 await test('WebGL disabled: static drawing, full part list and sheets still work', async () => {
   const nogl = await chromium.launch({ args: ['--disable-webgl', '--disable-3d-apis'] });
   const p = await newPage({ viewport: { width: 390, height: 844 } }, nogl); const reqs = [];
@@ -518,6 +706,52 @@ await test('submission with backend configured → success with reference, files
   await p.screenshot({ path: join(OUT, 'rfq-success.png') });
   await p.context().close();
 });
+await test('Pages: drawings go straight to private storage; success only once recorded and notified', async () => {
+  hooks.length = 0;
+  const p = await newPage(); await fillAll(p, D);
+  await p.check('#f-consent'); await p.click('[data-action="submit"]');
+  await p.waitForSelector('#rfq-result.ok', { timeout: 15000 });
+  const ref = /RFQ-\d{8}-[0-9A-F]{6}/.exec(await p.textContent('#rfq-result'))?.[0];
+  assert.ok(ref);
+  const store = await sim('/__sim/store');
+  assert.equal(store.records[ref].status, 'notified');
+  assert.deepEqual(Object.keys(store.objects).filter(k => k.startsWith(ref + '/') && !k.endsWith('request.json')).sort(), [`${ref}/1-plan-test.pdf`, `${ref}/2-coupe.dxf`]);
+  assert.equal(hooks.filter(h => h.body.ref === ref).length, 1);
+  assert.deepEqual(p.errors, [], 'no CSP or CORS errors');
+  await p.context().close();
+});
+await test('Pages: upload failure → honest error, nothing announced; retry → success, same reference, one notification', async () => {
+  hooks.length = 0;
+  await sim('/__sim/control?failPuts=2', { method: 'POST' }); // first drawing fails twice (the script retries once)
+  const p = await newPage(); await fillAll(p, D);
+  await p.check('#f-consent'); await p.click('[data-action="submit"]');
+  await p.waitForSelector('#rfq-result.fail', { timeout: 15000 });
+  assert.match(await p.textContent('#rfq-result'), /pas pu être envoyé/);
+  assert.equal(hooks.length, 0);
+  await p.click('[data-action="submit"]');
+  await p.waitForSelector('#rfq-result.ok', { timeout: 15000 });
+  const ref = /RFQ-\d{8}-[0-9A-F]{6}/.exec(await p.textContent('#rfq-result'))?.[0];
+  assert.equal(hooks.filter(h => h.body.ref === ref).length, 1); assert.equal(hooks.length, 1);
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+});
+await test('Pages: notification down → "recorded under reference" message; Send again → delivered once, no duplicate', async () => {
+  hooks.length = 0;
+  await sim('/__sim/control?notifyFail=1', { method: 'POST' });
+  const p = await newPage(); await fillAll(p, D);
+  await p.check('#f-consent'); await p.click('[data-action="submit"]');
+  await p.waitForSelector('#rfq-result.fail', { timeout: 15000 });
+  const txt = await p.textContent('#rfq-result'); const ref = /RFQ-\d{8}-[0-9A-F]{6}/.exec(txt)?.[0];
+  assert.ok(ref && /enregistrée/.test(txt), txt);
+  assert.equal((await sim('/__sim/store')).records[ref].status, 'notify_failed');
+  await sim('/__sim/control?notifyFail=0', { method: 'POST' });
+  await p.click('[data-action="submit"]');
+  await p.waitForSelector('#rfq-result.ok', { timeout: 15000 });
+  assert.match(await p.textContent('#rfq-result'), new RegExp(ref));
+  assert.equal(hooks.filter(h => h.body.ref === ref).length, 1);
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+});
 await test('Arabic RTL form works end to end', async () => {
   hooks.length = 0;
   const p = await newPage({ viewport: { width: 390, height: 844 } }); await p.goto(B + '/ar/contact/');
@@ -552,7 +786,11 @@ await test('screenshots: key pages at mobile / tablet / desktop', async () => {
     for (const path of ['/fr/', '/fr/products/', '/fr/contact/', '/ar/', '/en/quality/', '/fr/assembly/', '/ar/assembly/']) {
       await p.goto(A + path); await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 500) { scrollTo({ top: y, behavior: 'instant' }); await new Promise(r => setTimeout(r, 40)); } scrollTo({ top: 0, behavior: 'instant' }); });
       await p.waitForTimeout(800);
-      await p.screenshot({ path: join(OUT, `${label}${path.replace(/\//g, '_')}.png`), fullPage: true });
+      // SwiftShader (launched above for WebGL) caps a capture at 8192 px, so tall pages are saved in slices
+      const name = `${label}${path.replace(/\//g, '_')}`, width = w, height = await p.evaluate(() => document.documentElement.scrollHeight);
+      for (let y = 0, i = 1; y < height; y += 8000, i++) {
+        await p.screenshot({ path: join(OUT, height > 8000 ? `${name}-${i}.png` : `${name}.png`), fullPage: true, clip: { x: 0, y, width, height: Math.min(8000, height - y) } });
+      }
     }
     await p.context().close();
   }
