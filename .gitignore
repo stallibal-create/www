@@ -1,0 +1,50 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules/
+dist/
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# LIBALSTAL site
+.build/
+storage/
+.wrangler/
+preview/
+.env
+.env.*
+!.env.example
+
+# Generated test output
+tests/output/
+test-results/
+playwright-report/
+coverage/
+
+# Temporary files and release archives (keep backups outside Git)
+tmp/
+.tmp/
+*.tmp
+*~
+libalstal-site-*.zip
+
+# Python bytecode (Blender scripts)
+__pycache__/
+*.pyc
