@@ -1,5 +1,11 @@
 {
   "_readme": "SINGLE SOURCE OF COMPANY FACTS. Any value set to null is shown on the site as a clearly marked placeholder and listed in MISSING-INFO.md at build time. Replace null with a plain string (same for all languages) or with {\"fr\": \"…\", \"en\": \"…\", \"ar\": \"…\"}. Never enter anything that is not verified.",
+  "social": {
+    "_readme": "Every social profile URL used by the site (floating dock, footer, company page, contact, JSON-LD sameAs). Only real https profile URLs; null = not shown and listed in MISSING-INFO.md. Never put a guessed URL here.",
+    "facebook": "https://www.facebook.com/Libalstal/",
+    "instagram": null,
+    "tiktok": null
+  },
   "company": {
     "name": "LIBALSTAL",
     "legalName": "Libal Stal SARL",
@@ -31,7 +37,6 @@
       "en": "Libal Stal SARL manufactures metal duct systems for ventilation and smoke extraction. The company has been in operation since 2018.",
       "ar": "تصنع شركة Libal Stal SARL أنظمة مجاري معدنية للتهوية واستخراج الدخان. تمارس الشركة نشاطها منذ 2018."
     },
-    "facebook": "https://www.facebook.com/Libalstal/",
     "mapUrl": "https://www.google.com/maps/search/?api=1&query=Zaouia%20Center%2C%20Beni%20Tamou%2C%20Blida%2C%20Algeria"
   },
   "keyFacts": [
@@ -460,5 +465,9 @@
         "branch-1.inlet"
       ]
     ]
+  },
+  "display": {
+    "_note": "hideIncomplete: true hides home-page blocks that still have no verified data (empty key facts, quality items without evidence, unconfirmed industries, no projects). MISSING-INFO.md still lists everything.",
+    "hideIncomplete": true
   }
 }
