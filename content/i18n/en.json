@@ -87,8 +87,8 @@
     "cta1": "Request a quote",
     "cta2": "View products",
     "heroAlt": "Conceptual 3D visual of a duct run: rectangular duct, round elbow and grille",
-    "heroTag": "Conceptual 3D visual — to be replaced with workshop photos",
-    "heroTagStatic": "Conceptual visual — to be replaced with workshop photos",
+    "heroTag": "Conceptual 3D render — demonstration model",
+    "heroTagStatic": "Conceptual visual — demonstration model",
     "factsLabel": "Key facts",
     "capTitle": "Capabilities",
     "capIntro": "From drawing to part: Libalstal's fabrication families.",
@@ -104,7 +104,41 @@
     "projMore": "All projects",
     "bandTitle": "Send your drawings. We price the metal.",
     "bandText": "A three-step form with a review before sending. PDF, DWG or DXF drawings accepted.",
-    "bandCta": "Start a quote request"
+    "bandCta": "Start a quote request",
+    "heroIndex": "Air distribution network · Render",
+    "story": {
+      "eyebrow": "From drawing to metal",
+      "title": "From your drawings to the fitted part.",
+      "intro": "How one part takes shape: a square-to-round transition, from drawing to network.",
+      "caption": "Illustration of the principle — indicative proportions",
+      "stepOf": "Step {n} of 4",
+      "steps": [
+        {
+          "t": "The drawing",
+          "p": "It starts with your drawings: sections, lengths and connections for every part of the network."
+        },
+        {
+          "t": "The flat pattern",
+          "p": "The part is laid flat: its pattern gives the exact shape to cut from the sheet."
+        },
+        {
+          "t": "The forming",
+          "p": "Folded and seamed, the sheet takes its volume back: here, a square-to-round transition."
+        },
+        {
+          "t": "The network",
+          "p": "Ducts, elbows, fittings and flanges assemble into an air distribution network."
+        }
+      ],
+      "figPlan": "Isometric drawing of a square-to-round transition with fold lines and dimensions a, Ø d, h",
+      "figPattern": "Flat pattern of the transition, unfolded by triangulation",
+      "figFormed": "The transition formed in galvanised sheet",
+      "figNetwork": "Demonstration assembly of a duct network",
+      "cta3d": "Explore the assembly in 3D"
+    },
+    "asmTitle": "A complete run, part by part",
+    "asmText": "Rotate a demonstration duct run in 3D, pull its parts apart and open the sheet for each one: straight ducts, elbow, tee, reducer and flange.",
+    "asmAlt": "Illustrative 3D render of an assembled rectangular duct run: straight ducts, elbow, tee with take-off, reducer and flange."
   },
   "products": {
     "title": "Products",
@@ -166,7 +200,9 @@
     "related": "Same family",
     "ctaTitle": "Need this product?",
     "ctaText": "Attach your drawings or dimensions: the request is pre-filled with this product.",
-    "imageMissing": "Product photo"
+    "imageMissing": "Product photo",
+    "render": "Illustrative 3D render — demonstration proportions, not a product photo.",
+    "renderAlt": "{name} — illustrative 3D render"
   },
   "capabilities": {
     "title": "Capabilities",
@@ -335,6 +371,7 @@
     "edit": "Edit",
     "submit": "Send request",
     "sending": "Sending…",
+    "uploading": "Uploading drawings… {n}/{total}",
     "none": "—",
     "noFiles": "No files",
     "errRequired": "This field is required.",
@@ -352,6 +389,9 @@
     "failRate": "Too many requests from this connection. Try again in a few minutes.",
     "failInvalid": "Some information was rejected by the server. Please check the form.",
     "failCaptcha": "The anti-bot check failed. Reload the page and try again.",
+    "failUpload": "A drawing could not be uploaded (connection lost?). Your request has not been sent yet: try again, it will not be duplicated.",
+    "failUploadsOff": "Drawing upload is not activated on this site yet. Send the request without files and e-mail your drawings, or contact us directly.",
+    "failNotify": "Your request is recorded under reference {ref}, but the team has not been notified yet. Click Send again: it will not be duplicated.",
     "honeypot": "Leave this field empty",
     "productPrefill": "Product: {p}"
   },
@@ -432,6 +472,11 @@
     "rights": "All rights reserved.",
     "facebook": "Facebook",
     "newTab": "(opens in a new tab)"
+  },
+  "social": {
+    "label": "LIBALSTAL on social media",
+    "open": "Show social media links",
+    "close": "Hide social media links"
   },
   "assembly": {
     "title": "3D ductwork assembly",

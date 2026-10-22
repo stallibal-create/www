@@ -87,8 +87,8 @@
     "cta1": "Demander un devis",
     "cta2": "Voir les produits",
     "heroAlt": "Visuel 3D conceptuel d'un réseau de gaines : gaine rectangulaire, coude circulaire et grille",
-    "heroTag": "Visuel 3D conceptuel — à remplacer par des photos d'atelier",
-    "heroTagStatic": "Visuel conceptuel — à remplacer par des photos d'atelier",
+    "heroTag": "Rendu 3D conceptuel — modèle de démonstration",
+    "heroTagStatic": "Visuel conceptuel — modèle de démonstration",
     "factsLabel": "Chiffres clés",
     "capTitle": "Savoir-faire",
     "capIntro": "Du plan à la pièce : les familles de fabrication de Libalstal.",
@@ -104,7 +104,41 @@
     "projMore": "Toutes les réalisations",
     "bandTitle": "Envoyez vos plans. Nous chiffrons le métal.",
     "bandText": "Formulaire en trois étapes, avec récapitulatif avant envoi. Plans PDF, DWG ou DXF acceptés.",
-    "bandCta": "Démarrer une demande de devis"
+    "bandCta": "Démarrer une demande de devis",
+    "heroIndex": "Réseau aéraulique · Rendu",
+    "story": {
+      "eyebrow": "Du plan au métal",
+      "title": "De vos plans à la pièce posée.",
+      "intro": "Comment une pièce prend forme : une transition carré-rond, du plan jusqu'au réseau.",
+      "caption": "Illustration du principe — proportions indicatives",
+      "stepOf": "Étape {n} sur 4",
+      "steps": [
+        {
+          "t": "Le plan",
+          "p": "Tout commence par vos plans : sections, longueurs et raccordements de chaque pièce du réseau."
+        },
+        {
+          "t": "Le développé",
+          "p": "La pièce est mise à plat : son développé donne la forme exacte à découper dans la tôle."
+        },
+        {
+          "t": "Le formage",
+          "p": "Pliée et agrafée, la tôle reprend son volume : ici, une transition carré-rond."
+        },
+        {
+          "t": "Le réseau",
+          "p": "Gaines, coudes, raccords et brides s'assemblent en réseau aéraulique."
+        }
+      ],
+      "figPlan": "Dessin isométrique d'une transition carré-rond avec lignes de pliage et cotes a, Ø d, h",
+      "figPattern": "Développé de la transition, mis à plat par triangulation",
+      "figFormed": "La transition formée en tôle galvanisée",
+      "figNetwork": "Assemblage de démonstration d'un réseau de gaines",
+      "cta3d": "Explorer l'assemblage en 3D"
+    },
+    "asmTitle": "Un réseau complet, pièce par pièce",
+    "asmText": "Faites pivoter un réseau de démonstration en 3D, écartez ses pièces et ouvrez la fiche de chacune : gaines droites, coude, té, réduction et bride.",
+    "asmAlt": "Rendu 3D illustratif d'un réseau de gaines rectangulaires assemblé : gaines droites, coude, té avec piquage, réduction et bride."
   },
   "products": {
     "title": "Produits",
@@ -166,7 +200,9 @@
     "related": "Dans la même famille",
     "ctaTitle": "Besoin de ce produit ?",
     "ctaText": "Joignez vos plans ou dimensions : la demande est pré-remplie avec ce produit.",
-    "imageMissing": "Photo produit"
+    "imageMissing": "Photo produit",
+    "render": "Rendu 3D illustratif — proportions de démonstration, pas une photo du produit.",
+    "renderAlt": "{name} — rendu 3D illustratif"
   },
   "capabilities": {
     "title": "Savoir-faire",
@@ -335,6 +371,7 @@
     "edit": "Modifier",
     "submit": "Envoyer la demande",
     "sending": "Envoi en cours…",
+    "uploading": "Envoi des plans… {n}/{total}",
     "none": "—",
     "noFiles": "Aucun fichier",
     "errRequired": "Ce champ est obligatoire.",
@@ -352,6 +389,9 @@
     "failRate": "Trop de demandes envoyées depuis cette connexion. Réessayez dans quelques minutes.",
     "failInvalid": "Certaines informations ont été refusées par le serveur. Vérifiez le formulaire.",
     "failCaptcha": "La vérification anti-robot a échoué. Rechargez la page et réessayez.",
+    "failUpload": "Un plan n'a pas pu être envoyé (connexion interrompue ?). Votre demande n'est pas encore transmise : réessayez, elle ne sera pas dupliquée.",
+    "failUploadsOff": "L'envoi de plans n'est pas encore activé sur ce site. Envoyez la demande sans fichier et joignez vos plans par e-mail, ou contactez-nous directement.",
+    "failNotify": "Votre demande est enregistrée sous la référence {ref}, mais l'équipe n'a pas encore été prévenue. Cliquez à nouveau sur Envoyer : elle ne sera pas dupliquée.",
     "honeypot": "Ne pas remplir ce champ",
     "productPrefill": "Produit concerné : {p}"
   },
@@ -432,6 +472,11 @@
     "rights": "Tous droits réservés.",
     "facebook": "Facebook",
     "newTab": "(nouvel onglet)"
+  },
+  "social": {
+    "label": "LIBALSTAL sur les réseaux sociaux",
+    "open": "Afficher les réseaux sociaux",
+    "close": "Masquer les réseaux sociaux"
   },
   "assembly": {
     "title": "Assemblage de gaines en 3D",
