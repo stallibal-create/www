@@ -11,9 +11,20 @@ French (primary), English and Arabic (full RTL). Dark graphite theme by default,
 
 ---
 
+## v14 — visual upgrade (in progress)
+
+- **Quote form on Cloudflare Pages** (Phase 0): `functions/api/rfq/`, drawings uploaded straight to private R2 with presigned URLs (fits Workers Free), see "Deploying".
+- **Homepage hero:** full-width stage with a blueprint field, crop marks and the render without a box. The 3D run now uses a procedural **galvanised spangle** texture with a matching roughness map, a raised **helical lock seam** on the spiral duct, corner seams on the rectangular ducts, and turns gently as the hero scrolls away. Still 9 draw calls.
+- **"Du plan au métal" scroll story** (`scripts/story-svg.mjs`, `src/assets/js/story.js`): one real sheet-metal part, a square-to-round transition, drawn from the same geometry as an isometric plan, its true flat pattern (unfolded by triangulation with true lengths), the formed part, then the demo duct network. A sticky stage follows the step in view and draws its lines in. Without JavaScript the four drawings show as a grid; with reduced motion nothing animates.
+- **Hide incomplete:** `site.json → display.hideIncomplete: true` hides home-page blocks without verified data (empty key facts, quality items without evidence, unconfirmed industries, no projects). `MISSING-INFO.md` still lists everything.
+- **3D assembly page is public:** indexed, in the sitemap, linked from the home story and the products page. The demonstration labels stay.
+- **Micro-interactions:** header scrolled state and reading-progress hairline, card corner marks, staggered reveals, cross-document view transitions (reduced motion respected).
+
+Still to come with your material: workshop photography and video, real product data, Blender models (they can replace the procedural parts without a redesign).
+
 ## 3D assembly — cinematic milestone (v12, fixed in v13)
 
-The separate, still-unlisted `/fr/assembly/`, `/en/assembly/`, `/ar/assembly/` pages contain a lazy-loaded 3D model, a static SVG fallback, selectable product sheets and a short optional cinematic introduction. On supported WebGL devices, the camera orbits around the finished ducts, parts separate and return to their installed positions. Use Skip, Explode, Reassemble or Replay. The timeline never loads on unrelated pages.
+The `/fr/assembly/`, `/en/assembly/`, `/ar/assembly/` pages (public since v14) contain a lazy-loaded 3D model, a static SVG fallback, selectable product sheets and a short optional cinematic introduction. On supported WebGL devices, the camera orbits around the finished ducts, parts separate and return to their installed positions. Use Skip, Explode, Reassemble or Replay. The timeline never loads on unrelated pages.
 
 **v13 fixes (on top of v12):**
 - **Exploded framing:** the camera now backs off as the parts separate. The exploded distance is fitted to the real exploded shape from the current viewing direction (Explode) or along the intro's orbit (intro). v12 left the end ducts and the flange outside the frame.
@@ -111,7 +122,56 @@ NODE_ENV=production PORT=3000 TRUST_PROXY=1 RFQ_WEBHOOK_URL=… TURNSTILE_SECRET
 
 Run it under systemd or pm2, behind nginx or Caddy for TLS (proxy `/` to `127.0.0.1:3000`, set `client_max_body_size 60m`). Back up `RFQ_STORAGE_DIR`; it holds customers' drawings.
 
-**Static hosting (Netlify / Cloudflare Pages) is possible** for the pages: `dist/` already includes `_headers` and `_redirects`. The quote form, however, needs `/api/rfq`. Either host `server.mjs` somewhere and build with `RFQ_ENDPOINT=https://api.example.dz/api/rfq` (and set `RFQ_ALLOWED_ORIGINS` on that server), or port `handleRfq` to the platform's functions. Until then the form fails honestly.
+**Cloudflare Pages (v14).** Project `libalstal`, production URL https://libalstal.pages.dev (canonical domain `www.libalstal.com` once attached). Build command `npm run build`, output directory `dist`, Node 20 or later. The pages are static (`dist/`, with `_headers` and `_redirects`). The quote form runs as Pages Functions (`functions/`, logic in `functions/_lib/rfq.js`), built for the **Workers Free** limits (10 ms CPU, 128 MB): drawings never pass through the function.
+
+- `POST /api/rfq`: quote **without** attachments (also the no-JavaScript form), body capped at 64 KB.
+- `POST /api/rfq/start` → reference, one-time token and a **presigned PUT URL** per drawing (15 min, size and type signed). The browser uploads each file straight to the **private** R2 bucket.
+- `POST /api/rfq/finish` → checks every object (present, announced size, PDF/DWG/DXF signature from its first 64 bytes), records `request.json`, then notifies.
+- The visitor only sees success once the request is recorded **and** the team notified. A retry (same submission id) returns the same reference; the record is claimed with R2 conditional writes and the notifier gets `Idempotency-Key: <reference>`, so nobody is notified twice. If notification fails, the visitor is told the request is recorded and can send again.
+- `GET /healthz` → `rfq`, `storage`, `uploads`, `turnstile` (never secrets).
+
+```bash
+npm run build                    # with RFQ_UPLOAD_ORIGIN set, see below
+npx wrangler pages deploy dist --project-name libalstal --branch v14   # preview URL first (production branch must be main)
+```
+
+Set these in the dashboard (Workers & Pages → libalstal → Settings), for **Preview** first:
+
+| Name | Type | Purpose |
+|---|---|---|
+| `RFQ_BUCKET` | R2 bucket binding | Private bucket: `request.json` records + drawings |
+| `R2_ACCOUNT_ID`, `R2_BUCKET_NAME` | Variables | For presigned URLs (`https://<account>.r2.cloudflarestorage.com/<bucket>/…`) |
+| `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | Secrets | R2 API token, **Object Read & Write on this bucket only**. Without them attachments are refused (`uploads_unavailable`); quotes without files still work |
+| `R2_S3_ENDPOINT` | Variable (optional) | e.g. `https://<account>.eu.r2.cloudflarestorage.com` for an EU-jurisdiction bucket |
+| `RFQ_LINK_DAYS` | Variable (optional) | Download links in notifications, 1–7 days (default 7; `0` = none, the team opens R2 instead) |
+| `RESEND_API_KEY` | Secret | Option B: e-mail via resend.com (links, no attachments) |
+| `RFQ_TO_EMAIL`, `RFQ_FROM_EMAIL` | Variables | Recipient(s) and verified sender. LIBALSTAL recipient: `commercial@libalstal.com` |
+| `RFQ_WEBHOOK_URL`, `RFQ_WEBHOOK_TOKEN` | Variable / secret | Option A instead of Resend; deduplicate on the `Idempotency-Key` header |
+| `TURNSTILE_SECRET_KEY` | Secret | With `TURNSTILE_SITE_KEY` set at build time |
+| `RFQ_UPLOAD_ORIGIN` | **Build** variable | `https://<account>.r2.cloudflarestorage.com`, added to the CSP `connect-src` (without it the browser blocks the upload) |
+
+On the R2 bucket: keep public access **off**, and add a CORS policy allowing `PUT` with header `content-type` from the site origins (production domain and the preview URL):
+
+```json
+[{ "AllowedOrigins": ["https://www.libalstal.com", "https://libalstal.pages.dev", "https://v14.libalstal.pages.dev"], "AllowedMethods": ["PUT"], "AllowedHeaders": ["content-type"], "MaxAgeSeconds": 3600 }]
+```
+
+The per-IP limit in the function is best effort (each Cloudflare isolate has its own memory). Add a WAF rate-limiting rule on `/api/rfq*` for a strict limit. Tests: `npm run test:unit` (`tests/unit/rfq-function.test.mjs`, including the AWS SigV4 test vector) and `npm test`, which runs the real functions against a local Pages + private-R2 stand-in (`tests/pages-sim.mjs`).
+
+**Other static hosts.** Host `server.mjs` somewhere and build with `RFQ_ENDPOINT=https://api.example.dz/api/rfq` (and set `RFQ_ALLOWED_ORIGINS` on that server). Until then the form fails honestly.
+
+### Product renders (Blender)
+
+Each product family is shown by an **illustrative studio render** until real photos are supplied (`products[].image` always wins; the photo stays listed in `MISSING-INFO.md`). Rectangular parts come from `geometry.js` (identical to the 3D view); the spiral duct, segmented round elbow, square-to-round transition, grille, coupling and brackets are modelled in `scripts/blender-products.py`. Every render is captioned as an illustration in the three languages and carries no dimensions.
+
+```bash
+node scripts/blender-export.mjs                                                   # assembly + single parts + zinc textures
+blender --background --factory-startup --python scripts/blender-scene.py          # assembly .blend, GLB, preview
+blender --background --factory-startup --python scripts/blender-products.py       # src/assets/img/products/*-640|1280.webp
+blender --background --factory-startup --python scripts/blender-products.py -- elbows   # one family only
+```
+
+Renders are transparent WebP with a soft contact shadow (they sit on the dark and the light theme), lit by a graded studio environment; materials are shared through `scripts/blender_zinc.py`. About a minute per render on a laptop CPU.
 
 ### Font: Montserrat
 
@@ -125,7 +185,7 @@ The hero follows the three.js performance guidance: static parts are merged per 
 
 ### 3D ductwork assembly (development page)
 
-`/fr/assembly/`, `/en/assembly/`, `/ar/assembly/`: an interactive demonstration assembly (rotate, zoom, select a part, read its sheet). The pages are `noindex` and are kept out of the menu and the sitemap until the owner approves them. This is **not** access control: anyone with the URL can open them.
+`/fr/assembly/`, `/en/assembly/`, `/ar/assembly/`: an interactive demonstration assembly (rotate, zoom, select a part, read its sheet). Public since v14: indexed, in the sitemap, linked from the home story and the products page.
 
 - **Data:** `content/site.json → ductAssembly`. All geometry is demo geometry (`demo: true`), always shown under the "Modèle de démonstration" label. Parts link to `products[]` through `productSlug`. The product's verified `specs` are the only source of specifications, and a `null` value shows "Spécification à confirmer". Components may not carry specification fields; the validator rejects them.
 - **Coordinates:** millimetres, right-handed, +Y up. The origin is the centre of the first part's inlet. `toScene()` in `units.js` is the single mm → metre conversion.
@@ -137,6 +197,9 @@ The hero follows the three.js performance guidance: static parts are merged per 
 - **Checks:**
   - `scripts/assembly-validate.mjs` runs in `build` and `lint`: fields, units, ids, three languages, product links, buildable geometry, connected tree, matching sections, connector alignment.
   - `npm run test:unit` runs the `node:test` suite.
+- **Blender model:** `node scripts/blender-export.mjs` writes the solved demo parts to `brand/blender/assembly.json`, then `blender --background --python scripts/blender-scene.py` rebuilds the editable `brand/blender/duct-assembly-demo.blend`, the preview render and `src/assets/models/duct-assembly-demo.glb` (8 parts named by component id, metres, +Y up). The GLB's vertices are already in their **installed** positions, so the viewer gives its parts the identity transform and explode only adds the offset (`glb.js`, unit-tested in `tests/unit/glb.test.mjs`). The build compares every part with `site.json` (0.1 mm); a stale model is left out with a warning and the procedural geometry is used, so the 3D view never contradicts the dimension tables. Re-export after editing `ductAssembly`. `?debug3d=1` shows which geometry is in use.
+- **Construction details (v14.1):** `buildPart(…, { details: true })` adds corner pieces with nuts on every frame flange, a gasket (mating-face ring and joint line), lock seams along the corners (four on elbows) and cross-breaks on large flat panels, plus texture coordinates. They are visual cues only (`DETAIL` in `geometry.js`), never specifications; the body, its connectors and the SVG preview are unchanged. The 3D view and the GLB use them; about 3,400 triangles for the whole run.
+- **Galvanised zinc:** `spangle.js` generates the crystal pattern and its roughness map (no image download). The same pattern is written to `brand/blender/zinc-*.png` for Blender, so renders and the 3D view match.
 - **Static preview:** `scripts/assembly-svg.mjs` draws the assembly as an SVG at build time from the same geometry and transforms, using a fixed view direction. It is inlined in the page and replaced by the canvas when WebGL works.
 - **Loading:**
   - `boot.js` (≈1.5 KB gzip) is the only script the page loads up front.
@@ -176,7 +239,7 @@ No framework JS. CSS ≈ 26 KB (≈ 6 KB gzipped). JS ≈ 11 KB per page, plus a
 
 ## Tests
 
-`npm test` builds the site, starts three server instances (not configured / configured with a mock webhook / low rate limit) and runs 28 end-to-end checks with Playwright + Chromium:
+`npm test` builds the site, starts three `server.mjs` instances (not configured / configured with a mock webhook / low rate limit) plus the Cloudflare Pages + R2 stand-in and runs 50 end-to-end checks with Playwright + Chromium:
 
 - every page returns 200 with security headers; no dead internal links; only declared external links; root language redirect; localised 404; path-traversal refusal; sitemap with hreflang; no draft pages indexed; canonical and JSON-LD present; no `Product` schema without real data
 - RFQ API: not-configured → 503 with nothing stored; validation, honeypot, wrong type, spoofed PDF, too many files → 400; valid → stored (`0600`), webhook received, reference returned; storage not web-accessible; rate limit → 429; cross-origin → 403
@@ -195,7 +258,7 @@ No framework JS. CSS ≈ 26 KB (≈ 6 KB gzipped). JS ≈ 11 KB per page, plus a
 
 WebGL errors raised by the test browser itself (no GPU, broken software rasteriser) are counted separately and reported at the end of the run, not treated as site errors. If they appear, 3D rendering was **not** verified in that run. `npm run test:unit` covers the geometry, the solver and the validator without a browser.
 
-Playwright isn't a dependency. Install it (`npm i -D playwright && npx playwright install chromium`) or point `PLAYWRIGHT_MODULE` at an existing install.
+Playwright is a dev dependency (pinned in `package.json`). After `npm ci`, install its browser once with `npx playwright install chromium`, or point `PLAYWRIGHT_MODULE` at an existing install.
 
 **Not run in the build environment:** Lighthouse and axe-core (the npm registry was unreachable). The contrast, target-size, naming, landmark and focus checks above were written in-house instead. Run Lighthouse and axe once on the deployed site. The 3D scene is rendered in the tests with software WebGL (SwiftShader); check it once on real phones after deploying.
 

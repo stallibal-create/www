@@ -1,6 +1,6 @@
 # Informations manquantes — LIBALSTAL
 
-Généré automatiquement par `npm run build` le 2026-10-20. Chaque ligne correspond à un espace réservé visible sur le site.
+Généré automatiquement par `npm run build` le 2026-10-22. Chaque ligne correspond à un espace réservé visible sur le site.
 Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque ligne), puis relancez le build : la ligne disparaît.
 
 ## Savoir-faire
@@ -198,6 +198,13 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
   `quality.tolerances`
 - [ ] Justificatif qualité — Traçabilité des matières  
   `quality.traceability`
+
+## Réseaux sociaux (URL de profil réelles)
+
+- [ ] Instagram : URL du profil LIBALSTAL (bouton masqué tant qu'elle manque)  
+  `social.instagram`
+- [ ] TikTok : URL du profil LIBALSTAL (bouton masqué tant qu'elle manque)  
+  `social.tiktok`
 
 ## Configuration (variables d'environnement)
 

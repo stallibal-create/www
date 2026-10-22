@@ -232,7 +232,7 @@ async function handleRfq(req, res) {
 // ---------- static ----------
 // Precompressed variants written by the build (file.br, file.gz) are sent when the browser accepts them.
 // A variant older than its source is ignored, so a stale copy is never served. /api/rfq is never compressed.
-const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.mjs', '.json', '.svg', '.xml', '.txt', '.webmanifest']);
+const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.mjs', '.json', '.svg', '.xml', '.txt', '.webmanifest', '.glb']);
 function accepts(header, coding) {
   for (const part of String(header || '').toLowerCase().split(',')) {
     const [name, ...params] = part.trim().split(';').map(x => x.trim());
