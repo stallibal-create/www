@@ -1,18 +1,22 @@
 // 3D view of the demo assembly. Loaded on demand by boot.js; three.js itself is imported inside createViewer()
 // through the page's import map, so nothing 3D is downloaded before the section approaches the viewport.
 //
-// Geometry comes from geometry.js and placement from assembly.js (the same code as the SVG preview and the tests).
+// Geometry: the Blender-exported GLB when the page provides one (its vertices are already installed), otherwise
+// geometry.js placed by assembly.js (the same code as the SVG preview and the tests). Explode offsets come from
+// assembly.js in both cases.
 // Rendering is on demand: a frame is drawn only while the camera moves or something changed; there is no idle loop.
 // Quality: two profiles (desktop / mobile) and a pixel ratio adjusted conservatively from measured frame times.
 // WebGL context loss (common on Android) shows the static drawing until the context is restored.
 
-import { buildPart, partKey } from './geometry.js';
+import { buildPart, partKey, MATERIALS, UV_TILE_MM } from './geometry.js';
 import { solveAssembly, explodeOffsets, DEFAULT_VIEW_DIR } from './assembly.js';
 import { createMotion, smoothstep, INTRO_DURATION_MS, INTRO_ORBIT_RAD, INTRO_EXPLODE_FROM_MS } from './motion.js';
 import { toScene, vNorm } from './units.js';
+import { readGlb, mergePrimitives } from './glb.js';
+import { spangle } from './spangle.js';
 
 /** @typedef {{ host: HTMLElement, assembly: any, onSelect: (id: string) => void, onLost?: () => void, onRestored?: () => void,
- *  onDiag?: (patch: object) => void, onMotion?: (state: object) => void, debug?: boolean, simulate?: string|null }} ViewerOptions
+ *  onDiag?: (patch: object) => void, onMotion?: (state: object) => void, debug?: boolean, simulate?: string|null, modelUrl?: string|null }} ViewerOptions
  *  simulate (development diagnostics only, ?debug3d=1&simulate=…): "init" renderer failure, "blank" empty first frame, "lost" context loss + restore. */
 /** @typedef {{ setSelected: (id: string|null) => void, rotate: (deg: number) => void, zoom: (factor: number) => void, reset: () => void, playIntro: () => void, skipIntro: () => void, explode: (immediate?: boolean) => void, reassemble: (immediate?: boolean) => void, interrupt: () => void, destroy: () => void, stats: () => object }} Viewer */
 
@@ -30,25 +34,44 @@ export function paintedFraction(rgba, stride = 3) {
   return n ? hit / n : 0;
 }
 
-/** Build the part meshes exactly as shown: one shared BufferGeometry per distinct part (positions in metres),
- *  placed by its solved installed transform. Needs only three.js maths, so it also runs in Node tests.
+/** Build the part meshes exactly as shown (positions in metres). Procedural parts share one BufferGeometry per
+ *  distinct part and are placed by their solved installed transform; baked parts (from readGlb) are already
+ *  installed and keep the identity transform. Needs only three.js maths, so it also runs in Node tests.
  *  @param {any} THREE three.js module @param {any} assembly @param {number} segments elbow subdivisions @param {any} material
+ *  @param {Map<string, any[]>|null} baked parts read from the GLB, keyed by component id
  *  @returns {{ root: any, meshes: Map<string, any>, geometries: any[], center: any, size: any, radius: number }} */
-export function buildScene(THREE, assembly, segments, material) {
+export function buildScene(THREE, assembly, segments, material, baked = null) {
   const solved = solveAssembly(assembly);
   const cache = new Map();
   const root = new THREE.Group();
   const meshes = new Map();
   for (const c of assembly.components) {
-    const k = partKey(c, assembly.settings, segments);
+    if (baked) {
+      const m = mergePrimitives(baked.get(c.id));
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(m.positions, 3));
+      geo.setAttribute('normal', new THREE.BufferAttribute(m.normals, 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(m.uvs, 2));
+      geo.setIndex(new THREE.BufferAttribute(m.indices, 1));
+      for (const g of m.groups) geo.addGroup(g.start, g.count, g.slot);
+      geo.computeBoundingSphere();
+      cache.set(c.id, geo);
+      const mesh = new THREE.Mesh(geo, material);
+      mesh.matrixAutoUpdate = false;
+      mesh.userData.partId = c.id; mesh.userData.base = [0, 0, 0];
+      root.add(mesh); meshes.set(c.id, mesh);
+      continue;
+    }
+    const k = partKey(c, assembly.settings, segments, true);
     let geo = cache.get(k);
     if (!geo) {
-      const m = buildPart(c, assembly.settings, { segments });
+      const m = buildPart(c, assembly.settings, { segments, details: true });
       geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(m.positions.map(toScene), 3));
       geo.setAttribute('normal', new THREE.BufferAttribute(m.normals, 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(m.uvs.map(v => v / UV_TILE_MM), 2));
       geo.setIndex(new THREE.BufferAttribute(m.indices, 1));
-      for (const g of m.groups) geo.addGroup(g.start, g.count, g.material === 'sheet' ? 0 : 1);
+      for (const g of m.groups) geo.addGroup(g.start, g.count, MATERIALS.indexOf(g.material));
       geo.computeBoundingSphere();
       cache.set(k, geo);
     }
@@ -56,7 +79,7 @@ export function buildScene(THREE, assembly, segments, material) {
     const { r, t } = solved.parts.get(c.id).installed;
     mesh.matrixAutoUpdate = false;
     mesh.matrix.set(r[0], r[1], r[2], toScene(t[0]), r[3], r[4], r[5], toScene(t[1]), r[6], r[7], r[8], toScene(t[2]), 0, 0, 0, 1);
-    mesh.userData.partId = c.id;
+    mesh.userData.partId = c.id; mesh.userData.base = t.map(toScene);
     root.add(mesh); meshes.set(c.id, mesh);
   }
   root.updateMatrixWorld(true);
@@ -87,12 +110,13 @@ export function homeDistance(THREE, camera, meshes, center, dir, fill = HOME_FIL
   return d;
 }
 
-/** Place every part at an explode factor: solved installed transform + offset × factor, written fresh each time
- *  (never accumulated). @param {Map<string, any>} meshes @param {any} solved @param {Map<string, number[]>} offsets */
+/** Place every part at an explode factor: its installed base translation (zero for baked GLB parts, whose vertices
+ *  are already installed) + offset × factor, written fresh each time (never accumulated).
+ *  @param {Map<string, any>} meshes @param {any} solved @param {Map<string, number[]>} offsets */
 export function applyPose(meshes, solved, offsets, factor, root) {
   for (const [id, mesh] of meshes) {
-    const d = offsets.get(id), t = solved.parts.get(id).installed.t, e = mesh.matrix.elements;
-    e[12] = toScene(t[0] + d[0] * factor); e[13] = toScene(t[1] + d[1] * factor); e[14] = toScene(t[2] + d[2] * factor);
+    const d = offsets.get(id), b = mesh.userData.base, e = mesh.matrix.elements;
+    e[12] = b[0] + toScene(d[0] * factor); e[13] = b[1] + toScene(d[1] * factor); e[14] = b[2] + toScene(d[2] * factor);
     mesh.matrixWorldNeedsUpdate = true;
   }
   root.updateMatrixWorld(true);
@@ -123,13 +147,15 @@ export function introZoom(THREE, camera, sc, solved, offsets, homeDir, homeDist)
 }
 
 /** @param {ViewerOptions} opts @returns {Promise<Viewer>} */
-export async function createViewer({ host, assembly, onSelect, onLost, onRestored, onDiag = () => {}, onMotion = () => {}, debug = false, simulate = null }) {
+export async function createViewer({ host, assembly, onSelect, onLost, onRestored, onDiag = () => {}, onMotion = () => {}, debug = false, simulate = null, modelUrl = null }) {
   const t0 = performance.now();
-  const [THREE, { OrbitControls }, { RoomEnvironment }] = await Promise.all([
+  const [THREE, { OrbitControls }, { RoomEnvironment }, model] = await Promise.all([
     import('three'),
     import('three/addons/controls/OrbitControls.js'),
     import('three/addons/environments/RoomEnvironment.js'),
+    loadModel(modelUrl, assembly),
   ]);
+  onDiag({ geometry: model.source });
   const profile = matchMedia('(max-width: 860px), (pointer: coarse)').matches ? PROFILES.mobile : PROFILES.desktop;
   onDiag({ status: `creating renderer (three r${THREE.REVISION}, ${profile === PROFILES.mobile ? 'mobile' : 'desktop'} profile)` });
   if (simulate === 'init') throw new Error('simulated renderer failure (debug)');
@@ -169,14 +195,26 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
   scene.add(new THREE.HemisphereLight(0xe8ecef, 0x2b2f33, 0.35));
   const key = new THREE.DirectionalLight(0xffffff, 1.2); key.position.set(3, 6, 4); scene.add(key);
 
-  // ---------- materials: galvanised sheet, darker frame flanges, and their selected variants ----------
-  const sheet = new THREE.MeshStandardMaterial({ color: 0xc7ced5, metalness: 0.7, roughness: 0.42 });
-  const flange = new THREE.MeshStandardMaterial({ color: 0x8b949d, metalness: 0.65, roughness: 0.5 });
+  // ---------- materials (slots follow geometry MATERIALS): galvanised sheet with zinc spangle, darker galvanised
+  // frames, zinc-plated bolts and corner pieces, black gasket; plus their selected variants ----------
+  const zinc = spangle(profile === PROFILES.mobile ? 256 : 512, profile === PROFILES.mobile ? 20 : 26);
+  const tex = (data, srgb) => {
+    const t = new THREE.DataTexture(data, zinc.size, zinc.size);
+    if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter;
+    t.generateMipmaps = true; t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); t.needsUpdate = true;
+    return t;
+  };
+  const zincMap = tex(zinc.color, true), zincRough = tex(zinc.rough, false);
+  const sheet = new THREE.MeshStandardMaterial({ color: 0xe2e7eb, map: zincMap, roughnessMap: zincRough, metalness: 1, roughness: 1 });
+  const flange = new THREE.MeshStandardMaterial({ color: 0xa4acb4, map: zincMap, roughnessMap: zincRough, metalness: 1, roughness: 1.15 });
+  const hardware = new THREE.MeshStandardMaterial({ color: 0x9da5ad, metalness: 1, roughness: 0.3 });
+  const gasket = new THREE.MeshStandardMaterial({ color: 0x141618, metalness: 0, roughness: 0.85 });
   const pick = m => { const c = m.clone(); c.emissive.set(0x0066cc); c.emissiveIntensity = 0.45; return c; };
-  const BASE = [sheet, flange], SELECTED = [pick(sheet), pick(flange)];
+  const BASE = [sheet, flange, hardware, gasket], SELECTED = BASE.map(pick);
 
   // ---------- parts: one shared BufferGeometry per distinct part, placed by its installed transform ----------
-  const sc = buildScene(THREE, assembly, profile.segments, BASE);
+  const sc = buildScene(THREE, assembly, profile.segments, BASE, model.parts);
   const { root, meshes, geometries, center, size, box } = sc;
   scene.add(root);
   const solved = solveAssembly(assembly);
@@ -216,7 +254,8 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
   let zoomIntro = 1;                 // intro: distance ratio at full separation (fitted along the intro's orbit)
   let span = null;                   // explode / reassemble: { near, far } camera distances
   const viewDirNow = () => camera.position.clone().sub(controls.target).normalize();
-  const setDistance = d => { camera.position.copy(controls.target).addScaledVector(viewDirNow(), d); };
+  // the direction must be read before the camera is moved onto the target (it would then be a zero vector)
+  const setDistance = d => { const dir = viewDirNow(); camera.position.copy(controls.target).addScaledVector(dir, d); };
   function spanFor(factor) {
     // keep the distance the visitor chose for the assembled view; fit the exploded one from this direction
     const d = camera.position.distanceTo(controls.target);
@@ -334,6 +373,7 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
     controls.dispose();
     for (const g of geometries) g.dispose();
     for (const m of [...BASE, ...SELECTED, shadowMat]) m.dispose();
+    zincMap.dispose(); zincRough.dispose();
     shadowGeo.dispose(); shTex.dispose(); if (envTex) envTex.dispose();
     renderer.dispose(); renderer.forceContextLoss();
     canvas.remove();
@@ -404,7 +444,8 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
     interrupt: stopMotion,
     destroy,
     stats: () => ({
-      initMs, dpr, profile: profile === PROFILES.mobile ? 'mobile' : 'desktop', frames: rendered, painted, selected: selectedId, motion: motion.state().mode, explodeFactor: motion.state().factor,
+      initMs, geometry: model.source, dpr, profile: profile === PROFILES.mobile ? 'mobile' : 'desktop', frames: rendered, painted, selected: selectedId, motion: motion.state().mode, explodeFactor: motion.state().factor,
+      camera: { distance: camera.position.distanceTo(controls.target), homeDistance: homeDist, elevation: Math.asin(viewDirNow().y) },
       calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures,
       buffer: [renderer.getContext().drawingBufferWidth, renderer.getContext().drawingBufferHeight], css: [host.clientWidth, host.clientHeight],
       contextLost: lostCount, contextRestored: restoredCount, shaderErrors: shaderErrors.slice(),
@@ -413,4 +454,20 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
   if (debug) console.info('[assembly3d]', JSON.stringify(api.stats()));
   if (simulate === 'lost' && loseExt) setTimeout(() => loseExt.loseContext(), 2000);
   return api;
+}
+
+/** The exported GLB, checked against the assembly; on any problem the procedural geometry is used instead
+ *  (same shapes, so the page never depends on the model file). @returns {Promise<{ parts: Map<string, any[]>|null, source: string }>} */
+export async function loadModel(url, assembly) {
+  if (!url) return { parts: null, source: 'procedural' };
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const parts = readGlb(await res.arrayBuffer());
+    const ids = assembly.components.map(c => c.id);
+    if (parts.size !== ids.length || ids.some(id => !parts.has(id))) throw new Error('parts do not match the assembly');
+    return { parts, source: 'glb' };
+  } catch (e) {
+    return { parts: null, source: `procedural (model unavailable: ${e.message})` };
+  }
 }

@@ -92,7 +92,7 @@ function init() {
     if (diag) diag.set({ status: 'loading modules' });
     import('./viewer.js')
       .then(m => m.createViewer({
-        host, assembly: data.assembly, debug, simulate,
+        host, assembly: data.assembly, modelUrl: data.model, debug, simulate,
         onSelect: id => select(id),
         onLost: () => setState('lost', S.lost),
         onRestored: () => setState('3d'),
@@ -128,9 +128,9 @@ function webgl2() {
 
 // ---------- development diagnostics (?debug3d=1) ----------
 function diagnostics(after) {
-  const ROWS = [['state', 'View state'], ['webgl', 'WebGL availability'], ['status', 'Renderer'], ['painted', 'First frame (drawn pixels)'],
+  const ROWS = [['state', 'View state'], ['webgl', 'WebGL availability'], ['status', 'Renderer'], ['geometry', 'Geometry source'], ['painted', 'First frame (drawn pixels)'],
     ['shaderErrors', 'Shader compile / link errors'], ['frames', 'Frames rendered'], ['draw', 'Draw calls / triangles'],
-    ['selected', 'Selected component'], ['motion', 'Motion state'], ['resolution', 'Rendering resolution'], ['context', 'Context loss / restore'], ['contextEvent', 'Last context event']];
+    ['selected', 'Selected component'], ['motion', 'Motion state'], ['resolution', 'Rendering resolution'], ['context', 'Context loss / restore'], ['contextEvent', 'Last context event'], ['camera', 'Camera (distance / home, elevation)']];
   const box = document.createElement('section');
   box.className = 'asm-diag';
   box.setAttribute('aria-label', '3D diagnostics (development only)');
@@ -149,7 +149,7 @@ function diagnostics(after) {
     const tick = () => {
       const s = v.stats();
       set({ frames: s.frames, draw: `${s.calls} / ${s.triangles}`, resolution: `${s.buffer[0]} × ${s.buffer[1]} px buffer (${s.css[0]} × ${s.css[1]} CSS px, pixel ratio ${s.dpr}, ${s.profile} profile)`,
-        context: `${s.contextLost} lost / ${s.contextRestored} restored`, selected: s.selected || '—', shaderErrors: s.shaderErrors, painted: s.painted });
+        context: `${s.contextLost} lost / ${s.contextRestored} restored`, camera: `${s.camera.distance.toFixed(3)} m / ${s.camera.homeDistance.toFixed(3)} m, ${(s.camera.elevation * 180 / Math.PI).toFixed(1)}°`, selected: s.selected || '—', shaderErrors: s.shaderErrors, painted: s.painted });
     };
     tick(); setInterval(tick, 250);
   };
