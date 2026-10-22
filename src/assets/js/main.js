@@ -1,4 +1,4 @@
-// Site-wide behaviour: mobile menu, theme toggle, reveal-on-scroll, product filter.
+// Site-wide behaviour: mobile menu, theme toggle, social dock, reveal-on-scroll, product filter.
 (function () {
   'use strict';
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -40,6 +40,41 @@
       label();
       document.dispatchEvent(new CustomEvent('themechange', { detail: next }));
     });
+  }
+
+  // ----- header: scrolled state + reading progress hairline (one CSS variable, rAF-throttled) -----
+  var hdr = $('.site-header');
+  if (hdr) {
+    var pending = false;
+    var onScroll = function () {
+      pending = false;
+      var y = window.scrollY || 0, max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      hdr.classList.toggle('is-scrolled', y > 8);
+      hdr.style.setProperty('--scroll', Math.min(1, y / max).toFixed(4));
+    };
+    window.addEventListener('scroll', function () { if (!pending) { pending = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    onScroll();
+  }
+
+  // ----- social dock: phone toggle (several links) + out of the way while typing -----
+  var dock = $('.social-dock');
+  if (dock) {
+    var toggle = $('.sd-toggle', dock), narrow = window.matchMedia('(max-width: 760px), (max-height: 420px)');
+    var setDock = function (open, focusBack) {
+      dock.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? toggle.dataset.close : toggle.dataset.open);
+      if (!open && focusBack) toggle.focus();
+    };
+    if (toggle) {
+      dock.classList.add('is-ready');
+      toggle.addEventListener('click', function () { setDock(toggle.getAttribute('aria-expanded') !== 'true'); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && dock.classList.contains('is-open')) setDock(false, true); });
+      document.addEventListener('click', function (e) { if (dock.classList.contains('is-open') && !dock.contains(e.target)) setDock(false); });
+    }
+    var typing = function (e) { return e.target.matches && e.target.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea, select'); };
+    document.addEventListener('focusin', function (e) { if (narrow.matches && typing(e)) dock.classList.add('is-typing'); });
+    document.addEventListener('focusout', function (e) { if (typing(e)) dock.classList.remove('is-typing'); });
   }
 
   // ----- reveal -----

@@ -1,4 +1,4 @@
-// 3-step RFQ form: per-step validation, review, real submission (no fake success).
+// 3-step RFQ form: per-step validation, review, real submission (no fake success, no duplicate on retry).
 const form = document.getElementById('rfq');
 if (form) {
   const T = JSON.parse(document.getElementById('rfq-i18n').textContent);
@@ -126,6 +126,45 @@ if (form) {
     result.append(h, p); result.hidden = false; result.focus();
   }
 
+  // One id per quote: a retry (network error, notification failure) is recognised and never duplicated.
+  const newSid = () => (crypto.randomUUID ? crypto.randomUUID() : [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join(''));
+  let sid = newSid();
+  const post = async (url, body, json) => {
+    try {
+      const res = await fetch(url, { method: 'POST', body: json ? JSON.stringify(body) : body, credentials: 'same-origin',
+        headers: { Accept: 'application/json', ...(json ? { 'Content-Type': 'application/json' } : {}) } });
+      return { res, body: await res.json().catch(() => ({})) };
+    } catch { return { res: null, body: {} }; }
+  };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  // Drawings go straight to private storage with short-lived upload links; the server checks them afterwards.
+  // A server without /start (self-hosted server.mjs) answers 404/405: the whole form is then posted as before.
+  async function sendWithFiles(list, d) {
+    const fields = Object.fromEntries([...d].filter(([k, v]) => typeof v === 'string' && !['lang', 'sid', 'cf-turnstile-response'].includes(k)));
+    const st = await post(form.action + '/start', { lang: d.get('lang'), sid, fields, turnstile: d.get('cf-turnstile-response') || '',
+      files: list.map(f => ({ name: f.name, size: f.size })) }, true);
+    if (st.res && (st.res.status === 404 || st.res.status === 405)) return post(form.action, d);
+    if (!st.res || !st.res.ok || !st.body.ok) return st;
+    if (st.body.done) return st;
+    for (const [i, u] of st.body.uploads.entries()) {
+      btnSubmit.textContent = fmt(T.uploading, { n: i + 1, total: list.length });
+      let ok = false;
+      for (let attempt = 0; attempt < 2 && !ok; attempt++) {
+        try { ok = (await fetch(u.url, { method: 'PUT', body: list[i], headers: u.headers })).ok; } catch { ok = false; }
+      }
+      if (!ok) return { res: null, body: { error: 'upload_failed' } };
+    }
+    btnSubmit.textContent = T.sending;
+    let fin;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      fin = await post(form.action + '/finish', { ref: st.body.ref, token: st.body.token }, true);
+      if (!(fin.res && fin.res.status === 409 && fin.body.error === 'in_progress')) break;
+      await wait(1500);
+    }
+    return fin;
+  }
+
   form.addEventListener('submit', async e => {
     e.preventDefault();
     if (cur !== 2) { if (validate(cur)) show(cur + 1); return; }
@@ -133,16 +172,15 @@ if (form) {
     result.hidden = true;
     btnSubmit.disabled = true; btnBack.disabled = true;
     const label = btnSubmit.textContent; btnSubmit.textContent = T.sending;
-    let res, body = {};
-    try {
-      res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' }, credentials: 'same-origin' });
-      body = await res.json().catch(() => ({}));
-    } catch { res = null; }
+    const d = new FormData(form); d.set('sid', sid);
+    const list = [...(files.files || [])];
+    if (!list.length) d.delete('files');
+    const { res, body } = list.length ? await sendWithFiles(list, d) : await post(form.action, d);
     btnSubmit.disabled = false; btnBack.disabled = false; btnSubmit.textContent = label;
 
     if (res && res.ok && body.ok && body.ref) {
       showResult(true, T.okTitle, fmt(T.ok, { ref: body.ref }));
-      form.reset(); steps.forEach(s => s.classList.remove('is-active'));
+      form.reset(); sid = newSid(); steps.forEach(s => s.classList.remove('is-active'));
       form.querySelector('.form-nav').hidden = true; form.querySelector('.steps').hidden = true;
       return;
     }
@@ -151,7 +189,11 @@ if (form) {
       : code === 'rate_limited' ? T.failRate
       : code === 'captcha' ? T.failCaptcha
       : code === 'invalid' ? T.failInvalid
+      : code === 'uploads_unavailable' ? T.failUploadsOff
+      : code === 'upload_failed' || code === 'upload_incomplete' ? T.failUpload
+      : code === 'notify_failed' && body.ref ? fmt(T.failNotify, { ref: body.ref })
       : T.failGeneric;
+    if (code === 'invalid' && (body.fields || []).includes('files')) sid = newSid(); // refused drawings: the next try is a new quote
     showResult(false, T.failTitle, msg);
     if (window.turnstile) try { window.turnstile.reset(); } catch { /* ignore */ }
   });

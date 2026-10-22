@@ -2,6 +2,7 @@
 // echoing the LIBALSTAL mark. Three.js loads lazily through the page's import map.
 // If WebGL, the script, or data-saver block it, the static logo mark stays in place.
 //
+// v14: galvanised spangle texture + roughness map, raised helical lock seam, corner seams, scroll-linked framing.
 // Performance notes (see README): static parts are merged per material (≈10 draw calls instead of ≈60),
 // shaders compile before the first frame (compileAsync), the loop runs via setAnimationLoop and stops
 // off-screen / in background tabs, pixel ratio is capped at 2, nothing is allocated per frame.
@@ -48,34 +49,46 @@ async function init() {
 
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 60);
 
-  // ---------- procedural brushed-metal textures ----------
-  function brushed(w, h, streak, diagonal = false) {
-    const c = document.createElement('canvas'); c.width = w; c.height = h;
-    const g = c.getContext('2d');
-    g.fillStyle = '#c4cad0'; g.fillRect(0, 0, w, h);
-    for (let i = 0; i < streak; i++) {
-      const y = Math.random() * h, a = Math.random() * 0.07;
-      g.fillStyle = Math.random() > 0.5 ? `rgba(255,255,255,${a})` : `rgba(40,46,52,${a})`;
-      g.fillRect(0, y, w, Math.random() * 1.6 + 0.3);
+  // ---------- procedural galvanised spangle (v14) ----------
+  // Hot-dip galvanising leaves zinc crystals ("spangle"): irregular cells, each with its own sheen and a
+  // feathered grain. Jittered-grid Voronoi on a canvas (no asset to download), plus a matching roughness map.
+  function spangle(size, cells, seed) {
+    let s = seed >>> 0; const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+    const pts = [];
+    for (let j = 0; j < cells; j++) for (let i = 0; i < cells; i++) pts.push({ x: (i + rnd()) / cells, y: (j + rnd()) / cells, l: 0.8 + rnd() * 0.13, a: rnd() * Math.PI, f: 40 + rnd() * 60 });
+    const col = document.createElement('canvas'), rgh = document.createElement('canvas');
+    col.width = col.height = rgh.width = rgh.height = size;
+    const gc = col.getContext('2d'), gr = rgh.getContext('2d');
+    const ic = gc.createImageData(size, size), ir = gr.createImageData(size, size);
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      const u = x / size, v = y / size, ci = Math.floor(u * cells), cj = Math.floor(v * cells);
+      let d1 = 9, d2 = 9, best = null;
+      for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+        const ii = (ci + di + cells) % cells, jj = (cj + dj + cells) % cells, p = pts[jj * cells + ii];
+        const dx = p.x + (ci + di - ii) / cells - u, dy = p.y + (cj + dj - jj) / cells - v, d = dx * dx + dy * dy; // tileable
+        if (d < d1) { d2 = d1; d1 = d; best = p; } else if (d < d2) d2 = d;
+      }
+      const edge = Math.min(1, (Math.sqrt(d2) - Math.sqrt(d1)) * cells * 6);       // grain boundary
+      const grain = Math.sin((u * Math.cos(best.a) + v * Math.sin(best.a)) * best.f * 6.283) * 0.022;
+      const l = Math.max(0, Math.min(1, best.l + grain - (1 - edge) * 0.07));
+      const k = (y * size + x) * 4, c = Math.round(l * 255);
+      ic.data[k] = c; ic.data[k + 1] = c; ic.data[k + 2] = Math.min(255, c + 4); ic.data[k + 3] = 255;
+      const r = Math.round((0.2 + (0.93 - best.l) * 1.6 + (1 - edge) * 0.12) * 255);
+      ir.data[k] = r; ir.data[k + 1] = r; ir.data[k + 2] = r; ir.data[k + 3] = 255;
     }
-    if (diagonal) { // helical lock seams
-      g.strokeStyle = 'rgba(30,34,38,.55)'; g.lineWidth = 3;
-      for (let x = -h; x < w + h; x += w / 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + h * 0.9, h); g.stroke(); }
-      g.strokeStyle = 'rgba(255,255,255,.5)'; g.lineWidth = 1.5;
-      for (let x = -h + 4; x < w + h; x += w / 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + h * 0.9, h); g.stroke(); }
-    }
-    const t = new THREE.CanvasTexture(c);
-    t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-    return t;
+    gc.putImageData(ic, 0, 0); gr.putImageData(ir, 0, 0);
+    const mk = (c, srgb) => { const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); return t; };
+    return { map: mk(col, true), rough: mk(rgh, false) };
   }
-  const texFlat = brushed(512, 128, 900);
-  const texSpiral = brushed(512, 256, 700, true);
-  texSpiral.repeat.set(2, 1);
+  const spg = spangle(small ? 256 : 384, small ? 10 : 14, 1702);
+  spg.map.repeat.set(3, 2); spg.rough.repeat.set(3, 2);
+  const spgSpiral = { map: spg.map.clone(), rough: spg.rough.clone() };
+  spgSpiral.map.repeat.set(5, 2.5); spgSpiral.rough.repeat.set(5, 2.5);
+  spgSpiral.map.needsUpdate = spgSpiral.rough.needsUpdate = true;
 
-  // Galvanised / stainless sheet: physical material with anisotropy gives the stretched "brushed" highlight.
-  const steel = new THREE.MeshPhysicalMaterial({ color: 0xd9dee3, map: texFlat, metalness: 1, roughness: 0.34, anisotropy: 0.75 });
-  const steelSpiral = new THREE.MeshPhysicalMaterial({ color: 0xd9dee3, map: texSpiral, metalness: 1, roughness: 0.36, anisotropy: 0.6, anisotropyRotation: Math.PI / 2 });
+  // Galvanised sheet: metal with per-crystal roughness; the spiral duct shares the same zinc, tiled tighter.
+  const steel = new THREE.MeshPhysicalMaterial({ color: 0xdfe4e8, map: spg.map, roughnessMap: spg.rough, metalness: 1, roughness: 1 });
+  const steelSpiral = new THREE.MeshPhysicalMaterial({ color: 0xdfe4e8, map: spgSpiral.map, roughnessMap: spgSpiral.rough, metalness: 1, roughness: 1 });
   const steelDark = new THREE.MeshStandardMaterial({ color: 0x8b939b, metalness: 1, roughness: 0.42 });
   const inside = new THREE.MeshStandardMaterial({ color: 0x15181b, metalness: 0.6, roughness: 0.7, side: THREE.BackSide });
   const blue = new THREE.MeshPhysicalMaterial({ color: 0x0a63c9, metalness: 0.55, roughness: 0.28, clearcoat: 0.6, clearcoatRoughness: 0.25 }); // RAL 5017 powder coat
@@ -95,6 +108,7 @@ async function init() {
       for (const [by, bz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) add(BOLT, bolt, s * (len / 2 + 0.005), by * (h / 2 + 0.02), bz * (d / 2 + 0.02), g);
     }
     for (let i = 1; i < 4; i++) add(new THREE.BoxGeometry(0.018, h + 0.012, d + 0.012), steelDark, -len / 2 + (len / 4) * i, 0, 0, g); // stiffener beads
+    for (const [cy, cz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) add(new THREE.BoxGeometry(len - 0.14, 0.016, 0.016), steelDark, 0, cy * h / 2, cz * d / 2, g); // Pittsburgh corner seams
     g.position.set(x, y, 0); run.add(g); return g;
   }
 
@@ -119,6 +133,11 @@ async function init() {
   add(new THREE.CylinderGeometry(R, R, riserLen, 64, 1, true), steelSpiral, riserX, riserTop - riserLen / 2, 0);
   add(new THREE.CylinderGeometry(R - 0.004, R - 0.004, riserLen, 32, 1, true), inside, riserX, riserTop - riserLen / 2, 0);
   add(new THREE.CylinderGeometry(R + 0.012, R + 0.012, 0.42, 64), blue, riserX, riserTop - riserLen + 0.25, 0);
+  { // raised helical lock seam (one continuous helix, as on a real spiral duct)
+    const turns = 2.6, pts = [];
+    for (let i = 0; i <= 120; i++) { const t = i / 120, a = t * turns * Math.PI * 2; pts.push(new THREE.Vector3(riserX + (R + 0.004) * Math.cos(a), riserTop - t * (riserLen - 0.44), (R + 0.004) * Math.sin(a))); }
+    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), small ? 160 : 260, 0.009, 6, false), steelDark);
+  }
 
   // grille box with louvres
   const gy = riserTop - riserLen - 0.38;
@@ -200,7 +219,7 @@ async function init() {
   pivot.rotation.set(basePitch, baseYaw, 0);
 
   // ---------- sizing ----------
-  let running = false;
+  let running = false, contextLost = false;
   function resize() {
     const w = holder.clientWidth, h = holder.clientHeight; if (!w || !h) return;
     renderer.setSize(w, h, false);
@@ -223,12 +242,17 @@ async function init() {
   }, { passive: true });
   art.addEventListener('pointerleave', () => { target.x = 0; target.y = 0; });
 
+  // scroll-linked framing: as the hero scrolls away the run turns and settles (one number, read per frame)
+  let scrollK = 0;
+  const onScroll = () => { const r = art.getBoundingClientRect(); scrollK = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height))); };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
   let frames = 0;
   function frame(now) {
     const dt = Math.min((now - last) / 1000, 0.05); last = now; t += dt;
     cur.x += (target.x - cur.x) * 0.05; cur.y += (target.y - cur.y) * 0.05;
-    pivot.rotation.y = baseYaw + Math.sin(t * 0.25) * 0.22 + cur.x * 0.35;
-    pivot.rotation.x = basePitch + cur.y * 0.12;
+    pivot.rotation.y = baseYaw + Math.sin(t * 0.25) * 0.22 + cur.x * 0.35 + scrollK * 0.55;
+    pivot.rotation.x = basePitch + cur.y * 0.12 + scrollK * 0.18;
     for (let i = 0; i < N; i++) {
       life[i] += dt;
       if (life[i] > 2.4) spawn(i);
@@ -238,7 +262,7 @@ async function init() {
     renderer.render(scene, camera);
     if (debug && ++frames % 120 === 0) console.info(`[hero3d] ${renderer.info.render.calls} draw calls, ${renderer.info.render.triangles} triangles, ${renderer.info.memory.textures} textures`);
   }
-  function play() { if (running || reduce.matches || !visible || document.hidden) return; running = true; last = performance.now(); renderer.setAnimationLoop(frame); }
+  function play() { if (running || contextLost || reduce.matches || !visible || document.hidden) return; running = true; last = performance.now(); renderer.setAnimationLoop(frame); }
   function stop() { running = false; renderer.setAnimationLoop(null); }
 
   air.visible = !reduce.matches;
@@ -254,7 +278,32 @@ async function init() {
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : play()));
   new ResizeObserver(resize).observe(holder);
 
-  art.classList.add('is-3d');
-  const tag = art.querySelector('.hero-tag'); if (tag && tag.dataset.label3d) tag.textContent = tag.dataset.label3d;
+  const tag = art.querySelector('.hero-tag');
+  const fallbackLabel = tag && tag.textContent;
+  const show3d = () => {
+    art.classList.add('is-3d');
+    if (tag && tag.dataset.label3d) tag.textContent = tag.dataset.label3d;
+  };
+  // Mobile GPU resets must reveal the existing static visual, never an empty canvas.
+  renderer.domElement.addEventListener('webglcontextlost', event => {
+    event.preventDefault();
+    contextLost = true;
+    stop();
+    art.classList.remove('is-3d');
+    if (tag) tag.textContent = fallbackLabel;
+  });
+  renderer.domElement.addEventListener('webglcontextrestored', async () => {
+    try {
+      await renderer.compileAsync(scene, camera);
+      resize();
+      renderer.render(scene, camera);
+      contextLost = false;
+      show3d();
+      play();
+    } catch (error) {
+      console.warn('[hero3d] static fallback kept after GPU reset:', error.message);
+    }
+  });
+  show3d();
   play();
 }
