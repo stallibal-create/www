@@ -9,12 +9,18 @@ import { fileURLToPath } from 'node:url';
 import { icons } from './icons.mjs';
 import { validateAssembly } from './assembly-validate.mjs';
 import { assemblySvg } from './assembly-svg.mjs';
+import { modelProblems } from './assembly-model.mjs';
+import { storySvgs } from './story-svg.mjs';
+import { socialLinks, missingNetworks, socialDock } from './social.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
 const SITE_URL = (process.env.SITE_URL || 'https://www.libalstal.com').replace(/\/$/, '');
 const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY || '';
 const RFQ_ENDPOINT = process.env.RFQ_ENDPOINT || '/api/rfq';
+// Where browsers upload drawings with presigned URLs (Cloudflare Pages + R2): the R2 S3 endpoint, allowed in connect-src.
+// e.g. RFQ_UPLOAD_ORIGIN=https://<account_id>.r2.cloudflarestorage.com  (without it, uploads to R2 are blocked by the CSP)
+const RFQ_UPLOAD_ORIGIN = process.env.RFQ_UPLOAD_ORIGIN ? new URL(process.env.RFQ_UPLOAD_ORIGIN).origin : '';
 const THREE_VERSION = '0.170.0';
 // Self-hosting: copy three's build/ and examples/jsm/ into src/assets/vendor/three/ and the CDN is no longer used.
 // Montserrat: self-hosted if src/assets/fonts/montserrat.css exists (with its .woff2 files), otherwise Google Fonts.
@@ -37,6 +43,9 @@ const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
 const tv = (v, lang) => (v == null ? null : typeof v === 'object' ? (v[lang] ?? v.fr ?? null) : String(v));
 const missing = new Map(); // key -> label (fr) for MISSING-INFO.md
 function note(path, labelFr) { if (!missing.has(path)) missing.set(path, labelFr); }
+const SOCIAL = socialLinks(site.social); // the only source of social profile URLs
+const FB = SOCIAL.find(n => n.key === 'facebook')?.url || null;
+for (const n of missingNetworks(site.social)) note(`social.${n.key}`, `${n.name} : URL du profil LIBALSTAL (bouton masqué tant qu'elle manque)`);
 const fmt = (str, vars) => str.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? vars[k] : `{${k}}`));
 const hash = buf => createHash('sha256').update(buf).digest('hex').slice(0, 10);
 const url = (lang, path = '') => `/${lang}/${path ? path.replace(/^\/|\/$/g, '') + '/' : ''}`;
@@ -69,6 +78,29 @@ function copyAssets() {
 }
 const A = p => `${p}?v=${assetVer[p] || 'dev'}`;
 
+// Blender-exported assembly model: used by the 3D view only while it matches site.json (else procedural geometry).
+const MODEL_PATH = '/assets/models/duct-assembly-demo.glb';
+let MODEL_URL = null, MODEL_NOTE = 'none';
+function checkModel() {
+  const f = join(ROOT, 'src', MODEL_PATH);
+  if (!existsSync(f)) return;
+  const b = readFileSync(f), problems = modelProblems(site.ductAssembly, b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength));
+  if (problems.length) { MODEL_NOTE = 'left out, procedural geometry used'; console.warn(`⚠ ${MODEL_PATH} does not match content/site.json:\n  ${problems.join('\n  ')}`); return; }
+  MODEL_URL = A(MODEL_PATH); MODEL_NOTE = `${Math.round(b.length / 1024)} KB GLB`;
+}
+
+// Illustrative product renders (scripts/blender-products.py): shown when no product photo has been supplied.
+const RENDERS = new Set(site.products.map(p => p.slug).filter(s => ['640', '1280'].every(w => existsSync(join(ROOT, `src/assets/img/products/${s}-${w}.webp`)))));
+const renderImg = (slug, { alt = '', sizes, eager = false }) => {
+  const at = w => A(`/assets/img/products/${slug}-${w}.webp`);
+  return `<img src="${at(640)}" srcset="${at(640)} 640w, ${at(1280)} 1280w" sizes="${sizes}" width="1280" height="960" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+};
+
+// Typical product render per capability family (home page and Savoir-faire page).
+const CAP_RENDER = { spiral: 'spiral-round-duct', rect: 'rectangular-duct', sheet: 'custom-assemblies', fittings: 'elbows' };
+const ASM_RENDER = ['640', '1280'].every(w => existsSync(join(ROOT, `src/assets/img/products/assembly-${w}.webp`)));
+const capRender = id => (RENDERS.has(CAP_RENDER[id]) ? CAP_RENDER[id] : null);
+
 // ---------- import map (inline → CSP hash) ----------
 const IMPORT_MAP = JSON.stringify({ imports: { three: `${THREE_BASE}/build/three.module.min.js`, 'three/addons/': `${THREE_BASE}/examples/jsm/` } });
 const IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(IMPORT_MAP).digest('base64');
@@ -78,7 +110,7 @@ const IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(IMPORT_MAP).dige
 let ASM_IMPORT_MAP_HASH = '';
 function asmImportMap() {
   const m = JSON.parse(IMPORT_MAP);
-  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
+  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion', 'glb', 'spangle']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
   const s = JSON.stringify(m);
   ASM_IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(s).digest('base64');
   return s;
@@ -163,7 +195,7 @@ function footer(ctx, path) {
         <img src="${A('/assets/img/logo-480.webp')}" width="240" height="72" alt="LIBALSTAL" loading="lazy">
         <p class="tagline">${esc(D.meta.tagline)}.</p>
         <address>${cv('address')}<br>${ctx.phones()}<br>${esc(D.fields.whatsapp)}${ctx.colon} ${ctx.wa()}<br>${email ? `<a href="mailto:${esc(email)}">${esc(email)}</a>` : cv('email')}</address>
-        <p><a href="${esc(c.facebook)}" rel="noopener" target="_blank">${esc(D.footer.facebook)}<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>
+        ${FB ? `<p><a href="${esc(FB)}" rel="noopener" target="_blank">${esc(D.footer.facebook)}<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>` : ''}
       </div>
       <div><h2 class="foot-h">${esc(D.footer.nav)}</h2><ul>${nav}</ul></div>
       <div><h2 class="foot-h">${esc(D.footer.legal)}</h2><ul><li><a href="${url(lang, 'quality')}">${esc(D.nav.quality)}</a></li><li><a href="${url(lang, 'privacy')}">${esc(D.footer.privacy)}</a></li><li><a href="${url(lang, 'legal')}">${esc(D.footer.legalNotice)}</a></li></ul></div>
@@ -185,7 +217,7 @@ function crumbs(ctx, trail) { // trail: [[label, path], ...] last = current
 
 function orgLd() {
   const c = site.company;
-  const o = { '@context': 'https://schema.org', '@type': 'Organization', name: 'LIBALSTAL', url: SITE_URL + '/', logo: SITE_URL + '/assets/img/icon-512.png', sameAs: [c.facebook] };
+  const o = { '@context': 'https://schema.org', '@type': 'Organization', name: 'LIBALSTAL', url: SITE_URL + '/', logo: SITE_URL + '/assets/img/icon-512.png', sameAs: SOCIAL.map(n => n.url) };
   if (c.legalName) o.legalName = tv(c.legalName, 'fr');
   if (c.email) o.email = c.email;
   if (c.phone) o.telephone = c.phone;
@@ -205,6 +237,7 @@ ${header(ctx, active, path)}
 ${body}
 </main>
 ${footer(ctx, path)}
+${socialDock({ links: SOCIAL, t: { ...ctx.D.social, newTab: ctx.D.footer.newTab } })}
 </body>
 </html>
 `;
@@ -225,7 +258,7 @@ function productCard(ctx, p, headingLevel = 3) {
   const it = D.productItems[p.slug];
   return `<article class="card" data-cat="${p.cat}">
   <a class="card-link" href="${url(lang, 'products/' + p.slug)}">
-    <span class="card-fig" aria-hidden="true">${icons[p.slug]}</span>
+    ${RENDERS.has(p.slug) ? `<span class="card-fig card-render">${renderImg(p.slug, { sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>` : `<span class="card-fig" aria-hidden="true">${icons[p.slug]}</span>`}
     <span class="card-cat">${esc(D.products.cats[p.cat])}</span>
     <h${headingLevel} class="card-h">${esc(it.name)}</h${headingLevel}>
     <span class="card-sum">${esc(it.summary)}</span>
@@ -263,60 +296,100 @@ function projectsList(ctx) {
 
 // ---------- pages ----------
 function home(ctx) {
-  const { lang, D, ph, val, arr } = ctx;
-  const facts = site.keyFacts.map(f => `<div class="fact"><dt>${esc(D.keyFacts[f.id])}</dt><dd>${val(f.value, f.id === 'founded' ? 'founded' : f.id, `keyFacts.${f.id}`)}</dd></div>`).join('');
+  const { lang, D, val, arr } = ctx;
+  const H = D.home, S = H.story;
+  const hide = !!site.display?.hideIncomplete;
+  // val() records every missing value in MISSING-INFO.md even when the block is hidden.
+  const factRows = site.keyFacts.map(f => ({ f, html: val(f.value, f.id === 'founded' ? 'founded' : f.id, `keyFacts.${f.id}`) }));
+  const shownFacts = hide ? factRows.filter(r => r.f.value != null) : factRows;
+  const facts = shownFacts.map(({ f, html }) => `<div class="fact"><dt>${esc(D.keyFacts[f.id])}</dt><dd>${html}</dd></div>`).join('');
   const hv = site.heroVisual;
   if (!hv.photo) note('heroVisual.photo', 'Photo d\'atelier ou rendu 3D réel pour la page d\'accueil (sinon visuel 3D conceptuel)');
   const visual = hv.photo
     ? `<figure class="hero-art"><img src="/assets/img/${esc(hv.photo)}" alt="${esc(tv(hv.photoAlt, lang) || '')}" width="1200" height="1260" fetchpriority="high"></figure>`
-    : `<figure class="hero-art" id="hero-art" role="img" aria-label="${esc(D.home.heroAlt)}">
+    : `<figure class="hero-art" id="hero-art" role="img" aria-label="${esc(H.heroAlt)}">
   <div class="hero-fallback" aria-hidden="true"><img src="${A('/assets/img/mark-640.webp')}" width="640" height="640" alt="" fetchpriority="high"></div>
   <div class="hero-canvas" aria-hidden="true"></div>
-  <figcaption class="hero-tag" data-label3d="${esc(D.home.heroTag)}">${esc(D.home.heroTagStatic)}</figcaption>
+  <svg class="hero-marks" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path d="M4 4h6M4 4v6M96 4h-6M96 4v6M4 96h6M4 96v-6M96 96h-6M96 96v-6"/></svg>
+  <figcaption class="hero-tag" data-label3d="${esc(H.heroTag)}">${esc(H.heroTagStatic)}</figcaption>
 </figure>`;
-  const caps = site.capabilities.map((c, i) => `<li><span class="n">${String(i + 1).padStart(2, '0')}</span><h3>${esc(D.capabilities.items[c.id].title)}</h3><p>${esc(D.capabilities.items[c.id].text)}</p><a href="${url(lang, 'capabilities')}#${c.id}" aria-label="${esc(D.capabilities.items[c.id].title)} — ${esc(D.home.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`).join('');
-  const qual = site.quality.slice(0, 6).map(q => `<li><span>${esc(D.quality.items[q.id].t)}</span>${q.evidence ? `<a href="${esc(q.evidence)}">${esc(D.quality.evidenceLink)}</a>` : `<em class="badge">${esc(D.quality.evidenceMissing)}</em>`}</li>`).join('');
-  const body = `
-<section class="hero wrap" aria-labelledby="hero-h">
-  <div class="hero-text">
-    <p class="eyebrow">${esc(D.home.eyebrow)}</p>
-    <h1 id="hero-h">${esc(D.home.h1a)} <span>${esc(D.home.h1b)}</span></h1>
-    <p class="lead">${esc(D.home.lead)}</p>
-    <div class="acts"><a class="btn btn-primary btn-lg" href="${url(lang, 'contact')}">${esc(D.home.cta1)} <span class="arr" aria-hidden="true">${arr}</span></a><a class="btn btn-lg" href="${url(lang, 'products')}">${esc(D.home.cta2)}</a></div>
-  </div>
-  ${visual}
-</section>
-<div class="wrap"><dl class="facts" aria-label="${esc(D.home.factsLabel)}">${facts}</dl></div>
+  // capabilities are families, not steps: no numbering; each shows the render of its typical product
+  const caps = site.capabilities.filter(c => c.offered !== false && !(hide && c.offered === null)).map(c => {
+    const r = capRender(c.id);
+    return `<li${r ? ' class="has-fig"' : ''}>${r ? `<span class="cap-fig">${renderImg(r, { sizes: '(max-width: 600px) 30vw, 200px' })}</span>` : ''}<div><h3>${esc(D.capabilities.items[c.id].title)}</h3><p>${esc(D.capabilities.items[c.id].text)}</p></div><a href="${url(lang, 'capabilities')}#${c.id}" aria-label="${esc(D.capabilities.items[c.id].title)} — ${esc(H.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`;
+  }).join('');
+  const qItems = site.quality.slice(0, 6).filter(q => !hide || q.evidence);
+  const qual = qItems.map(q => `<li><span>${esc(D.quality.items[q.id].t)}</span>${q.evidence ? `<a href="${esc(q.evidence)}">${esc(D.quality.evidenceLink)}</a>` : `<em class="badge">${esc(D.quality.evidenceMissing)}</em>`}</li>`).join('');
+  const showInd = !hide || site.industriesConfirmed;
+  const showProj = !hide || publishedProjects().length > 0;
 
+  const svgs = storySvgs({ plan: S.figPlan, pattern: S.figPattern, formed: S.figFormed });
+  const steps = S.steps.map((st, i) => `<li class="st-step" data-step="${i}"><span class="st-n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><h3>${esc(st.t)}</h3><p>${esc(st.p)}</p>${i === 3 ? `<p><a class="btn" href="${url(lang, 'assembly')}">${esc(S.cta3d)} <span class="arr" aria-hidden="true">${arr}</span></a></p>` : ''}</li>`).join('');
+  const story = `
+<section class="story sec" aria-labelledby="story-h"><div class="wrap">
+  <div class="sh rv"><div><p class="eyebrow">${esc(S.eyebrow)}</p><h2 id="story-h">${esc(S.title)}</h2></div><p>${esc(S.intro)}</p></div>
+  <div class="st-grid">
+    <figure class="st-stage" data-active="0">
+      <div class="st-figs">
+        <div class="st-fig" data-step="0">${svgs.plan}</div>
+        <div class="st-fig" data-step="1">${svgs.pattern}</div>
+        <div class="st-fig" data-step="2">${svgs.formed}</div>
+        <div class="st-fig" data-step="3">${assemblySvg(site.ductAssembly, { title: S.figNetwork, id: 'st-t4', width: 900 })}</div>
+      </div>
+      <figcaption><span class="st-count" aria-hidden="true" data-template="${esc(S.stepOf)}">${esc(fmt(S.stepOf, { n: 1 }))}</span><span class="st-cap">${esc(S.caption)}</span></figcaption>
+      <div class="st-rail" aria-hidden="true"><span></span></div>
+    </figure>
+    <ol class="st-steps" role="list">${steps}</ol>
+  </div>
+</div></section>`;
+
+  const body = `
+<section class="hero" aria-labelledby="hero-h">
+  <div class="hero-grid wrap">
+    <div class="hero-text">
+      <p class="eyebrow">${esc(H.eyebrow)}</p>
+      <h1 id="hero-h">${esc(H.h1a)} <span>${esc(H.h1b)}</span></h1>
+      <p class="lead">${esc(H.lead)}</p>
+      <div class="acts"><a class="btn btn-primary btn-lg" href="${url(lang, 'contact')}">${esc(H.cta1)} <span class="arr" aria-hidden="true">${arr}</span></a><a class="btn btn-lg" href="${url(lang, 'products')}">${esc(H.cta2)}</a></div>
+      ${facts ? `<dl class="facts${shownFacts.length < 3 ? ' facts-inline' : ''}" aria-label="${esc(H.factsLabel)}">${facts}</dl>` : ''}
+    </div>
+    ${visual}
+  </div>
+</section>
+${story}
 <section class="sec" aria-labelledby="cap-h"><div class="wrap">
-  <div class="sh rv"><h2 id="cap-h">${esc(D.home.capTitle)}</h2><p>${esc(D.home.capIntro)}</p></div>
-  <ol class="caps rv">${caps}</ol>
+  <div class="sh rv"><h2 id="cap-h">${esc(H.capTitle)}</h2><p>${esc(H.capIntro)}</p></div>
+  <ul class="cap-grid rv" role="list">${caps}</ul>
 </div></section>
 
 <section class="sec alt" aria-labelledby="prod-h"><div class="wrap">
-  <div class="sh rv"><h2 id="prod-h">${esc(D.home.prodTitle)}</h2><p>${esc(D.home.prodIntro)}</p></div>
+  <div class="sh rv"><h2 id="prod-h">${esc(H.prodTitle)}</h2><p>${esc(H.prodIntro)}</p></div>
   <div class="grid rv">${site.products.map(p => productCard(ctx, p)).join('')}</div>
-  <p class="more"><a class="btn" href="${url(lang, 'products')}">${esc(D.home.prodMore)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
+  <p class="more"><a class="btn" href="${url(lang, 'products')}">${esc(H.prodMore)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
 </div></section>
-
+${ASM_RENDER ? `
+<section class="sec asm-band" aria-labelledby="asm-h"><div class="wrap">
+  <figure class="asm-band-fig rv">${renderImg('assembly', { alt: H.asmAlt, sizes: '(max-width: 860px) 92vw, 760px' })}<span class="asm-tag">${esc(D.assembly.demoLabel)}</span></figure>
+  <div class="rv"><h2 id="asm-h">${esc(H.asmTitle)}</h2><p class="lead">${esc(H.asmText)}</p><p><a class="btn btn-primary" href="${url(lang, 'assembly')}">${esc(S.cta3d)} <span class="arr" aria-hidden="true">${arr}</span></a></p></div>
+</div></section>` : ''}
+${qual ? `
 <section class="sec" aria-labelledby="q-h"><div class="wrap two">
-  <div class="rv"><p class="eyebrow">${esc(D.home.qualMore)}</p><h2 id="q-h">${esc(D.home.qualTitle)}</h2><p class="lead">${esc(D.home.qualIntro)}</p><p><a class="btn" href="${url(lang, 'quality')}">${esc(D.home.qualMore)} <span class="arr" aria-hidden="true">${arr}</span></a></p></div>
+  <div class="rv"><p class="eyebrow">${esc(H.qualMore)}</p><h2 id="q-h">${esc(H.qualTitle)}</h2><p class="lead">${esc(H.qualIntro)}</p><p><a class="btn" href="${url(lang, 'quality')}">${esc(H.qualMore)} <span class="arr" aria-hidden="true">${arr}</span></a></p></div>
   <ul class="qa rv" role="list">${qual}</ul>
-</div></section>
-
+</div></section>` : ''}${showInd ? `
 <section class="sec alt" aria-labelledby="ind-h"><div class="wrap">
-  <div class="sh rv"><h2 id="ind-h">${esc(D.home.indTitle)}</h2><p>${esc(D.industries.intro)}</p></div>
+  <div class="sh rv"><h2 id="ind-h">${esc(H.indTitle)}</h2><p>${esc(D.industries.intro)}</p></div>
   <div class="rv">${industriesGrid(ctx)}</div>
-</div></section>
-
+</div></section>` : ''}${showProj ? `
 <section class="sec" aria-labelledby="pj-h"><div class="wrap">
-  <div class="sh rv"><h2 id="pj-h">${esc(D.home.projTitle)}</h2><p>${esc(D.projects.intro)}</p></div>
+  <div class="sh rv"><h2 id="pj-h">${esc(H.projTitle)}</h2><p>${esc(D.projects.intro)}</p></div>
   <div class="rv">${projectsList(ctx)}</div>
-</div></section>
+</div></section>` : ''}
 ${rfqBand(ctx)}`;
-  const extraHead = hv.photo ? '' : `<script type="importmap">${IMPORT_MAP}</script>
+  const extraHead = `${hv.photo ? '' : `<script type="importmap">${IMPORT_MAP}</script>
 <link rel="modulepreload" href="${A('/assets/js/hero3d.js')}">
-<script type="module" src="${A('/assets/js/hero3d.js')}"></script>`;
+<script type="module" src="${A('/assets/js/hero3d.js')}"></script>`}
+<script defer src="${A('/assets/js/story.js')}"></script>`;
   emit(lang, '', page(ctx, { title: '', path: '', bodyClass: 'home', jsonld: [orgLd()], extraHead }, body));
 }
 
@@ -333,6 +406,7 @@ function products(ctx) {
   <p class="count" role="status" data-template="${esc(D.products.count)}">${esc(fmt(D.products.count, { n: site.products.length }))}</p>
   <div class="grid" id="product-grid">${site.products.map(p => productCard(ctx, p, 2)).join('')}</div>
   <p class="empty" id="product-empty" hidden>${esc(D.products.empty)}</p>
+  <p class="more"><a class="btn" href="${url(lang, 'assembly')}">${esc(D.home.story.cta3d)} <span class="arr" aria-hidden="true">${D.meta.arrow}</span></a></p>
 </div></section>
 ${rfqBand(ctx)}`;
   emit(lang, 'products', page(ctx, { title: D.products.title, description: D.products.intro, path: 'products', active: 'products', jsonld: [cr.ld] }, body));
@@ -349,7 +423,9 @@ ${rfqBand(ctx)}`;
     const body = `<div class="wrap page-head">${c2.html}<p class="eyebrow">${esc(D.products.cats[p.cat])}</p><h1>${esc(it.name)}</h1><p class="lead">${esc(it.summary)}</p></div>
 <section class="sec tight"><div class="wrap two pd">
   <figure class="drawing">
-    ${p.image ? `<img src="/assets/img/${esc(p.image)}" alt="${esc(it.name)}" width="1200" height="900">` : `<div class="drawing-fig" aria-hidden="true">${icons[p.slug]}</div><figcaption>${ctx.ph(D.product.imageMissing, 'toProvide')}</figcaption>`}
+    ${p.image ? `<img src="/assets/img/${esc(p.image)}" alt="${esc(it.name)}" width="1200" height="900">`
+      : RENDERS.has(p.slug) ? `<div class="drawing-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div><figcaption class="small muted">${esc(D.product.render)}</figcaption>`
+      : `<div class="drawing-fig" aria-hidden="true">${icons[p.slug]}</div><figcaption>${ctx.ph(D.product.imageMissing, 'toProvide')}</figcaption>`}
     <div class="titleblock" aria-hidden="true"><span>LIBALSTAL</span><span>${esc(it.name)}</span><span>${esc(D.products.cats[p.cat])}</span></div>
   </figure>
   <div>
@@ -369,21 +445,22 @@ ${related.length ? `<section class="sec alt" aria-labelledby="rel-h"><div class=
 function capabilities(ctx) {
   const { lang, D, val, ph } = ctx;
   const cr = crumbs(ctx, [[D.nav.capabilities, 'capabilities']]);
-  const rows = site.capabilities.map((c, i) => {
+  const rows = site.capabilities.map(c => {
     const it = D.capabilities.items[c.id];
     let extra = '';
     if ('range' in c && c.range == null) note(`capabilities.${c.id}.range`, `Gamme — ${DICT.fr.capabilities.items[c.id].title}`);
     if ('range' in c) extra = `<p class="meta"><span>${esc(D.fields.range)}${ctx.colon}</span> ${val(c.range, 'range', `capabilities.${c.id}.range`, 'toConfirm')}</p>`;
     if ('offered' in c) { if (c.offered == null) note(`capabilities.${c.id}.offered`, 'Pose / accompagnement : service proposé oui ou non ?'); extra = c.offered == null ? `<p class="meta">${ph(D.capabilities.offeredUnknown, 'toConfirm')}</p>` : ''; }
     if (c.offered === false) return '';
-    return `<li id="${c.id}"><span class="n">${String(i + 1).padStart(2, '0')}</span><div><h2 class="h3">${esc(it.title)}</h2><p>${esc(it.text)}</p>${extra}</div></li>`;
+    const r = capRender(c.id);
+    return `<li id="${c.id}"${r ? ' class="has-fig"' : ''}>${r ? `<span class="cap-fig">${renderImg(r, { sizes: '(max-width: 600px) 92vw, 260px' })}</span>` : ''}<div><h2 class="h3">${esc(it.title)}</h2><p>${esc(it.text)}</p>${extra}</div></li>`;
   }).join('');
   if (!site.equipment.length) note('equipment', 'Parc machines (type, marque, capacités)');
   const equip = site.equipment.length
     ? `<ul class="qa" role="list">${site.equipment.map(e => `<li><span>${esc(tv(e.name, lang))}</span><span class="muted">${esc(tv(e.detail, lang) || '')}</span></li>`).join('')}</ul>`
     : `<p>${ph(D.capabilities.equipmentEmpty)}</p>`;
   const body = `${pageHead(ctx, D.nav.capabilities, D.capabilities.h1, D.capabilities.intro, cr.html)}
-<section class="sec tight"><div class="wrap"><ol class="caps caps-lg">${rows}</ol></div></section>
+<section class="sec tight"><div class="wrap"><ul class="caps caps-lg" role="list">${rows}</ul></div></section>
 <section class="sec alt" aria-labelledby="eq-h"><div class="wrap two">
   <div><h2 id="eq-h">${esc(D.capabilities.equipmentTitle)}</h2></div><div>${equip}</div>
 </div></section>
@@ -463,7 +540,7 @@ function company(ctx) {
 <section class="sec tight"><div class="wrap two">
   <div><h2>${esc(D.company.aboutTitle)}</h2><p class="lead">${cv('about')}</p>
     <h2 class="h3">${esc(D.company.findUs)}</h2><p>${cv('address')}</p><p>${c.mapUrl ? `<a class="btn" href="${esc(c.mapUrl)}" rel="noopener" target="_blank">${esc(D.company.map)}<span class="sr"> ${esc(D.footer.newTab)}</span></a>` : cv('mapUrl')}</p>
-    <h2 class="h3">${esc(D.company.social)}</h2><p><a href="${esc(c.facebook)}" rel="noopener" target="_blank">facebook.com/Libalstal<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>
+    <h2 class="h3">${esc(D.company.social)}</h2><p>${SOCIAL.map(n => `<a href="${esc(n.url)}" rel="noopener" target="_blank">${esc(n.url.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, ''))}<span class="sr"> ${esc(D.footer.newTab)}</span></a>`).join('<br>')}</p>
   </div>
   <aside class="factbox" aria-labelledby="lf-h"><h2 id="lf-h" class="h3">${esc(D.company.factsTitle)}</h2><dl class="spec">${dl}</dl></aside>
 </div></section>
@@ -541,7 +618,7 @@ function contact(ctx) {
     <div><dt>${esc(D.fields.address)}</dt><dd>${cv('address')}</dd></div>
     <div><dt>${esc(D.fields.hours)}</dt><dd>${cv('hours')}</dd></div>
   </dl>
-  <p><a href="${esc(c.facebook)}" rel="noopener" target="_blank">Facebook — Libalstal<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>
+  ${FB ? `<p><a href="${esc(FB)}" rel="noopener" target="_blank">Facebook — Libalstal<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>` : ''}
 </aside>
 </div></section>`;
   const extraHead = `<script type="module" src="${A('/assets/js/rfq.js')}"></script>${TURNSTILE_SITE_KEY ? '\n<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>' : ''}`;
@@ -627,7 +704,7 @@ function assembly(ctx) {
     tool('replay', T.replay, 'M5 5v5h5M5 10a8 8 0 1 1 1.5 6M11 8l6 4-6 4z'),
   ].join('');
   // client data: geometry and connections only (names and specs are already in the HTML)
-  const clientData = { assembly: { settings: st, components: a.components.map(({ id, type, geometry, explode }) => ({ id, type, geometry, explode })), connections: a.connections },
+  const clientData = { assembly: { settings: st, components: a.components.map(({ id, type, geometry, explode }) => ({ id, type, geometry, explode })), connections: a.connections }, model: MODEL_URL,
     strings: { loading: T.loading, unavailable: T.unavailable, lost: T.lost, saveData: T.saveData, playing: T.playing } };
   const body = `${pageHead(ctx, T.eyebrow, T.h1, T.intro, cr.html)}
 <section class="sec tight" id="asm" aria-label="${esc(T.title)}"><div class="wrap asm-layout">
@@ -656,7 +733,7 @@ ${cards}
 ${rfqBand(ctx)}`;
   const extraHead = `<script type="importmap">${asmImportMap()}</script>
 <script type="module" src="${A('/assets/js/assembly/boot.js')}"></script>`;
-  emit(lang, 'assembly', page(ctx, { title: T.title, description: T.intro, path: 'assembly', noindex: true, jsonld: [cr.ld], extraHead }, body), { index: false });
+  emit(lang, 'assembly', page(ctx, { title: T.title, description: T.intro, path: 'assembly', jsonld: [cr.ld], extraHead }, body));
 }
 
 function notFound(ctx) {
@@ -683,7 +760,7 @@ function rootFiles() {
     `style-src 'self'${FONT_LOCAL ? '' : ' https://fonts.googleapis.com'}`,
     "img-src 'self' data: blob:",
     `font-src 'self'${FONT_LOCAL ? '' : ' https://fonts.gstatic.com'}`,
-    `connect-src 'self'${RFQ_ENDPOINT.startsWith('http') ? ' ' + new URL(RFQ_ENDPOINT).origin : ''}`,
+    `connect-src 'self'${RFQ_ENDPOINT.startsWith('http') ? ' ' + new URL(RFQ_ENDPOINT).origin : ''}${RFQ_UPLOAD_ORIGIN ? ' ' + RFQ_UPLOAD_ORIGIN : ''}`,
     `frame-src ${TURNSTILE_SITE_KEY ? 'https://challenges.cloudflare.com' : "'none'"}`,
     "worker-src 'self' blob:",
     "object-src 'none'",
@@ -710,7 +787,7 @@ function missingReport() {
   const lines = [...missing.entries()].sort(([a], [b]) => a.localeCompare(b));
   const groups = {};
   for (const [k, v] of lines) { const g = k.split('.')[0]; (groups[g] ||= []).push(`- [ ] ${v}  \n  \`${k}\``); }
-  const titles = { company: 'Entreprise & contact', keyFacts: 'Chiffres clés (accueil)', heroVisual: 'Visuel d\'accueil', capabilities: 'Savoir-faire', equipment: 'Équipements', products: 'Produits', industriesConfirmed: 'Secteurs', quality: 'Qualité & justificatifs', projects: 'Réalisations', legal: 'Mentions légales & confidentialité' };
+  const titles = { company: 'Entreprise & contact', social: 'Réseaux sociaux (URL de profil réelles)', keyFacts: 'Chiffres clés (accueil)', heroVisual: 'Visuel d\'accueil', capabilities: 'Savoir-faire', equipment: 'Équipements', products: 'Produits', industriesConfirmed: 'Secteurs', quality: 'Qualité & justificatifs', projects: 'Réalisations', legal: 'Mentions légales & confidentialité' };
   const md = `# Informations manquantes — LIBALSTAL\n\nGénéré automatiquement par \`npm run build\` le ${BUILD_DATE}. Chaque ligne correspond à un espace réservé visible sur le site.\nRenseignez les valeurs dans \`content/site.json\` (chemin indiqué sous chaque ligne), puis relancez le build : la ligne disparaît.\n\n${Object.entries(groups).map(([g, items]) => `## ${titles[g] || g}\n\n${items.join('\n')}\n`).join('\n')}\n## Configuration (variables d'environnement)\n\n- [ ] Réception des devis : \`RFQ_WEBHOOK_URL\` **ou** \`RESEND_API_KEY\` + \`RFQ_TO_EMAIL\` + \`RFQ_FROM_EMAIL\`\n- [ ] Anti-robot (recommandé) : \`TURNSTILE_SITE_KEY\` (build) + \`TURNSTILE_SECRET_KEY\` (serveur)\n`;
   writeFileSync(join(ROOT, 'MISSING-INFO.md'), md);
   return lines.length;
@@ -720,7 +797,7 @@ function missingReport() {
 // Every text file ≥ 1 KB gets .br (Brotli q11) and .gz (gzip 9) siblings, served by server.mjs when the browser accepts
 // them. Done once at build time: q11 is far too slow to run per request. PRECOMPRESS=0 skips it (faster local builds;
 // the server then sends the uncompressed files).
-const COMPRESSIBLE = /\.(html|css|js|mjs|json|svg|xml|txt|webmanifest)$/;
+const COMPRESSIBLE = /\.(html|css|js|mjs|json|svg|xml|txt|webmanifest|glb)$/;
 function precompress() {
   if (process.env.PRECOMPRESS === '0') return null;
   const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
@@ -742,6 +819,7 @@ function precompress() {
 rmSync(DIST, { recursive: true, force: true });
 mkdirSync(DIST, { recursive: true });
 copyAssets();
+checkModel();
 for (const lang of LANGS) {
   const ctx = makeCtx(lang);
   home(ctx); products(ctx); capabilities(ctx); industries(ctx); projects(ctx); quality(ctx); company(ctx); contact(ctx); legalPages(ctx); assembly(ctx); notFound(ctx);
@@ -753,5 +831,6 @@ const count = (d => { let c = 0; const w = p => readdirSync(p).forEach(f => { co
 console.log(`Built ${count} HTML pages → dist/  (SITE_URL=${SITE_URL})`);
 console.log(`${n} missing items listed in MISSING-INFO.md`);
 console.log(`Font: Montserrat + Cairo for Arabic (${FONT_LOCAL ? 'self-hosted' : 'Google Fonts'})`);
+console.log(`3D assembly model: ${MODEL_NOTE}`);
 console.log(`Three.js: ${THREE_LOCAL ? 'self-hosted' : 'CDN ' + THREE_BASE}`);
 console.log(pc ? `Precompressed ${pc.files} files: ${Math.round(pc.raw / 1024)} KB → br ${Math.round(pc.br / 1024)} KB / gzip ${Math.round(pc.gz / 1024)} KB` : 'Precompression skipped (PRECOMPRESS=0)');

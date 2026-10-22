@@ -10,7 +10,7 @@ const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return sta
 let errors = 0; const fail = m => { errors++; console.error('✗ ' + m); };
 
 // 1. JS syntax
-for (const f of [...walk(join(ROOT, 'src/assets/js')), ...walk(join(ROOT, 'scripts')), join(ROOT, 'server.mjs'), ...walk(join(ROOT, 'tests')).filter(f => /\.m?js$/.test(f) && !f.includes('/output/'))])
+for (const f of [...walk(join(ROOT, 'src/assets/js')), ...walk(join(ROOT, 'scripts')), join(ROOT, 'server.mjs'), ...(existsSync(join(ROOT, 'functions')) ? walk(join(ROOT, 'functions')) : []),...walk(join(ROOT, 'tests')).filter(f => /\.m?js$/.test(f) && !f.includes('/output/'))])
   if (/\.m?js$/.test(f)) try { execFileSync(process.execPath, ['--check', f], { stdio: 'pipe' }); } catch (e) { fail(`syntax ${f}: ${e.stderr}`); }
 
 // 2. JSON + i18n parity

@@ -40,17 +40,18 @@ for (const f of walk(DIST).filter(f => f.endsWith('.html') && f !== join(DIST, '
   const rel = relative(DIST, f).split('\\').join('/');
   const depth = rel.split('/').length - 1;
   const up = depth ? '../'.repeat(depth) : './';
-  let h = readFileSync(f, 'utf8');
+  let h = readFileSync(f, 'utf8'); let hasStory = false;
   h = h.replace(/<link rel="stylesheet" href="\/assets\/css\/site\.css[^"]*">/, () => `<style>${css}</style>`)
     .replace(/<script src="\/assets\/js\/theme\.js[^"]*"><\/script>/, () => `<script>${js('theme.js')}</script>`)
     .replace(/<script src="\/assets\/js\/main\.js[^"]*" defer><\/script>\n?/, '')
     .replace(/<link rel="modulepreload"[^>]*>\n?/, '')
+    .replace(/<script defer src="\/assets\/js\/story\.js[^"]*"><\/script>\n?/, () => { hasStory = true; return ''; })
     .replace(/<script type="module" src="\/assets\/js\/(hero3d|rfq)\.js[^"]*"><\/script>/, (_, n) => `<script type="module">${js(n + '.js')}</script>`)
     .replace(/<script type="module" src="\/assets\/js\/assembly\/boot\.js[^"]*"><\/script>/, () => `<script type="module">${asmBundle}</script>`)
     .replace(/<link rel="manifest"[^>]*>\n?/, '')
     // preview hosts only allow CDN scripts: point the import map at jsDelivr (same r170 files)
     .replace(/"\/assets\/vendor\/three\//g, '"https://cdn.jsdelivr.net/npm/three@0.170.0/')
-    .replace('</body>', () => `<script>${js('main.js')}</script>\n</body>`)
+    .replace('</body>', () => `<script>${js('main.js')}</script>\n${hasStory ? `<script>${js('story.js')}</script>\n` : ''}</body>`)
     // internal links → relative files
     .replace(/(href|src)="\/([^"]*)"/g, (m, attr, p) => {
       if (p.startsWith('api/')) return m;
