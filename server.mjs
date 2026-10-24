@@ -31,7 +31,8 @@ const PRODUCT_SLUGS = new Set([...site.products.map(p => p.slug), 'other']);
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
   '.webmanifest': 'application/manifest+json', '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
-  '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.pdf': 'application/pdf', '.woff2': 'font/woff2', '.glb': 'model/gltf-binary' };
+  '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.pdf': 'application/pdf', '.woff2': 'font/woff2', '.glb': 'model/gltf-binary',
+  '.mp4': 'video/mp4', '.webm': 'video/webm' };
 
 // ---------- notification config ----------
 function notifyMode() {
@@ -270,8 +271,20 @@ async function serveStatic(req, res, pathname) {
     const isHtml = ext === '.html';
     const enc = COMPRESSIBLE.has(ext) ? await precompressed(file, s, req.headers['accept-encoding']) : null;
     const buf = await readFile(enc ? enc.path : file);
+    // Byte ranges for media (Safari/iOS only play <video> from a server that answers them)
+    const range = !enc && /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range || ''));
+    if (range && (range[1] || range[2])) {
+      const size = buf.length;
+      let start = range[1] ? Number(range[1]) : size - Number(range[2]);
+      let end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+      if (start < 0) start = 0;
+      if (start >= size || start > end) { res.writeHead(416, { ...HEADERS, 'Content-Range': `bytes */${size}` }); return res.end(); }
+      res.writeHead(206, { ...HEADERS, 'Content-Type': MIME[ext] || 'application/octet-stream', 'Content-Length': end - start + 1, 'Content-Range': `bytes ${start}-${end}/${size}`, 'Accept-Ranges': 'bytes',
+        'Cache-Control': p.startsWith('/assets/') ? 'public, max-age=604800' : 'public, max-age=3600' });
+      return res.end(req.method === 'HEAD' ? undefined : buf.subarray(start, end + 1));
+    }
     res.writeHead(200, { ...HEADERS, 'Content-Type': MIME[ext] || 'application/octet-stream', 'Content-Length': buf.length,
-      ...(COMPRESSIBLE.has(ext) ? { Vary: 'Accept-Encoding' } : {}), ...(enc ? { 'Content-Encoding': enc.coding } : {}),
+      ...(COMPRESSIBLE.has(ext) ? { Vary: 'Accept-Encoding' } : { 'Accept-Ranges': 'bytes' }), ...(enc ? { 'Content-Encoding': enc.coding } : {}),
       'Cache-Control': isHtml ? 'no-cache' : (p.startsWith('/assets/') ? 'public, max-age=604800' : 'public, max-age=3600') });
     return res.end(req.method === 'HEAD' ? undefined : buf);
   } catch {
