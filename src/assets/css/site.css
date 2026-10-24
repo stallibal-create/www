@@ -188,6 +188,11 @@ a:hover .arr, button:hover .arr { transform: translateX(3px); }
 .hero-canvas canvas { display: block; width: 100% !important; height: 100% !important; touch-action: pan-y; }
 .hero-art.is-3d .hero-canvas { opacity: 1; }
 .hero-art.is-3d .hero-fallback { opacity: 0; }
+/* welcome video: 16:9, plays once and holds on the logo frame (its background matches --bg) */
+.hero-art.hero-video { min-height: 0; align-self: center; aspect-ratio: 16 / 9; background: #16191c; border: 1px solid var(--line); overflow: hidden; }
+.hero-vid { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hero-replay { position: absolute; inset-inline-end: .8rem; bottom: .8rem; display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding: .5rem .9rem; font: 600 .85rem var(--font); color: #e8ecef; background: rgba(10, 12, 14, .78); border: 1px solid #4a525a; border-radius: var(--r); cursor: pointer; }
+.hero-replay:hover { border-color: #4d9bff; }
 .hero-marks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .hero-marks path { fill: none; stroke: var(--line-2); stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .hero-tag { position: absolute; inset-inline-end: 4%; bottom: 3.5%; max-width: 70%; z-index: 2; font: 500 .7rem/1.4 var(--mono); letter-spacing: .02em; color: var(--muted); text-align: end; }
@@ -658,3 +663,35 @@ html:not(.js) .asm-pick { cursor: default; }
 @media (prefers-reduced-motion: reduce) { .sd-btn, .sd-btn::before, .sd-ico, .sd-tip, .social-dock { transition: none; } .sd-btn:hover, .sd-btn:focus-visible, .sd-btn:active { transform: none; } }
 @media (forced-colors: active) { .sd-btn { border-color: ButtonText; color: ButtonText; background: ButtonFace; } .sd-btn:hover, .sd-btn:focus-visible { color: HighlightText; background: Highlight; } }
 @media print { .social-dock { display: none; } }
+
+/* ---------- welcome intro (home, first visit per tab session; see src/assets/js/intro.js) ----------
+   The homepage underneath is fully rendered and stays in the accessibility tree: the overlay only covers it.
+   Hero text stays opaque (LCP-eligible) and only settles 16 px when the overlay lifts. */
+.intro { display: none; }
+.intro-on .intro { display: block; position: fixed; inset: 0; z-index: 1000; overflow: hidden; background: #0b0d0f; contain: strict;
+  animation: intro-failsafe 0s linear 10s forwards; } /* even if the script never runs, the page is never held behind it */
+.intro-stage { position: absolute; inset: 0; pointer-events: none; }
+.intro-video { position: absolute; top: 0; left: 0; display: block; max-width: none; transform-origin: 0 0; background: transparent; }
+.intro-logo { position: fixed; z-index: 2; display: block; max-width: none; transform-origin: 0 0; pointer-events: none; will-change: transform; }
+.intro-skip { position: absolute; z-index: 3; inset-inline-end: max(1.25rem, env(safe-area-inset-right, 0px)); bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + .75rem));
+  min-height: 44px; padding: .7rem 1.05rem; font: 600 .72rem/1 var(--font); letter-spacing: .18em; text-transform: uppercase;
+  color: #c3ccd4; background: rgba(11, 13, 15, .35); border: 1px solid rgba(232, 236, 239, .22); border-radius: var(--r); cursor: pointer;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: color .2s, border-color .2s, background-color .2s; }
+[dir="rtl"] .intro-skip { letter-spacing: 0; font-size: .85rem; }
+.intro-skip:hover { color: #fff; border-color: rgba(232, 236, 239, .55); }
+.intro-skip:focus-visible { outline: 2px solid #4d9bff; outline-offset: 3px; color: #fff; }
+.intro.is-leaving { opacity: 0; transition: opacity .25s ease; }
+.intro.is-handoff .intro-skip { opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.intro-on:not(.intro-landed) .site-header .brand img { visibility: hidden; animation: intro-failsafe-show 0s linear 10s forwards; }
+.intro-on .hero-text > *, .intro-on .hero-art { translate: 0 16px; }
+.intro-on.intro-reveal .hero-text > *, .intro-on.intro-reveal .hero-art { translate: 0 0; transition: translate .8s cubic-bezier(.2, .7, .2, 1); }
+.intro-on.intro-reveal .hero-text > :nth-child(2) { transition-delay: .06s; }
+.intro-on.intro-reveal .hero-text > :nth-child(3) { transition-delay: .12s; }
+.intro-on.intro-reveal .hero-text > :nth-child(4) { transition-delay: .18s; }
+.intro-on.intro-reveal .hero-text > :nth-child(n+5) { transition-delay: .24s; }
+.intro-on.intro-reveal .hero-art { transition-delay: .1s; }
+.intro-on.intro-quick .hero-text > *, .intro-on.intro-quick .hero-art { transition-duration: .25s; transition-delay: 0s; }
+@keyframes intro-failsafe { to { opacity: 0; visibility: hidden; } }
+@keyframes intro-failsafe-show { to { visibility: visible; } }
+@media (prefers-reduced-motion: reduce) { .intro-on .intro { display: none; } .intro-on .hero-text > *, .intro-on .hero-art { translate: none; } .intro-on .site-header .brand img { visibility: visible; } }
+@media print { .intro { display: none !important; } }
