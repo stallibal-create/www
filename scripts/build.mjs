@@ -73,6 +73,7 @@ function makeCtx(lang) {
 const assetVer = {};
 function copyAssets() {
   cpSync(join(ROOT, 'src/assets'), join(DIST, 'assets'), { recursive: true });
+  if (process.env.INTRO_ASSETS_DIR) cpSync(process.env.INTRO_ASSETS_DIR, join(DIST, INTRO_DIR), { recursive: true });
   const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
   for (const p of walk(join(DIST, 'assets'))) assetVer['/' + relative(DIST, p).split('\\').join('/')] = hash(readFileSync(p));
 }
@@ -114,6 +115,29 @@ function asmImportMap() {
   const s = JSON.stringify(m);
   ASM_IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(s).digest('base64');
   return s;
+}
+
+// ---------- welcome intro (content/intro.json + approved renders in src/assets/video/intro/) ----------
+// On for a language only when its wording is approved AND every video for it is present: until the renders from
+// video-studio/ are reviewed and installed (npm run install-intro there), the homepage is unchanged.
+const INTRO = JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'utf8'));
+const INTRO_DIR = '/assets/video/intro';
+// INTRO_ASSETS_DIR: use videos from another folder (the test suite points it at generated fixtures)
+const INTRO_SRC = process.env.INTRO_ASSETS_DIR || join(ROOT, 'src', INTRO_DIR);
+const introFile = (format, lang, ext) => `${INTRO_DIR}/welcome-${format}-${lang}.${ext}`;
+const introOn = lang => INTRO.langs.includes(lang) && !!INTRO.copy[lang]?.approved
+  && Object.keys(INTRO.compositions).every(f => ['mp4', 'webm'].every(x => existsSync(join(INTRO_SRC, `welcome-${f}-${lang}.${x}`))));
+function introMarkup(ctx) {
+  const { lang, D } = ctx;
+  const comps = Object.fromEntries(Object.entries(INTRO.compositions).map(([f, c]) => [f, { w: c.width, h: c.height, logo: c.logo, safe: c.safe }]));
+  const src = Object.fromEntries(Object.keys(INTRO.compositions).map(f => [f, { mp4: A(introFile(f, lang, 'mp4')), webm: A(introFile(f, lang, 'webm')) }]));
+  const data = { timing: INTRO.timing, background: INTRO.background, comps, src, logo: { src: A('/assets/img/logo-960.webp') } };
+  return `<div class="intro" id="intro">
+  <div class="intro-stage" aria-hidden="true"><video class="intro-video" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1"></video></div>
+  <button type="button" class="intro-skip">${esc(D.intro.skip)}</button>
+  <script type="application/json" id="intro-data">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>
+</div>
+`;
 }
 
 // ---------- layout ----------
@@ -232,7 +256,7 @@ function page(ctx, opts, body) {
   const { active = null, path = '' } = opts;
   return `${head(ctx, opts)}
 <body class="page-${opts.bodyClass || 'inner'}">
-${header(ctx, active, path)}
+${opts.beforeHeader || ''}${header(ctx, active, path)}
 <main id="main" tabindex="-1">
 ${body}
 </main>
@@ -304,9 +328,21 @@ function home(ctx) {
   const shownFacts = hide ? factRows.filter(r => r.f.value != null) : factRows;
   const facts = shownFacts.map(({ f, html }) => `<div class="fact"><dt>${esc(D.keyFacts[f.id])}</dt><dd>${html}</dd></div>`).join('');
   const hv = site.heroVisual;
-  if (!hv.photo) note('heroVisual.photo', 'Photo d\'atelier ou rendu 3D réel pour la page d\'accueil (sinon visuel 3D conceptuel)');
+  // Welcome video in the page's language (English if that language has none): plays once, muted, and holds on the
+  // logo; main.js starts it unless reduced motion or data saver is on (then the poster, the final logo frame, stays).
+  const videoFiles = l => [`welcome-${l}.webm`, `welcome-${l}-720.mp4`, `welcome-${l}-poster.webp`].every(f => existsSync(join(ROOT, 'src/assets/video', f)));
+  const vl = videoFiles(lang) ? lang : 'en';
+  const hasVideo = videoFiles(vl);
+  if (!hv.photo && !hasVideo) note('heroVisual.photo', 'Photo d\'atelier ou rendu 3D réel pour la page d\'accueil (sinon visuel 3D conceptuel)');
   const visual = hv.photo
     ? `<figure class="hero-art"><img src="/assets/img/${esc(hv.photo)}" alt="${esc(tv(hv.photoAlt, lang) || '')}" width="1200" height="1260" fetchpriority="high"></figure>`
+    : hasVideo ? `<figure class="hero-art hero-video" id="hero-art">
+  <video class="hero-vid" muted playsinline preload="none" width="1280" height="720" poster="${A(`/assets/video/welcome-${vl}-poster.webp`)}" aria-label="${esc(H.videoAlt)}">
+    <source src="${A(`/assets/video/welcome-${vl}.webm`)}" type="video/webm">
+    <source src="${A(`/assets/video/welcome-${vl}-720.mp4`)}" type="video/mp4">
+  </video>
+  <button type="button" class="hero-replay" hidden><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="M5 5v5h5M5 10a8 8 0 1 1 1.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> ${esc(H.videoReplay)}</button>
+</figure>`
     : `<figure class="hero-art" id="hero-art" role="img" aria-label="${esc(H.heroAlt)}">
   <div class="hero-fallback" aria-hidden="true"><img src="${A('/assets/img/mark-640.webp')}" width="640" height="640" alt="" fetchpriority="high"></div>
   <div class="hero-canvas" aria-hidden="true"></div>
@@ -386,11 +422,14 @@ ${qual ? `
   <div class="rv">${projectsList(ctx)}</div>
 </div></section>` : ''}
 ${rfqBand(ctx)}`;
-  const extraHead = `${hv.photo ? '' : `<script type="importmap">${IMPORT_MAP}</script>
+  const extraHead = `${hv.photo || hasVideo ? '' : `<script type="importmap">${IMPORT_MAP}</script>
 <link rel="modulepreload" href="${A('/assets/js/hero3d.js')}">
 <script type="module" src="${A('/assets/js/hero3d.js')}"></script>`}
-<script defer src="${A('/assets/js/story.js')}"></script>`;
-  emit(lang, '', page(ctx, { title: '', path: '', bodyClass: 'home', jsonld: [orgLd()], extraHead }, body));
+<script defer src="${A('/assets/js/story.js')}"></script>${introOn(lang) ? `
+<script src="${A('/assets/js/intro-gate.js')}"></script>
+<script defer src="${A('/assets/js/intro.js')}"></script>` : ''}`;
+  const beforeHeader = introOn(lang) ? introMarkup(ctx) : '';
+  emit(lang, '', page(ctx, { title: '', path: '', bodyClass: 'home', jsonld: [orgLd()], extraHead, beforeHeader }, body));
 }
 
 function products(ctx) {
@@ -833,4 +872,5 @@ console.log(`${n} missing items listed in MISSING-INFO.md`);
 console.log(`Font: Montserrat + Cairo for Arabic (${FONT_LOCAL ? 'self-hosted' : 'Google Fonts'})`);
 console.log(`3D assembly model: ${MODEL_NOTE}`);
 console.log(`Three.js: ${THREE_LOCAL ? 'self-hosted' : 'CDN ' + THREE_BASE}`);
+console.log(`Welcome intro: ${LANGS.map(l => `${l} ${introOn(l) ? 'on' : 'off'}`).join(' · ')}${LANGS.some(introOn) ? '' : '  (no approved renders in src/assets/video/intro/ — see video-studio/README.md)'}`);
 console.log(pc ? `Precompressed ${pc.files} files: ${Math.round(pc.raw / 1024)} KB → br ${Math.round(pc.br / 1024)} KB / gzip ${Math.round(pc.gz / 1024)} KB` : 'Precompression skipped (PRECOMPRESS=0)');
