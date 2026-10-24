@@ -1,0 +1,151 @@
+{
+  "_doc": "What the V3 Blender export must contain so the website can drive it (rotate, assemble, exploded view, airflow, reset, scroll camera) without hard-coding anything per model. Checked by v3/tools/validate-glb.mjs; the emblem silhouette is checked separately by v3/tools/emblem_fit.py.",
+  "version": 1,
+  "space": {
+    "units": "metres",
+    "up": "+Y (glTF)",
+    "front": "+Z: the emblem faces the viewer on +Z, as on the logo",
+    "restPose": "assembled: every part at its final position in the logo layout",
+    "logoFrame": "Front view in the official PNG frame: 1 PNG pixel = 1 mm (0.001 m), origin at the PNG top-left corner, x right, y up (so the emblem lies at y < 0). emblem_fit.py --register contract checks against it without any fitting."
+  },
+  "root": "LIBALSTAL_emblem",
+  "parts": [
+    {
+      "name": "top_run",
+      "logoPart": "topRun",
+      "dof": "slide"
+    },
+    {
+      "name": "bottom_run",
+      "logoPart": "bottomRun",
+      "dof": "fixed"
+    },
+    {
+      "name": "side_panel",
+      "logoPart": "sidePanel",
+      "dof": "hinge"
+    },
+    {
+      "name": "wedge",
+      "logoPart": "wedge",
+      "dof": "slide"
+    },
+    {
+      "name": "elbow_gore_1",
+      "logoPart": "elbow",
+      "dof": "fixed",
+      "parent": "top_run"
+    },
+    {
+      "name": "elbow_gore_2",
+      "logoPart": "elbow",
+      "dof": "hinge",
+      "parent": "elbow_gore_1"
+    },
+    {
+      "name": "elbow_gore_3",
+      "logoPart": "elbow",
+      "dof": "hinge",
+      "parent": "elbow_gore_2"
+    },
+    {
+      "name": "elbow_gore_4",
+      "logoPart": "elbow",
+      "dof": "hinge",
+      "parent": "elbow_gore_3"
+    },
+    {
+      "name": "collar",
+      "logoPart": "collar",
+      "dof": "slide"
+    },
+    {
+      "name": "grille",
+      "logoPart": "grille",
+      "dof": "slide"
+    },
+    {
+      "name": "louvre_1",
+      "logoPart": "grille",
+      "dof": "hinge",
+      "parent": "grille"
+    },
+    {
+      "name": "louvre_2",
+      "logoPart": "grille",
+      "dof": "hinge",
+      "parent": "grille"
+    },
+    {
+      "name": "louvre_3",
+      "logoPart": "grille",
+      "dof": "hinge",
+      "parent": "grille"
+    },
+    {
+      "name": "louvre_4",
+      "logoPart": "grille",
+      "dof": "hinge",
+      "parent": "grille"
+    },
+    {
+      "name": "louvre_5",
+      "logoPart": "grille",
+      "dof": "hinge",
+      "parent": "grille"
+    },
+    {
+      "name": "louvre_6",
+      "logoPart": "grille",
+      "dof": "hinge",
+      "parent": "grille"
+    }
+  ],
+  "optionalPrefixes": [
+    "fastener_",
+    "rail_",
+    "seam_",
+    "gasket_"
+  ],
+  "extras": {
+    "_doc": "Blender custom property 'libalstal' on each part object, exported with export_extras=True. Origins are the mechanical pivots.",
+    "required": [
+      "part",
+      "dof"
+    ],
+    "optional": {
+      "explode": "[x, y, z] metres: where the part sits in the exploded view, relative to its rest position",
+      "axis": "[x, y, z] unit vector: hinge axis or slide direction, in the parent's space",
+      "limits": "[min, max] radians or metres along axis"
+    }
+  },
+  "materials": {
+    "allowed": [
+      "galvanised",
+      "galvanised_flange",
+      "stainless_brushed",
+      "ral5017_coat",
+      "gasket",
+      "interior"
+    ],
+    "_doc": "Names the site maps to its own real-time materials; texture images optional (PBR, ≤ 2048 px, KTX2 later)."
+  },
+  "animations": {
+    "assemble": "optional clip, exploded → assembled over ≤ 4 s; the site can also build it from extras.explode with GSAP"
+  },
+  "airflow": {
+    "file": "airflow-paths.json",
+    "_doc": "Next to the GLB. Centrelines in the same space (metres, +Y up): { note, paths: { name: [[x,y,z], ...] } }. Must state it is illustrative, not CFD."
+  },
+  "budgets": {
+    "desktop": {
+      "maxTriangles": 150000,
+      "maxBytes": 4000000
+    },
+    "mobile": {
+      "maxTriangles": 60000,
+      "maxBytes": 2000000,
+      "_doc": "a separate *-mobile.glb LOD, same names"
+    }
+  }
+}
