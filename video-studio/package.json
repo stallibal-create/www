@@ -1,0 +1,27 @@
+{
+  "name": "libalstal-video-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LIBALSTAL — cinematic welcome intro (\"Précision en mouvement\"), rendered with Remotion and played by the website",
+  "scripts": {
+    "sync": "node scripts/sync-assets.mjs",
+    "studio": "node scripts/sync-assets.mjs && remotion studio",
+    "render": "node scripts/sync-assets.mjs && node scripts/render.mjs",
+    "install-intro": "node scripts/install-to-site.mjs",
+    "typecheck": "tsc --noEmit",
+    "preview:standin": "node standin/render-standin.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.528",
+    "@remotion/fonts": "4.0.528",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.528",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "@types/three": "0.170.0",
+    "typescript": "5.9.3"
+  }
+}
