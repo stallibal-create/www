@@ -77,6 +77,23 @@
     document.addEventListener('focusout', function (e) { if (typing(e)) dock.classList.remove('is-typing'); });
   }
 
+  // ----- welcome video: plays once (muted) unless reduced motion or data saver; the poster is the final logo frame -----
+  var vid = $('.hero-vid');
+  if (vid) {
+    var replay = $('.hero-replay');
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      (navigator.connection && (navigator.connection.saveData || /(^|-)2g$/.test(navigator.connection.effectiveType || '')));
+    var start = function () { vid.currentTime = 0; var r = vid.play(); if (r && r.catch) r.catch(function () { replay.hidden = false; }); };
+    vid.addEventListener('ended', function () { replay.hidden = false; });
+    replay.addEventListener('click', function () { replay.hidden = true; start(); });
+    // after the page's load event: a fetching video would otherwise hold back "load" (the logo poster shows meanwhile)
+    // while the full-screen intro plays (intro-gate.js sets .intro-on), the hero video waits for its end
+    var whenLoaded = function () { if (document.readyState === 'complete') start(); else window.addEventListener('load', start); };
+    if (still) replay.hidden = false;
+    else if (document.documentElement.classList.contains('intro-on')) window.addEventListener('libalstal:introend', whenLoaded, { once: true });
+    else whenLoaded();
+  }
+
   // ----- reveal -----
   var rv = $$('.rv');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -19,7 +19,10 @@ const saveData = navigator.connection && (navigator.connection.saveData || /2g/.
 if (holder && webglOK() && !saveData) {
   const start = () => init().catch(err => { console.warn('[hero3d] fallback kept:', err && err.message); });
   const idle = window.requestIdleCallback || (cb => setTimeout(cb, 200));
-  if (document.readyState === 'complete') idle(start); else addEventListener('load', () => idle(start), { once: true });
+  const boot = () => { if (document.readyState === 'complete') idle(start); else addEventListener('load', () => idle(start), { once: true }); };
+  // While the welcome intro plays (intro.js), leave the GPU/CPU to the video; start right after it ends.
+  if (document.documentElement.classList.contains('intro-on')) addEventListener('libalstal:introend', boot, { once: true });
+  else boot();
 }
 
 async function init() {
