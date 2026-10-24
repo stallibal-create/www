@@ -18,7 +18,24 @@ for (const m of [process.env.PLAYWRIGHT_MODULE, 'playwright', '@playwright/test'
 if (!chromium) { console.error('Playwright not found. run npm ci, then npx playwright install chromium  (or set PLAYWRIGHT_MODULE)'); process.exit(2); }
 
 rmSync(OUT, { recursive: true, force: true }); mkdirSync(OUT, { recursive: true });
-execFileSync(process.execPath, [join(ROOT, 'scripts/build.mjs')], { stdio: 'inherit', env: { ...process.env, SITE_URL: 'https://www.libalstal.example', RFQ_UPLOAD_ORIGIN: 'http://127.0.0.1:4321' } });
+// Welcome intro: tested with the installed renders, or else with generated 6-second fixtures (needs ffmpeg),
+// so the playback / skip / handoff logic is always exercised. Without either, those tests are reported as skipped.
+const INTRO_REAL = existsSync(join(ROOT, 'src/assets/video/intro/welcome-desktop-fr.webm'));
+let INTRO_FIX = '';
+if (!INTRO_REAL) {
+  try {
+    const dir = join(OUT, 'intro-fixture'); mkdirSync(dir, { recursive: true });
+    const intro = JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'utf8'));
+    for (const lang of intro.langs) for (const [f, size] of [['desktop', '320x180'], ['mobile', '180x320']]) {
+      const src = ['-f', 'lavfi', '-i', `color=c=0x0b0d0f:s=${size}:d=6:r=30`];
+      execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...src, '-c:v', 'libvpx-vp9', '-b:v', '50k', join(dir, `welcome-${f}-${lang}.webm`)]);
+      try { execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...src, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', join(dir, `welcome-${f}-${lang}.mp4`)]); }
+      catch { execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...src, '-c:v', 'mpeg4', join(dir, `welcome-${f}-${lang}.mp4`)]); }
+    }
+    INTRO_FIX = dir;
+  } catch { console.log('(ffmpeg not available: welcome-intro playback tests will be skipped)'); }
+}
+execFileSync(process.execPath, [join(ROOT, 'scripts/build.mjs')], { stdio: 'inherit', env: { ...process.env, SITE_URL: 'https://www.libalstal.example', RFQ_UPLOAD_ORIGIN: 'http://127.0.0.1:4321', ...(INTRO_FIX ? { INTRO_ASSETS_DIR: INTRO_FIX } : {}) } });
 
 // ---------- harness ----------
 const results = []; let current = '';
@@ -71,7 +88,10 @@ const CDN = /cdn\.jsdelivr\.net/; // blocked in the CI sandbox; hero falls back 
 const WEBGL_ENV = /^THREE\.WebGLRenderer: (A WebGL context could not be created|Error creating WebGL context)|^WebGL: CONTEXT_LOST_WEBGL|^THREE\.WebGLProgram: Shader Error|INVALID_OPERATION: (useProgram|drawElements)/;
 const webglEnv = [];
 async function newPage(opts = {}, b = browser) {
-  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, ...opts });
+  const { intro = false, ...ctxOpts } = opts;
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, ...ctxOpts });
+  // the welcome intro plays once per tab session; every test except the intro's own starts after it
+  if (!intro) await ctx.addInitScript(() => { try { sessionStorage.setItem('libalstal-intro', '1'); } catch { /* storage blocked */ } });
   const page = await ctx.newPage(); page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
   page.on('console', m => {
@@ -296,17 +316,29 @@ await test('product page CTA pre-fills the quote form', async () => {
   assert.match(await p.inputValue('#f-req'), /Product: Elbows/);
   await p.context().close();
 });
-await test('hero: 3D renders within the draw-call budget (or falls back cleanly)', async () => {
-  const p = await newPage(); const info = []; p.on('console', m => { if (m.text().startsWith('[hero3d]')) info.push(m.text()); });
-  await p.goto(A + '/fr/?debug3d'); await p.waitForFunction(() => document.getElementById('hero-art').classList.contains('is-3d') || performance.now() > 12000, null, { timeout: 15000 }).catch(() => {});
-  const st = await p.evaluate(() => ({ is3d: document.getElementById('hero-art').classList.contains('is-3d'), tag: document.querySelector('.hero-tag').textContent, fb: getComputedStyle(document.querySelector('.hero-fallback')).opacity }));
-  if (st.is3d) {
-    assert.match(st.tag, /3D conceptuel/);
-    const m = info.join(' ').match(/first frame: (\d+) draw calls/); assert.ok(m, 'debug info logged');
-    assert.ok(+m[1] <= 12, `draw calls ${m[1]} > 12`);
-    console.log(`      (3D rendered: ${m[1]} draw calls)`);
-  } else { assert.match(st.tag, /Visuel conceptuel/); assert.equal(st.fb, '1'); console.log('      (3D unavailable → static fallback shown)'); }
+await test('hero welcome video in each page language; plays once muted, holds on the logo, replay; still under reduced motion', async () => {
+  for (const [l, v] of [['fr', 'fr'], ['en', 'en'], ['ar', 'ar']]) {
+    const h = await (await fetch(`${A}/${l}/`)).text();
+    assert.match(h, new RegExp(`/assets/video/welcome-${v}\\.webm`), l); assert.match(h, new RegExp(`welcome-${v}-720\\.mp4`), l);
+    assert.match(h, new RegExp(`poster="/assets/video/welcome-${v}-poster\\.webp`), l);
+    assert.doesNotMatch(h, /hero3d\.js|Rendu 3D conceptuel/, `${l}: no 3D hero any more`);
+  }
+  let p = await newPage();
+  await p.goto(A + '/fr/');
+  const v0 = await p.$eval('.hero-vid', v => ({ muted: v.muted, loop: v.loop, label: v.getAttribute('aria-label') }));
+  assert.equal(v0.muted, true); assert.equal(v0.loop, false); assert.match(v0.label, /Vidéo de bienvenue/);
+  await p.waitForFunction(() => document.querySelector('.hero-vid').currentTime > 0.5, null, { timeout: 10000 });
+  await p.evaluate(() => { const v = document.querySelector('.hero-vid'); v.currentTime = v.duration - 0.05; });
+  await p.waitForFunction(() => document.querySelector('.hero-vid').ended, null, { timeout: 10000 });
+  assert.equal(await p.isVisible('.hero-replay'), true, 'replay offered once it ends');
+  await p.click('.hero-replay');
+  await p.waitForFunction(() => { const v = document.querySelector('.hero-vid'); return !v.paused && v.currentTime < 2; }, null, { timeout: 5000 });
   assert.deepEqual(p.errors, []);
+  await p.context().close();
+  p = await newPage({ reducedMotion: 'reduce' });
+  await p.goto(A + '/ar/'); await p.waitForTimeout(800);
+  assert.equal(await p.$eval('.hero-vid', v => v.paused && v.currentTime === 0), true, 'no autoplay under reduced motion');
+  assert.equal(await p.isVisible('.hero-replay'), true);
   await p.context().close();
 });
 await test('reduced motion: content visible without animation', async () => {
@@ -494,9 +526,10 @@ await test('server: three.js, OrbitControls and assembly modules — paths, MIME
   for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion']) assert.match(imports[`/assets/js/assembly/${n}.js`], /\?v=[0-9a-f]{10}$/, `${n} is versioned (cache busting)`);
   const { createHash } = await import('node:crypto');
   const csp = (await fetch(A + '/fr/assembly/')).headers.get('content-security-policy');
-  for (const page of ['/fr/assembly/', '/fr/']) {
-    const m = (await (await fetch(A + page)).text()).match(/<script type="importmap">([^<]*)<\/script>/)[1];
-    assert.ok(csp.includes(`'sha256-${createHash('sha256').update(m).digest('base64')}'`), `CSP allows the import map of ${page}`);
+  for (const page of ['/fr/assembly/', '/fr/']) { // the home page has no import map since the welcome video replaced the 3D hero
+    const m = (await (await fetch(A + page)).text()).match(/<script type="importmap">([^<]*)<\/script>/);
+    if (page === '/fr/assembly/') assert.ok(m, 'the 3D page has an import map');
+    if (m) assert.ok(csp.includes(`'sha256-${createHash('sha256').update(m[1]).digest('base64')}'`), `CSP allows the import map of ${page}`);
   }
 });
 await test('?debug3d=1 diagnostics panel: WebGL, renderer status, selection; absent without the flag', async () => {
@@ -760,6 +793,108 @@ await test('Arabic RTL form works end to end', async () => {
   await p.check('#f-consent'); await p.click('[data-action="submit"]');
   await p.waitForSelector('#rfq-result.ok'); assert.match(await p.textContent('#rfq-result'), /أُرسل الطلب/);
   assert.equal(hooks.at(-1).body.lang, 'ar');
+  await p.context().close();
+});
+
+
+console.log('\nWelcome intro');
+const INTRO_BUILT = (await (await fetch(A + '/fr/')).text()).includes('id="intro"');
+const introTest = (name, fn) => INTRO_BUILT ? test(name, fn) : (console.log(`  - ${name} (skipped: no intro videos and no ffmpeg for fixtures)`), undefined);
+const introState = p => p.evaluate(() => ({ on: document.documentElement.classList.contains('intro-on'), overlay: !!document.getElementById('intro'), end: document.documentElement.getAttribute('data-intro-end') }));
+await test('intro is only on approved home pages, gated by its videos; never on inner pages', async () => {
+  const intro = JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'utf8'));
+  for (const l of ['fr', 'en', 'ar']) {
+    const h = await (await fetch(A + `/${l}/`)).text();
+    const want = INTRO_BUILT && intro.langs.includes(l) && intro.copy[l].approved;
+    assert.equal(h.includes('id="intro"'), want, `/${l}/ intro markup`);
+    assert.equal(h.includes('/assets/js/intro-gate.js'), want, `/${l}/ gate script`);
+  }
+  for (const path of ['/fr/products/', '/fr/contact/', '/fr/assembly/']) assert.doesNotMatch(await (await fetch(A + path)).text(), /id="intro"|intro-gate/, path);
+});
+await introTest('first visit: plays over the mounted homepage, skip control from the start, hands over to the page at 6 s', async () => {
+  const p = await newPage({ intro: true });
+  const t0 = Date.now();
+  await p.goto(A + '/fr/');
+  assert.ok(await p.isVisible('#intro'), 'overlay shown');
+  assert.equal(await p.locator('.intro-skip').innerText(), "PASSER L'INTRO");
+  assert.ok(await p.locator('#hero-h').count(), 'hero mounted underneath');
+  assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('.site-header .brand img')).visibility), 'hidden', 'header logo waits for the handoff');
+  await p.waitForFunction(() => document.querySelector('.intro-video').currentTime > 0.3, null, { timeout: 4000 });
+  assert.match(await p.evaluate(() => document.querySelector('.intro-video').currentSrc), /welcome-desktop-fr\.(webm|mp4)\?v=/);
+  await p.waitForFunction(() => document.querySelector('.intro-logo'), null, { timeout: 8000 });
+  const ms = Date.now() - t0;
+  await p.waitForFunction(() => !document.getElementById('intro'), null, { timeout: 8000 });
+  const total = Date.now() - t0;
+  assert.ok(ms > 4000, `handoff not before 4.75 s of video (${ms} ms)`);
+  assert.ok(total < 9000, `homepage revealed in time (${total} ms)`);
+  assert.equal((await introState(p)).end, 'complete');
+  await p.waitForFunction(() => !document.documentElement.classList.contains('intro-on'), null, { timeout: 3000 });
+  assert.deepEqual(await introState(p), { on: false, overlay: false, end: 'complete' });
+  assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('.site-header .brand img')).visibility), 'visible');
+  await p.click('.nav-links a[href="/fr/products/"]'); await p.waitForURL('**/fr/products/');
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+});
+await introTest('skip: the button reveals the page at once; refresh and repeat navigation never replay it', async () => {
+  const p = await newPage({ intro: true });
+  await p.goto(A + '/fr/');
+  await p.waitForTimeout(600);
+  const t = Date.now(); await p.click('.intro-skip');
+  await p.waitForFunction(() => !document.getElementById('intro'), null, { timeout: 2000 });
+  assert.ok(Date.now() - t < 800, `skip took ${Date.now() - t} ms`);
+  assert.equal((await introState(p)).end, 'skip');
+  await p.reload(); assert.deepEqual((await introState(p)).on, false, 'refresh: page directly');
+  assert.equal(await p.isVisible('#intro'), false);
+  await p.goto(A + '/fr/products/'); await p.goto(A + '/fr/');
+  assert.equal((await introState(p)).on, false, 'back to home: no replay');
+  await p.goto(A + '/en/'); assert.equal((await introState(p)).on, false, 'other language: no replay');
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+});
+await introTest('Escape, scrolling or tabbing into the page end the intro; keyboard focus is never trapped', async () => {
+  for (const how of ['Escape', 'wheel', 'tab']) {
+    const p = await newPage({ intro: true });
+    await p.goto(A + '/fr/'); await p.waitForTimeout(400);
+    if (how === 'Escape') await p.keyboard.press('Escape');
+    else if (how === 'wheel') await p.mouse.wheel(0, 300);
+    else { await p.keyboard.press('Tab'); assert.equal(await p.evaluate(() => document.activeElement.className), 'intro-skip', 'skip button is first'); await p.keyboard.press('Tab'); }
+    await p.waitForFunction(() => !document.getElementById('intro'), null, { timeout: 2000 });
+    if (how === 'tab') assert.equal(await p.evaluate(() => document.activeElement.className), 'skip', 'focus continues to the page');
+    await p.context().close();
+  }
+});
+await introTest('reduced motion, data saver path and no JavaScript: the homepage directly, no overlay', async () => {
+  const p = await newPage({ intro: true, reducedMotion: 'reduce' });
+  await p.goto(A + '/fr/');
+  assert.deepEqual(await introState(p), { on: false, overlay: true, end: null });
+  assert.equal(await p.isVisible('#intro'), false);
+  assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('.site-header .brand img')).visibility), 'visible');
+  await p.context().close();
+  const ctx = await browser.newContext({ javaScriptEnabled: false }); const q = await ctx.newPage(); await q.goto(A + '/fr/');
+  assert.equal(await q.isVisible('#intro'), false); assert.ok(await q.isVisible('#hero-h'));
+  await ctx.close();
+});
+await introTest('video failure: the homepage without delay', async () => {
+  const p = await newPage({ intro: true });
+  await p.route('**/assets/video/**', r => r.abort());
+  await p.goto(A + '/fr/', { waitUntil: 'domcontentloaded' }); const t = Date.now();
+  await p.waitForFunction(() => !document.getElementById('intro'), null, { timeout: 3500 });
+  assert.ok(Date.now() - t < 3000, `revealed after ${Date.now() - t} ms`);
+  assert.match((await introState(p)).end, /error|slow/);
+  await p.context().close();
+});
+await introTest('phones get the portrait footage; the overlay never crops the safe area', async () => {
+  const p = await newPage({ intro: true, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await p.goto(A + '/fr/');
+  await p.waitForFunction(() => document.querySelector('.intro-video').currentSrc, null, { timeout: 3000 });
+  assert.match(await p.evaluate(() => document.querySelector('.intro-video').currentSrc), /welcome-mobile-fr/);
+  const fit = await p.evaluate(() => {
+    const cfg = JSON.parse(document.getElementById('intro-data').textContent).comps.mobile;
+    const r = document.querySelector('.intro-video').getBoundingClientRect(), s = r.width / cfg.w, sf = cfg.safe;
+    return { x0: r.left + sf[0] * s, y0: r.top + sf[1] * s, x1: r.left + (sf[0] + sf[2]) * s, y1: r.top + (sf[1] + sf[3]) * s, vw: innerWidth, vh: innerHeight };
+  });
+  assert.ok(fit.x0 >= -0.5 && fit.y0 >= -0.5 && fit.x1 <= fit.vw + 0.5 && fit.y1 <= fit.vh + 0.5, JSON.stringify(fit));
+  await p.screenshot({ path: join(OUT, 'intro-mobile.png') });
   await p.context().close();
 });
 
