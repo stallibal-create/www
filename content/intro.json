@@ -1,0 +1,68 @@
+{
+  "_doc": "Welcome intro (\"Précision en mouvement\"). Single source of truth shared by the Remotion project (video-studio/) and the site build (scripts/build.mjs, src/assets/js/intro.js). Units: composition pixels and seconds. Change the layout here, re-render, then rebuild the site so the live handoff matches the video.",
+  "fps": 30,
+  "durationInFrames": 180,
+  "logo": {
+    "file": "logo-source.png",
+    "width": 2076,
+    "height": 625,
+    "_content": "opaque bounds of the artwork inside the PNG (x0, y0, x1, y1)",
+    "content": [5, 21, 2020, 509],
+    "_topDuct": "the mark's top horizontal duct, measured on the PNG: body between the flanges, and the flanges' outer box",
+    "topDuct": { "body": [168, 33, 403, 175], "flange": [136, 23, 423, 186] }
+  },
+  "compositions": {
+    "desktop": {
+      "id": "WelcomeDesktop",
+      "width": 1920,
+      "height": 1080,
+      "logo": [510, 338, 900, 271],
+      "titleY": 637,
+      "ruleY": 677,
+      "taglineY": 712,
+      "titleSize": 32,
+      "titleTracking": 0.34,
+      "taglineSize": 19,
+      "taglineTracking": 0.42,
+      "textMaxWidth": 900,
+      "_safe": "rect (x, y, w, h) that must stay visible on any screen ratio; the page never crops inside it",
+      "safe": [480, 320, 960, 420]
+    },
+    "mobile": {
+      "id": "WelcomeMobile",
+      "width": 1080,
+      "height": 1920,
+      "logo": [90, 659, 900, 271],
+      "titleY": 985,
+      "ruleY": 1031,
+      "taglineY": 1067,
+      "titleSize": 40,
+      "titleTracking": 0.16,
+      "taglineSize": 31,
+      "taglineTracking": 0.26,
+      "textMaxWidth": 900,
+      "safe": [60, 630, 960, 470]
+    }
+  },
+  "_timing": "seconds of video time. scenes follow the brief; handoff is when the page takes over from the video",
+  "timing": {
+    "scene1": [0, 1.5],
+    "scene2": [1.5, 3.0],
+    "scene3": [3.0, 4.75],
+    "scene4": [4.75, 6.0],
+    "handoff": 4.75,
+    "videoFade": [4.75, 5.1],
+    "overlayFade": [5.1, 5.95],
+    "logoFlight": [4.95, 5.8],
+    "heroIn": [5.3, 6.0]
+  },
+  "_background": "flat background colour of the video and of the page overlay over time; ends on the hero colour (--bg, dark theme)",
+  "background": [[0, "#0b0d0f"], [3.0, "#0d0f12"], [4.75, "#101316"], [5.95, "#16191c"]],
+  "_langs": "languages rendered and shown. Only add en/ar once their wording below is approved and their videos are rendered.",
+  "langs": ["fr"],
+  "copy": {
+    "fr": { "title": "BIENVENUE CHEZ LIBALSTAL", "tagline": "L’EXCELLENCE PREND FORME", "approved": true },
+    "en": { "title": "WELCOME TO LIBALSTAL", "tagline": "EXCELLENCE TAKES SHAPE", "approved": false },
+    "ar": { "title": "مرحبًا بكم في LIBALSTAL", "tagline": "التميّز يتشكّل", "approved": false }
+  }
+}
