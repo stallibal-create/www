@@ -1,0 +1,20 @@
+{
+ "mode": "glb",
+ "iou": {
+  "topRun": 0.895,
+  "bottomRun": 0.885,
+  "sidePanel": 0.981,
+  "wedge": 0.892,
+  "elbow": 0.902,
+  "collar": 0.932,
+  "grille": 0.938,
+  "emblem": 0.936
+ },
+ "below_threshold": {},
+ "scale_px_per_unit": 1000.0,
+ "model_aspect": 1.3201213322173244,
+ "official_aspect": 1.322381930184805,
+ "register": "contract",
+ "triangles": 720,
+ "nodes": 41
+}

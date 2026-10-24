@@ -1,0 +1,14 @@
+{
+ "mode": "plan",
+ "iou": {
+  "topRun": 0.896,
+  "bottomRun": 0.879,
+  "sidePanel": 0.978,
+  "wedge": 0.892,
+  "elbow": 0.905,
+  "collar": 0.932,
+  "grille": 0.938,
+  "emblem": 0.937
+ },
+ "below_threshold": {}
+}

@@ -1,0 +1,28 @@
+{
+ "mode": "glb",
+ "iou": {
+  "topRun": 0.509,
+  "bottomRun": 0.469,
+  "sidePanel": 0.346,
+  "wedge": 0.116,
+  "elbow": 0.403,
+  "collar": 0.053,
+  "grille": 0.481,
+  "emblem": 0.561
+ },
+ "below_threshold": {
+  "topRun": 0.509,
+  "bottomRun": 0.469,
+  "sidePanel": 0.346,
+  "wedge": 0.116,
+  "elbow": 0.403,
+  "collar": 0.053,
+  "grille": 0.481,
+  "emblem": 0.561
+ },
+ "scale_px_per_unit": 358.6156084856209,
+ "model_aspect": 1.0382915728842672,
+ "official_aspect": 1.322381930184805,
+ "triangles": 7276,
+ "nodes": 52
+}

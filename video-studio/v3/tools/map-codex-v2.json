@@ -1,0 +1,3 @@
+{"riser_": "sidePanel", "mitre_upper": "sidePanel", "mitre_lower": "wedge", "top_duct": "topRun", "top_flange": "topRun", "nut_top": "topRun",
+ "elbow_gore": "elbow", "collar": "collar", "grille": "grille", "louvre": "grille", "nut_grille": "grille",
+ "bottom_duct": "bottomRun", "bottom_flange": "bottomRun", "nut_bottom": "bottomRun"}

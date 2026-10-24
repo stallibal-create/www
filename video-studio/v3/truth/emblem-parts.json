@@ -1,0 +1,19 @@
+{
+ "size": [
+  2076,
+  625
+ ],
+ "ids": {
+  "topRun": 1,
+  "bottomRun": 2,
+  "sidePanel": 3,
+  "wedge": 4,
+  "elbow": 5,
+  "collar": 6,
+  "grille": 7
+ },
+ "unclaimed": 255,
+ "source": "vector guide part outlines (brand/LIBALSTAL-vector-guide-NOT-OFFICIAL.svg, fills only, scaled to 2076x625) intersected with the official PNG alpha",
+ "unclaimed_px": 4706,
+ "emblem_px": 229258
+}

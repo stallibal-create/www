@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LIBALSTAL V3 — emblem viewer (prototype)</title>
+<!-- Serve the repo root (e.g. `node server.mjs` or any static server) and open /video-studio/v3/viewer/ -->
+<script type="importmap">{"imports":{"three":"/src/assets/vendor/three/build/three.module.min.js","three/addons/":"/src/assets/vendor/three/examples/jsm/"}}</script>
+<script src="/src/assets/vendor/gsap/gsap.min.js"></script>
+<script src="/src/assets/vendor/gsap/ScrollTrigger.min.js"></script>
+<style>
+  :root { --bg: #0d1117; --fg: #e8edf2; --muted: #8b98a5; --blue: #0066cc; --line: #2a333d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; }
+  .stage { position: relative; height: 100vh; height: 100svh; }
+  #view { position: absolute; inset: 0; }
+  .bar { position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  button { font: inherit; color: var(--fg); background: #161c23cc; border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); }
+  .tag { position: absolute; top: 16px; left: 16px; right: 16px; font-size: 12px; color: var(--muted); }
+  .note { font-size: 12px; color: var(--muted); width: 100%; text-align: center; min-height: 1.5em; }
+  .scrolly { height: 300vh; position: relative; }
+  .scrolly .sticky { position: sticky; top: 0; height: 100vh; height: 100svh; }
+  .scrolly #view2 { position: absolute; inset: 0; }
+  h2 { position: absolute; top: 16px; left: 16px; margin: 0; font-size: 14px; color: var(--muted); font-weight: 500; }
+</style>
+</head>
+<body>
+<section class="stage">
+  <div id="view" aria-label="Emblème LIBALSTAL en 3D, interactif"></div>
+  <p class="tag">PROTOTYPE V3 · modèle provisoire (grey-box) — le modèle Blender le remplacera sans changer ce code</p>
+  <div class="bar">
+    <button data-act="assemble">Assembler</button>
+    <button data-act="explode">Vue éclatée</button>
+    <button data-act="airflow" aria-pressed="false">Flux d'air</button>
+    <button data-act="reset">Réinitialiser</button>
+    <p class="note" id="note" aria-live="polite"></p>
+  </div>
+</section>
+<section class="scrolly" id="scrolly"><div class="sticky"><h2>Caméra au défilement</h2><div id="view2"></div></div></section>
+<script type="module">
+import { createEmblemViewer } from './emblem-viewer.js';
+const q = new URLSearchParams(location.search);
+const glbUrl = q.get('glb') || '../proxy/out/libalstal-emblem-proxy.glb';
+const pathsUrl = q.get('paths') || glbUrl.replace(/[^/]+$/, 'airflow-paths.json');
+const common = { glbUrl, pathsUrl, gsap: window.gsap, ScrollTrigger: window.ScrollTrigger, preserveDrawingBuffer: q.has('test') };
+const v = await createEmblemViewer(document.getElementById('view'), common);
+const note = document.getElementById('note');
+document.querySelector('.bar').addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'assemble') v.assemble();
+  if (act === 'explode') v.explode(1);
+  if (act === 'reset') { document.querySelector('[data-act=airflow]').setAttribute('aria-pressed', 'false'); note.textContent = ''; v.reset(); }
+  if (act === 'airflow') {
+    const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on));
+    note.textContent = on ? 'Illustration du flux d’air — pas une simulation CFD.' : '';
+    v.setAirflow(on);
+  }
+});
+const v2 = await createEmblemViewer(document.getElementById('view2'), { ...common, pathsUrl: null });
+v2.bindScroll(document.getElementById('scrolly'));
+window.__viewer = v; window.__viewer2 = v2; window.__ready = true;
+</script>
+</body>
+</html>
