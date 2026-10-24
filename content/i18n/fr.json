@@ -138,7 +138,9 @@
     },
     "asmTitle": "Un réseau complet, pièce par pièce",
     "asmText": "Faites pivoter un réseau de démonstration en 3D, écartez ses pièces et ouvrez la fiche de chacune : gaines droites, coude, té, réduction et bride.",
-    "asmAlt": "Rendu 3D illustratif d'un réseau de gaines rectangulaires assemblé : gaines droites, coude, té avec piquage, réduction et bride."
+    "asmAlt": "Rendu 3D illustratif d'un réseau de gaines rectangulaires assemblé : gaines droites, coude, té avec piquage, réduction et bride.",
+    "videoAlt": "Vidéo de bienvenue : un réseau de gaines s'assemble, puis le logo LIBALSTAL apparaît.",
+    "videoReplay": "Rejouer la vidéo"
   },
   "products": {
     "title": "Produits",
@@ -533,5 +535,8 @@
     "replay": "Revoir l'animation",
     "skip": "Passer l'animation",
     "playing": "Présentation de l'assemblage en cours. Vous pouvez la passer ou interagir directement."
+  },
+  "intro": {
+    "skip": "Passer l'intro"
   }
 }

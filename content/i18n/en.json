@@ -138,7 +138,9 @@
     },
     "asmTitle": "A complete run, part by part",
     "asmText": "Rotate a demonstration duct run in 3D, pull its parts apart and open the sheet for each one: straight ducts, elbow, tee, reducer and flange.",
-    "asmAlt": "Illustrative 3D render of an assembled rectangular duct run: straight ducts, elbow, tee with take-off, reducer and flange."
+    "asmAlt": "Illustrative 3D render of an assembled rectangular duct run: straight ducts, elbow, tee with take-off, reducer and flange.",
+    "videoAlt": "Welcome video: a duct network assembles, then the LIBALSTAL logo appears.",
+    "videoReplay": "Replay the video"
   },
   "products": {
     "title": "Products",
@@ -533,5 +535,8 @@
     "replay": "Replay animation",
     "skip": "Skip animation",
     "playing": "Assembly presentation playing. You can skip or interact immediately."
+  },
+  "intro": {
+    "skip": "Skip intro"
   }
 }
