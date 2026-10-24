@@ -1,0 +1,9 @@
+node_modules/
+out/
+standin/.build/
+# copied from ../brand/ by scripts/sync-assets.mjs (single source of the official logo)
+public/logo-source.png
+animatic/.build/
+animatic/*.mp4
+blender/__pycache__/
+standin/.build-future/
