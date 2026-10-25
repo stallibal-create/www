@@ -3,6 +3,7 @@
 // Serves dist/ with security headers and handles POST /api/rfq.
 // Env: see README.md ("Environment variables").
 import { createServer } from 'node:http';
+import { visitorLanguage } from './functions/_lib/language.js';
 import { readFile, stat, mkdir, writeFile, rm } from 'node:fs/promises';
 import { readFileSync, existsSync } from 'node:fs';
 import { Readable, Transform } from 'node:stream';
@@ -255,9 +256,8 @@ async function serveStatic(req, res, pathname) {
   try { p = decodeURIComponent(pathname); } catch { return send(res, 400, 'Bad request', 'text/plain'); }
   if (p.includes('\0')) return send(res, 400, 'Bad request', 'text/plain');
   if (p === '/') {
-    const al = String(req.headers['accept-language'] || '').toLowerCase();
-    const best = al.startsWith('ar') ? 'ar' : al.startsWith('en') ? 'en' : 'fr';
-    res.writeHead(302, { ...HEADERS, Location: `/${best}/`, Vary: 'Accept-Language', 'Cache-Control': 'no-store' }); return res.end();
+    const best = visitorLanguage(req.headers['accept-language']);
+    res.writeHead(302, { ...HEADERS, Location: `/${best}/${new URL(req.url, 'http://local').search}`, Vary: 'Accept-Language', 'Cache-Control': 'no-store' }); return res.end();
   }
   let file = normalize(join(DIST, p));
   if (!file.startsWith(DIST)) return send(res, 403, 'Forbidden', 'text/plain');
