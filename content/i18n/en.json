@@ -12,7 +12,8 @@
     "toConfirm": "to be confirmed",
     "toProvide": "to be provided",
     "arrow": "→",
-    "back": "←"
+    "back": "←",
+    "onRequest": "On request"
   },
   "nav": {
     "home": "Home",
@@ -80,10 +81,10 @@
   },
   "home": {
     "title": "Metal fabrication & ventilation ductwork",
-    "eyebrow": "Ductwork · Ventilation · Smoke extraction",
+    "eyebrow": "Fabrication · Supply · Installation",
     "h1a": "Air in motion.",
     "h1b": "Precision fabrication.",
-    "lead": "Ventilation and smoke-extraction ducts, fittings and sheet-metal parts made to your drawings. Built for engineering firms, HVAC contractors and buyers who need drawings turned into dependable metal.",
+    "lead": "Your partner in ventilation, air conditioning and smoke extraction: ducts, fittings and accessories made to your drawings, supplied and installed nationwide.",
     "cta1": "Request a quote",
     "cta2": "View products",
     "heroAlt": "Conceptual 3D visual of a duct run: rectangular duct, round elbow and grille",
@@ -94,7 +95,7 @@
     "capIntro": "From drawing to part: Libalstal's fabrication families.",
     "capMore": "All capabilities",
     "prodTitle": "Duct systems",
-    "prodIntro": "Ducts, fittings and accessories — each sheet is completed with verified technical data.",
+    "prodIntro": "Ducts, fittings and accessories made to your drawings — detailed data on each sheet or on request.",
     "prodMore": "All products",
     "qualTitle": "Evidence, not adjectives.",
     "qualIntro": "Every quality commitment is published with the document that proves it. Until evidence is supplied, the line says so.",
@@ -137,7 +138,7 @@
       "cta3d": "Explore the assembly in 3D"
     },
     "asmTitle": "A complete run, part by part",
-    "asmText": "Rotate a demonstration duct run in 3D, pull its parts apart and open the sheet for each one: straight ducts, elbow, tee, reducer and flange.",
+    "asmText": "Explore rectangular and spiral round systems in 3D. Follow the airflow, or enable the high-temperature option for a black-steel heat illustration.",
     "asmAlt": "Illustrative 3D render of an assembled rectangular duct run: straight ducts, elbow, tee with take-off, reducer and flange.",
     "videoAlt": "Welcome video: a duct network assembles, then the LIBALSTAL logo appears.",
     "videoReplay": "Replay the video"
@@ -145,7 +146,7 @@
   "products": {
     "title": "Products",
     "h1": "Duct systems & accessories",
-    "intro": "Filter by family. Dimensions, materials and datasheets appear as soon as verified data is supplied.",
+    "intro": "Rectangular and spiral round ducts, stainless steel, aluminium and black steel ducts, and a complete range of air-distribution accessories. The specifications shown are those provided by Libalstal; others are added once confirmed.",
     "filterLabel": "Filter by family",
     "all": "All",
     "cats": {
@@ -155,18 +156,19 @@
       "cus": "Custom"
     },
     "empty": "No products in this family yet.",
-    "count": "{n} product(s)",
+    "count": "{n} products",
     "details": "View details",
-    "quote": "Request a quote"
+    "quote": "Request a quote",
+    "countOne": "{n} product"
   },
   "productItems": {
     "spiral-round-duct": {
       "name": "Spiral round duct",
-      "summary": "Round duct with a continuous helical lock seam, for supply, return and extract systems."
+      "summary": "Spiral round ducts in galvanised steel: 0.4 to 1.2 mm thick, all sizes, sealed assembly."
     },
     "rectangular-duct": {
       "name": "Rectangular duct",
-      "summary": "Rectangular sections formed and assembled to drawings, for runs where ceiling depth is limited."
+      "summary": "Rectangular ducts in galvanised steel sheet: 0.4 to 2 mm thick, standard lengths 1 m and 1.25 m, made to measure."
     },
     "elbows": {
       "name": "Elbows",
@@ -178,19 +180,31 @@
     },
     "tees-branches": {
       "name": "Tees & branches",
-      "summary": "Tees, Y-branches and take-offs for branching the air distribution network."
+      "summary": "Tees, take-offs and plenums for the branches of the air distribution network."
     },
     "flanges-connectors": {
       "name": "Flanges & connectors",
-      "summary": "Joining components between duct sections: flanges, couplings and connectors."
+      "summary": "Flanges, frames, corners and connecting elements between duct sections."
     },
     "grilles-dampers": {
       "name": "Grilles, dampers & accessories",
-      "summary": "Diffusers, grilles, balancing dampers and network accessories."
+      "summary": "Grilles, volume dampers and filter holders."
     },
     "custom-assemblies": {
       "name": "Custom metal fabrication",
       "summary": "Sheet-metal parts and assemblies made to your drawings and specifications."
+    },
+    "stainless-ducts": {
+      "name": "Stainless steel ducts 304 / 316",
+      "summary": "Ducts in 304 or 316 stainless steel for demanding environments: corrosion resistance, hygiene and durability."
+    },
+    "aluminium-ducts": {
+      "name": "Aluminium ducts",
+      "summary": "Aluminium ducts, light and resistant, suited to specific environments."
+    },
+    "black-steel-ducts": {
+      "name": "Black steel ducts",
+      "summary": "Black steel ducts for industrial applications, including high temperatures according to the project specification."
     }
   },
   "product": {
@@ -201,10 +215,11 @@
     "noDownloads": "Datasheet and standard drawings",
     "related": "Same family",
     "ctaTitle": "Need this product?",
-    "ctaText": "Attach your drawings or dimensions: the request is pre-filled with this product.",
+    "ctaText": "Send your dimensions: the request is pre-filled with this product. Drawings can then be sent by email.",
     "imageMissing": "Product photo",
     "render": "Illustrative 3D render — demonstration proportions, not a product photo.",
-    "renderAlt": "{name} — illustrative 3D render"
+    "renderAlt": "{name} — illustrative 3D render",
+    "datasheetRequest": "Technical datasheet available on request."
   },
   "capabilities": {
     "title": "Capabilities",
@@ -228,8 +243,8 @@
         "text": "Elbows, reducers, take-offs and transitions made to order."
       },
       "install": {
-        "title": "Installation & project support",
-        "text": "On-site support and installation — published only if the service is offered."
+        "title": "Installation",
+        "text": "Installation of air distribution networks by a qualified technical team, nationwide."
       }
     },
     "equipmentTitle": "Equipment",
@@ -254,21 +269,34 @@
         "d": "Checks, then shipping or collection."
       }
     ],
-    "offeredUnknown": "Service offered?"
+    "offeredUnknown": "Service offered?",
+    "why": {
+      "title": "Why choose Libalstal",
+      "items": [
+        "Modern, automated fabrication workshop",
+        "Made to measure to your requirements",
+        "Reference standards: SMACNA, ASHRAE, DW/144",
+        "Sealed assemblies",
+        "Experienced technical team and qualified installation service",
+        "Work carried out nationwide"
+      ]
+    }
   },
   "industries": {
     "title": "Industries",
     "h1": "Industries served",
-    "intro": "Settings where air distribution matters. The list will be adjusted to Libalstal's actual experience.",
+    "intro": "The settings we work in, from network design to installation.",
     "unconfirmed": "Indicative list — to be confirmed by Libalstal",
     "items": {
       "commercial": "Commercial & office buildings",
-      "industrial": "Industrial sites",
-      "health": "Healthcare",
-      "hospitality": "Hospitality & food service",
+      "industrial": "Industry",
+      "health": "Hospitals & clinics",
+      "hospitality": "Hotels & residences",
       "logistics": "Warehousing & logistics",
       "infrastructure": "Infrastructure & public facilities",
-      "special": "Specialised environments"
+      "special": "Specialised environments",
+      "tertiary": "Office & service buildings",
+      "retail": "Shopping centres"
     },
     "cta": "Tell us about your project"
   },
@@ -285,7 +313,8 @@
     "challenge": "Challenge",
     "solution": "Our solution",
     "gallery": "Site photos",
-    "photosMissing": "Project photos"
+    "photosMissing": "Project photos",
+    "emptyRefs": "Detailed case studies coming soon."
   },
   "quality": {
     "title": "Engineering & quality",
@@ -334,14 +363,14 @@
   "contact": {
     "title": "Contact & quote",
     "h1": "Request a quote",
-    "intro": "Three short steps, with a review before anything is sent. Your drawings are stored privately and used only to prepare the quote.",
+    "intro": "Three short steps, with a review before anything is sent. Any drawings are then sent by email and used only to prepare the quote.",
     "direct": "Direct contact"
   },
   "rfq": {
     "formLabel": "Quote request form",
     "steps": [
       "Contact",
-      "Requirements",
+      "Needs",
       "Review"
     ],
     "stepOf": "Step {n} of 3",
@@ -395,7 +424,9 @@
     "failUploadsOff": "Drawing upload is not activated on this site yet. Send the request without files and e-mail your drawings, or contact us directly.",
     "failNotify": "Your request is recorded under reference {ref}, but the team has not been notified yet. Click Send again: it will not be duplicated.",
     "honeypot": "Leave this field empty",
-    "productPrefill": "Product: {p}"
+    "productPrefill": "Product: {p}",
+    "filesByEmail": "Drawings and documents: email them to {email}, quoting your request reference.",
+    "captchaLoadError": "The anti-robot check could not load. Reload the page; if it persists, email us at {email}."
   },
   "privacy": {
     "title": "Privacy policy",
@@ -404,23 +435,19 @@
     "sections": [
       {
         "h": "Data controller",
-        "p": "LIBALSTAL ({legalName}), {address}. Contact: {privacyContact}."
+        "p": "LIBALSTAL ({legalName}), {address}."
       },
       {
         "h": "Data collected",
-        "p": "Through the quote form only: name, company, email, phone (optional), delivery country, description of requirements and attached drawings. No data is collected for advertising."
+        "p": "Through the quote form only: name, company, email, phone (optional), delivery country and description of requirements. Drawings, if any, are sent by email. No data is collected for advertising."
       },
       {
         "h": "Purpose",
         "p": "To review your request, prepare a quote and contact you about it."
       },
       {
-        "h": "Retention",
-        "p": "Retention period: {dataRetention}."
-      },
-      {
         "h": "Recipients & storage",
-        "p": "Requests and files are stored privately and are accessible only to the Libalstal staff who prepare quotes. Hosting: {host}."
+        "p": "Requests are forwarded by email and are accessible only to the Libalstal staff who prepare quotes."
       },
       {
         "h": "Cookies & local storage",
@@ -428,7 +455,7 @@
       },
       {
         "h": "Your rights",
-        "p": "You can request access to, correction or deletion of your data by writing to {privacyContact}. Legal framework: {applicableLaw}."
+        "p": "You can request access to, correction or deletion of your data by writing to {email}."
       }
     ]
   },
@@ -441,20 +468,12 @@
         "p": "{legalName} — LIBALSTAL. {address}. Phone: {phone}. Email: {email}. Registration: {registration}."
       },
       {
-        "h": "Publication director",
-        "p": "{publicationDirector}."
-      },
-      {
-        "h": "Hosting",
-        "p": "{host}."
-      },
-      {
         "h": "Intellectual property",
         "p": "The LIBALSTAL logo, texts and visuals on this site belong to their respective owners. Reproduction without permission is prohibited."
       },
       {
         "h": "Visuals",
-        "p": "The 3D visual on the home page is a conceptual illustration and does not depict a specific project."
+        "p": "The 3D renders and animations on this site are illustrations and do not depict a specific project."
       }
     ]
   },
@@ -476,9 +495,10 @@
     "newTab": "(opens in a new tab)"
   },
   "social": {
-    "label": "LIBALSTAL on social media",
+    "label": "Contact LIBALSTAL and social media",
     "open": "Show social media links",
-    "close": "Hide social media links"
+    "close": "Hide social media links",
+    "pending": "Link coming soon"
   },
   "assembly": {
     "title": "3D ductwork assembly",
@@ -520,7 +540,11 @@
       "innerRadius": "Inner radius",
       "angle": "Angle",
       "flangeWidth": "Flange leg width",
-      "flangeDepth": "Flange depth"
+      "flangeDepth": "Flange depth",
+      "diameter": "Internal diameter",
+      "inletDiameter": "Inlet diameter",
+      "outletDiameter": "Outlet diameter",
+      "pitch": "Spiral pitch (demonstration)"
     },
     "types": {
       "straight": "Straight duct",
@@ -528,15 +552,67 @@
       "reducer": "Reducer",
       "tee": "Tee",
       "branch": "Branch duct",
-      "flange": "Flange"
+      "flange": "Flange",
+      "spiral-straight": "Spiral round",
+      "round-straight": "Round duct",
+      "round-elbow": "Round 90° elbow",
+      "round-reducer": "Round reducer"
     },
     "explode": "Explode parts",
     "reassemble": "Reassemble",
     "replay": "Replay animation",
     "skip": "Skip animation",
-    "playing": "Assembly presentation playing. You can skip or interact immediately."
+    "playing": "Assembly presentation playing. You can skip or interact immediately.",
+    "systems": {
+      "label": "Choose a duct system",
+      "rectangular": "Rectangular",
+      "spiral": "Spiral round",
+      "high-temperature": "High temperature",
+      "spiralTitle": "Spiral round duct system",
+      "heatTitle": "Black-steel industrial duct system",
+      "spiralIntro": "Explore a round duct run with a spiral seam, elbow and reducer. Dimensions and joints illustrate a demonstration model.",
+      "heatIntro": "Explore a black-steel duct example for high-temperature industrial applications, subject to project specifications. This model declares no operating temperature or fire-resistance rating."
+    },
+    "effects": {
+      "label": "Flow and material illustration",
+      "air": "Air circulation",
+      "play": "Play motion",
+      "pause": "Pause motion",
+      "cutaway": "See inside",
+      "note": "Animated illustration of flow direction. Not a fluid simulation or performance test.",
+      "heatNote": "Black-steel / heat illustration. Operating limits and fire resistance must be established for the actual project."
+    }
   },
   "intro": {
     "skip": "Skip intro"
+  },
+  "references": {
+    "title": "Project references",
+    "intro": "Projects Libalstal has worked on, according to the company's documentation.",
+    "note": "Names and trademarks mentioned belong to their respective owners."
+  },
+  "standards": {
+    "title": "Reference standards",
+    "intro": "Libalstal relies on these references for the design and fabrication of duct systems. They are reference standards, not certifications.",
+    "items": {
+      "smacna": {
+        "t": "SMACNA",
+        "d": "Sheet Metal and Air Conditioning Contractors' National Association (USA): construction standards for metal ducts — thicknesses, reinforcement, joints and sealing."
+      },
+      "ashrae": {
+        "t": "ASHRAE",
+        "d": "American Society of Heating, Refrigerating and Air-Conditioning Engineers: design references and guides for HVAC installations, including duct sizing."
+      },
+      "dw144": {
+        "t": "DW/144",
+        "d": "BESA (UK) specification for sheet metal ductwork: construction, air-tightness classes and testing."
+      }
+    }
+  },
+  "services": {
+    "title": "Our services",
+    "fabrication": "Fabrication",
+    "supply": "Supply",
+    "installation": "Installation"
   }
 }

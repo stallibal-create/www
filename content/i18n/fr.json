@@ -12,7 +12,8 @@
     "toConfirm": "à confirmer",
     "toProvide": "à fournir",
     "arrow": "→",
-    "back": "←"
+    "back": "←",
+    "onRequest": "Sur demande"
   },
   "nav": {
     "home": "Accueil",
@@ -80,10 +81,10 @@
   },
   "home": {
     "title": "Fabrication métallique & gaines de ventilation",
-    "eyebrow": "Gaines · Ventilation · Désenfumage",
+    "eyebrow": "Fabrication · Fourniture · Installation",
     "h1a": "L'air en mouvement.",
     "h1b": "Fabrication de précision.",
-    "lead": "Gaines de ventilation et de désenfumage, raccords et pièces de tôlerie fabriqués d'après vos plans. Pensé pour les bureaux d'études, entreprises de génie climatique et acheteurs qui veulent transformer des plans en métal fiable.",
+    "lead": "Votre partenaire en ventilation, climatisation et désenfumage : gaines, raccords et accessoires fabriqués d'après vos plans, fournis et installés sur tout le territoire national.",
     "cta1": "Demander un devis",
     "cta2": "Voir les produits",
     "heroAlt": "Visuel 3D conceptuel d'un réseau de gaines : gaine rectangulaire, coude circulaire et grille",
@@ -94,7 +95,7 @@
     "capIntro": "Du plan à la pièce : les familles de fabrication de Libalstal.",
     "capMore": "Tout le savoir-faire",
     "prodTitle": "Systèmes de gaines",
-    "prodIntro": "Gaines, raccords et accessoires — chaque fiche se complète avec les données techniques réelles.",
+    "prodIntro": "Gaines, raccords et accessoires fabriqués d'après vos plans — caractéristiques détaillées sur chaque fiche ou sur demande.",
     "prodMore": "Tous les produits",
     "qualTitle": "Des preuves, pas des adjectifs.",
     "qualIntro": "Chaque engagement qualité est publié avec le document qui le prouve. Tant qu'un justificatif manque, la ligne l'indique.",
@@ -137,7 +138,7 @@
       "cta3d": "Explorer l'assemblage en 3D"
     },
     "asmTitle": "Un réseau complet, pièce par pièce",
-    "asmText": "Faites pivoter un réseau de démonstration en 3D, écartez ses pièces et ouvrez la fiche de chacune : gaines droites, coude, té, réduction et bride.",
+    "asmText": "Explorez les réseaux rectangulaires et circulaires spiralés en 3D. Visualisez la circulation d’air ou activez l’option haute température pour une illustration en acier noir avec effet de chaleur.",
     "asmAlt": "Rendu 3D illustratif d'un réseau de gaines rectangulaires assemblé : gaines droites, coude, té avec piquage, réduction et bride.",
     "videoAlt": "Vidéo de bienvenue : un réseau de gaines s'assemble, puis le logo LIBALSTAL apparaît.",
     "videoReplay": "Rejouer la vidéo"
@@ -145,7 +146,7 @@
   "products": {
     "title": "Produits",
     "h1": "Systèmes de gaines & accessoires",
-    "intro": "Filtrez par famille. Dimensions, matières et fiches techniques s'affichent dès que les données vérifiées sont fournies.",
+    "intro": "Gaines rectangulaires et circulaires spiralées, gaines inox, aluminium et acier noir, et accessoires aérauliques complets. Les caractéristiques affichées sont celles communiquées par Libalstal ; les autres s'ajoutent dès qu'elles sont confirmées.",
     "filterLabel": "Filtrer par famille",
     "all": "Tous",
     "cats": {
@@ -155,18 +156,19 @@
       "cus": "Sur mesure"
     },
     "empty": "Aucun produit dans cette famille pour l'instant.",
-    "count": "{n} produit(s)",
+    "count": "{n} produits",
     "details": "Voir la fiche",
-    "quote": "Demander un devis"
+    "quote": "Demander un devis",
+    "countOne": "{n} produit"
   },
   "productItems": {
     "spiral-round-duct": {
       "name": "Gaine circulaire spiralée",
-      "summary": "Conduit circulaire à agrafage hélicoïdal continu, pour réseaux de soufflage, de reprise et d'extraction."
+      "summary": "Gaines circulaires spiralées en acier galvanisé : épaisseur 0,4 à 1,2 mm, toutes dimensions, assemblage étanche."
     },
     "rectangular-duct": {
       "name": "Gaine rectangulaire",
-      "summary": "Sections rectangulaires formées et assemblées selon plans, pour réseaux où l'encombrement en hauteur est limité."
+      "summary": "Gaines rectangulaires en tôle d'acier galvanisée : épaisseur 0,4 à 2 mm, longueurs standard 1 m et 1,25 m, fabrication sur mesure."
     },
     "elbows": {
       "name": "Coudes",
@@ -178,19 +180,31 @@
     },
     "tees-branches": {
       "name": "Piquages & tés",
-      "summary": "Tés, culottes et piquages pour les dérivations du réseau aéraulique."
+      "summary": "Tés, piquages et plénums pour les dérivations du réseau aéraulique."
     },
     "flanges-connectors": {
       "name": "Brides & raccords",
-      "summary": "Éléments d'assemblage entre tronçons : brides, manchons et pièces de jonction."
+      "summary": "Brides, cadres, angles et éléments d'assemblage entre tronçons."
     },
     "grilles-dampers": {
       "name": "Grilles, registres & accessoires",
-      "summary": "Bouches, grilles, registres de réglage et accessoires de réseau."
+      "summary": "Grilles, registres de réglage (volume dampers) et porte-filtres."
     },
     "custom-assemblies": {
       "name": "Fabrication métallique sur mesure",
       "summary": "Pièces et assemblages de tôlerie réalisés d'après vos plans et cahiers des charges."
+    },
+    "stainless-ducts": {
+      "name": "Gaines spéciales inox 304 / 316",
+      "summary": "Gaines en acier inoxydable 304 ou 316 pour les milieux exigeants : résistance à la corrosion, hygiène et durabilité."
+    },
+    "aluminium-ducts": {
+      "name": "Gaines aluminium",
+      "summary": "Gaines en aluminium, légères et résistantes, adaptées à des environnements spécifiques."
+    },
+    "black-steel-ducts": {
+      "name": "Gaines en acier noir",
+      "summary": "Gaines en acier noir pour applications industrielles, y compris à températures élevées selon les spécifications du projet."
     }
   },
   "product": {
@@ -201,10 +215,11 @@
     "noDownloads": "Fiche technique et plans types",
     "related": "Dans la même famille",
     "ctaTitle": "Besoin de ce produit ?",
-    "ctaText": "Joignez vos plans ou dimensions : la demande est pré-remplie avec ce produit.",
+    "ctaText": "Envoyez vos dimensions : la demande est pré-remplie avec ce produit. Vos plans pourront être transmis par e-mail.",
     "imageMissing": "Photo produit",
     "render": "Rendu 3D illustratif — proportions de démonstration, pas une photo du produit.",
-    "renderAlt": "{name} — rendu 3D illustratif"
+    "renderAlt": "{name} — rendu 3D illustratif",
+    "datasheetRequest": "Fiche technique disponible sur demande."
   },
   "capabilities": {
     "title": "Savoir-faire",
@@ -228,8 +243,8 @@
         "text": "Coudes, réductions, piquages et transitions fabriqués à la demande."
       },
       "install": {
-        "title": "Pose & accompagnement de projet",
-        "text": "Accompagnement sur chantier et mise en œuvre — rubrique publiée uniquement si le service est proposé."
+        "title": "Installation",
+        "text": "Installation des réseaux aérauliques par une équipe technique qualifiée, sur tout le territoire national."
       }
     },
     "equipmentTitle": "Parc machines",
@@ -254,21 +269,34 @@
         "d": "Vérification puis expédition ou enlèvement."
       }
     ],
-    "offeredUnknown": "Service proposé ?"
+    "offeredUnknown": "Service proposé ?",
+    "why": {
+      "title": "Pourquoi choisir Libalstal",
+      "items": [
+        "Atelier de fabrication moderne et automatisé",
+        "Fabrication sur mesure selon vos besoins",
+        "Normes de référence : SMACNA, ASHRAE, DW/144",
+        "Assemblages étanches",
+        "Équipe technique expérimentée et service d'installation qualifié",
+        "Intervention sur tout le territoire national"
+      ]
+    }
   },
   "industries": {
     "title": "Secteurs",
     "h1": "Secteurs desservis",
-    "intro": "Les environnements où les réseaux aérauliques comptent. La liste sera ajustée à l'expérience réelle de Libalstal.",
+    "intro": "Les environnements où nous intervenons, de la conception du réseau à la pose.",
     "unconfirmed": "Liste indicative — à confirmer par Libalstal",
     "items": {
       "commercial": "Bâtiments commerciaux & tertiaires",
-      "industrial": "Sites industriels",
-      "health": "Santé",
-      "hospitality": "Hôtellerie & restauration",
+      "industrial": "Industries",
+      "health": "Hôpitaux & cliniques",
+      "hospitality": "Hôtels & résidences",
       "logistics": "Entrepôts & logistique",
       "infrastructure": "Infrastructures & équipements publics",
-      "special": "Environnements spécialisés"
+      "special": "Environnements spécialisés",
+      "tertiary": "Bâtiments tertiaires",
+      "retail": "Centres commerciaux"
     },
     "cta": "Parlez-nous de votre projet"
   },
@@ -285,7 +313,8 @@
     "challenge": "Enjeu",
     "solution": "Notre réponse",
     "gallery": "Photos du chantier",
-    "photosMissing": "Photos du projet"
+    "photosMissing": "Photos du projet",
+    "emptyRefs": "Études de cas détaillées à venir."
   },
   "quality": {
     "title": "Ingénierie & qualité",
@@ -334,7 +363,7 @@
   "contact": {
     "title": "Contact & devis",
     "h1": "Demande de devis",
-    "intro": "Trois étapes courtes, avec un récapitulatif avant tout envoi. Vos plans sont stockés de façon privée et ne servent qu'à établir le devis.",
+    "intro": "Trois étapes courtes, avec un récapitulatif avant tout envoi. Vos plans éventuels se transmettent ensuite par e-mail ; ils ne servent qu'à établir le devis.",
     "direct": "Contact direct"
   },
   "rfq": {
@@ -395,7 +424,9 @@
     "failUploadsOff": "L'envoi de plans n'est pas encore activé sur ce site. Envoyez la demande sans fichier et joignez vos plans par e-mail, ou contactez-nous directement.",
     "failNotify": "Votre demande est enregistrée sous la référence {ref}, mais l'équipe n'a pas encore été prévenue. Cliquez à nouveau sur Envoyer : elle ne sera pas dupliquée.",
     "honeypot": "Ne pas remplir ce champ",
-    "productPrefill": "Produit concerné : {p}"
+    "productPrefill": "Produit concerné : {p}",
+    "filesByEmail": "Plans et documents : envoyez-les par e-mail à {email} en rappelant la référence de votre demande.",
+    "captchaLoadError": "La vérification anti-robot n'a pas pu se charger. Rechargez la page ; si le problème persiste, écrivez-nous à {email}."
   },
   "privacy": {
     "title": "Politique de confidentialité",
@@ -404,23 +435,19 @@
     "sections": [
       {
         "h": "Responsable du traitement",
-        "p": "LIBALSTAL ({legalName}), {address}. Contact : {privacyContact}."
+        "p": "LIBALSTAL ({legalName}), {address}."
       },
       {
         "h": "Données collectées",
-        "p": "Via le formulaire de devis uniquement : nom, société, e-mail, téléphone (facultatif), pays de livraison, description du besoin et plans joints. Aucune donnée n'est collectée à des fins publicitaires."
+        "p": "Via le formulaire de devis uniquement : nom, société, e-mail, téléphone (facultatif), pays de livraison et description du besoin. Les plans éventuels sont envoyés par e-mail. Aucune donnée n'est collectée à des fins publicitaires."
       },
       {
         "h": "Finalité",
         "p": "Étudier votre demande, établir un devis et vous recontacter à ce sujet."
       },
       {
-        "h": "Conservation",
-        "p": "Durée de conservation : {dataRetention}."
-      },
-      {
         "h": "Destinataires & stockage",
-        "p": "Les demandes et fichiers sont stockés de façon privée et ne sont accessibles qu'aux personnes de Libalstal chargées des devis. Hébergement : {host}."
+        "p": "Les demandes sont transmises par e-mail et ne sont accessibles qu'aux personnes de Libalstal chargées des devis."
       },
       {
         "h": "Cookies & stockage local",
@@ -428,7 +455,7 @@
       },
       {
         "h": "Vos droits",
-        "p": "Vous pouvez demander l'accès, la rectification ou la suppression de vos données en écrivant à {privacyContact}. Cadre légal : {applicableLaw}."
+        "p": "Vous pouvez demander l'accès, la rectification ou la suppression de vos données en écrivant à {email}."
       }
     ]
   },
@@ -441,20 +468,12 @@
         "p": "{legalName} — LIBALSTAL. {address}. Téléphone : {phone}. E-mail : {email}. Immatriculation : {registration}."
       },
       {
-        "h": "Directeur de la publication",
-        "p": "{publicationDirector}."
-      },
-      {
-        "h": "Hébergement",
-        "p": "{host}."
-      },
-      {
         "h": "Propriété intellectuelle",
         "p": "Le logo LIBALSTAL, les textes et les visuels de ce site sont la propriété de leurs titulaires respectifs. Toute reproduction sans autorisation est interdite."
       },
       {
         "h": "Visuels",
-        "p": "Le visuel 3D de la page d'accueil est une illustration conceptuelle et ne représente pas une réalisation précise."
+        "p": "Les rendus 3D et animations de ce site sont des illustrations et ne représentent pas une réalisation précise."
       }
     ]
   },
@@ -476,9 +495,10 @@
     "newTab": "(nouvel onglet)"
   },
   "social": {
-    "label": "LIBALSTAL sur les réseaux sociaux",
+    "label": "Contacter LIBALSTAL et réseaux sociaux",
     "open": "Afficher les réseaux sociaux",
-    "close": "Masquer les réseaux sociaux"
+    "close": "Masquer les réseaux sociaux",
+    "pending": "Lien à venir"
   },
   "assembly": {
     "title": "Assemblage de gaines en 3D",
@@ -520,7 +540,11 @@
       "innerRadius": "Rayon intérieur",
       "angle": "Angle",
       "flangeWidth": "Largeur de l'aile de bride",
-      "flangeDepth": "Profondeur de bride"
+      "flangeDepth": "Profondeur de bride",
+      "diameter": "Diamètre intérieur",
+      "inletDiameter": "Diamètre d’entrée",
+      "outletDiameter": "Diamètre de sortie",
+      "pitch": "Pas de spirale (démonstration)"
     },
     "types": {
       "straight": "Gaine droite",
@@ -528,15 +552,67 @@
       "reducer": "Réduction",
       "tee": "Té",
       "branch": "Gaine de piquage",
-      "flange": "Bride"
+      "flange": "Bride",
+      "spiral-straight": "Circulaire spiralé",
+      "round-straight": "Gaine circulaire",
+      "round-elbow": "Coude circulaire 90°",
+      "round-reducer": "Réduction circulaire"
     },
     "explode": "Éclater les pièces",
     "reassemble": "Réassembler",
     "replay": "Revoir l'animation",
     "skip": "Passer l'animation",
-    "playing": "Présentation de l'assemblage en cours. Vous pouvez la passer ou interagir directement."
+    "playing": "Présentation de l'assemblage en cours. Vous pouvez la passer ou interagir directement.",
+    "systems": {
+      "label": "Choisir un réseau",
+      "rectangular": "Rectangulaire",
+      "spiral": "Circulaire spiralé",
+      "high-temperature": "Haute température",
+      "spiralTitle": "Réseau de gaines circulaires spiralées",
+      "heatTitle": "Réseau industriel en acier noir",
+      "spiralIntro": "Explorez un réseau circulaire avec joint spiralé, coude et réduction. Les dimensions et les assemblages illustrent un modèle de démonstration.",
+      "heatIntro": "Explorez un exemple de réseau en acier noir pour applications industrielles à haute température, selon les spécifications du projet. Aucune température admissible ni résistance au feu n’est déclarée par ce modèle."
+    },
+    "effects": {
+      "label": "Illustration du flux et de la matière",
+      "air": "Circulation d’air",
+      "play": "Animer",
+      "pause": "Pause",
+      "cutaway": "Voir l’intérieur",
+      "note": "Illustration animée du sens de circulation. Ni simulation des fluides ni essai de performance.",
+      "heatNote": "Illustration acier noir / chaleur. Les limites de fonctionnement et la résistance au feu doivent être établies pour le projet réel."
+    }
   },
   "intro": {
     "skip": "Passer l'intro"
+  },
+  "references": {
+    "title": "Références de projets",
+    "intro": "Projets sur lesquels Libalstal est intervenu, d'après la documentation de l'entreprise.",
+    "note": "Les noms et marques cités appartiennent à leurs propriétaires respectifs."
+  },
+  "standards": {
+    "title": "Normes de référence",
+    "intro": "Libalstal s'appuie sur ces référentiels pour la conception et la fabrication des réseaux de gaines. Ce sont des normes de référence, pas des certifications.",
+    "items": {
+      "smacna": {
+        "t": "SMACNA",
+        "d": "Sheet Metal and Air Conditioning Contractors' National Association (États-Unis) : normes de construction des gaines métalliques — épaisseurs, renforts, assemblages et étanchéité."
+      },
+      "ashrae": {
+        "t": "ASHRAE",
+        "d": "American Society of Heating, Refrigerating and Air-Conditioning Engineers : référentiels et guides de conception des installations de chauffage, ventilation et climatisation, dont le dimensionnement des réseaux."
+      },
+      "dw144": {
+        "t": "DW/144",
+        "d": "Spécification britannique de la BESA pour les réseaux de gaines en tôle : construction, classes d'étanchéité et essais."
+      }
+    }
+  },
+  "services": {
+    "title": "Nos services",
+    "fabrication": "Fabrication",
+    "supply": "Fourniture",
+    "installation": "Installation"
   }
 }

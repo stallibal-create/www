@@ -1,10 +1,11 @@
 {
   "_readme": "SINGLE SOURCE OF COMPANY FACTS. Any value set to null is shown on the site as a clearly marked placeholder and listed in MISSING-INFO.md at build time. Replace null with a plain string (same for all languages) or with {\"fr\": \"…\", \"en\": \"…\", \"ar\": \"…\"}. Never enter anything that is not verified.",
   "social": {
-    "_readme": "Every social profile URL used by the site (floating dock, footer, company page, contact, JSON-LD sameAs). Only real https profile URLs; null = not shown and listed in MISSING-INFO.md. Never put a guessed URL here.",
+    "_readme": "Every social profile URL used by the site (floating dock, footer, company page, contact, JSON-LD sameAs). Only real https profile URLs; null = inactive icon in footer/dock and listed in MISSING-INFO.md. Never put a guessed URL here.",
     "facebook": "https://www.facebook.com/Libalstal/",
     "instagram": null,
-    "tiktok": null
+    "tiktok": null,
+    "linkedin": null
   },
   "company": {
     "name": "LIBALSTAL",
@@ -29,15 +30,37 @@
     "phone2": "+213 553 09 82 14",
     "whatsapp": "+213 561 63 19 42",
     "email": "commercial@libalstal.com",
-    "hours": null,
+    "hours": {
+      "fr": "Dimanche – jeudi, 9 h 00 – 16 h 30",
+      "en": "Sunday – Thursday, 9:00 – 16:30",
+      "ar": "من الأحد إلى الخميس، 9:00 – 16:30"
+    },
+    "hoursSpec": {
+      "dayOfWeek": [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday"
+      ],
+      "opens": "09:00",
+      "closes": "16:30"
+    },
     "registration": null,
-    "director": null,
+    "director": "Ihab Noureddine",
     "about": {
       "fr": "Libal Stal SARL fabrique des réseaux de gaines métalliques pour la ventilation et le désenfumage. L'entreprise est en activité depuis 2018.",
       "en": "Libal Stal SARL manufactures metal duct systems for ventilation and smoke extraction. The company has been in operation since 2018.",
       "ar": "تصنع شركة Libal Stal SARL أنظمة مجاري معدنية للتهوية واستخراج الدخان. تمارس الشركة نشاطها منذ 2018."
     },
-    "mapUrl": "https://www.google.com/maps/search/?api=1&query=Zaouia%20Center%2C%20Beni%20Tamou%2C%20Blida%2C%20Algeria"
+    "mapUrl": "https://www.google.com/maps/search/?api=1&query=Zaouia%20Center%2C%20Beni%20Tamou%2C%20Blida%2C%20Algeria",
+    "registrationPublic": false,
+    "_registrationNote": "RC known (brochure) but not published, by the owner's decision (2026-10-24).",
+    "services": [
+      "fabrication",
+      "supply",
+      "installation"
+    ]
   },
   "keyFacts": [
     {
@@ -46,15 +69,23 @@
     },
     {
       "id": "materials",
-      "value": null
+      "value": {
+        "fr": "Acier galvanisé, inox 304/316, aluminium, acier noir",
+        "en": "Galvanised steel, stainless 304/316, aluminium, black steel",
+        "ar": "فولاذ مجلفن، فولاذ مقاوم للصدأ 304/316، ألمنيوم، فولاذ أسود"
+      }
     },
     {
       "id": "standards",
-      "value": null
+      "value": "SMACNA · ASHRAE · DW/144"
     },
     {
       "id": "markets",
-      "value": null
+      "value": {
+        "fr": "Tout le territoire national",
+        "en": "Nationwide (Algeria)",
+        "ar": "كامل التراب الوطني"
+      }
     }
   ],
   "heroVisual": {
@@ -81,18 +112,72 @@
     },
     {
       "id": "install",
-      "offered": null
+      "offered": true
     }
   ],
   "equipment": [],
   "materials": [],
   "products": [
     {
+      "slug": "rectangular-duct",
+      "cat": "duct",
+      "specs": {
+        "dimensions": {
+          "fr": "Sur mesure ; longueurs standard 1 m et 1,25 m",
+          "en": "Made to measure; standard lengths 1 m and 1.25 m",
+          "ar": "حسب الطلب؛ أطوال قياسية 1 m و1.25 m"
+        },
+        "material": {
+          "fr": "Tôle d'acier galvanisée",
+          "en": "Galvanised steel sheet",
+          "ar": "صفائح فولاذية مجلفنة"
+        },
+        "thickness": {
+          "fr": "0,4 à 2 mm",
+          "en": "0.4 to 2 mm",
+          "ar": "من 0.4 إلى 2 mm"
+        },
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
       "slug": "spiral-round-duct",
       "cat": "duct",
       "specs": {
+        "dimensions": {
+          "fr": "Toutes dimensions",
+          "en": "All sizes",
+          "ar": "جميع المقاسات"
+        },
+        "material": {
+          "fr": "Tôle d'acier galvanisée",
+          "en": "Galvanised steel sheet",
+          "ar": "صفائح فولاذية مجلفنة"
+        },
+        "thickness": {
+          "fr": "0,4 à 1,2 mm",
+          "en": "0.4 to 1.2 mm",
+          "ar": "من 0.4 إلى 1.2 mm"
+        },
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "stainless-ducts",
+      "cat": "duct",
+      "specs": {
         "dimensions": null,
-        "material": null,
+        "material": {
+          "fr": "Acier inoxydable 304 / 316",
+          "en": "Stainless steel 304 / 316",
+          "ar": "فولاذ مقاوم للصدأ 304 / 316"
+        },
         "thickness": null,
         "finish": null,
         "standard": null
@@ -101,11 +186,32 @@
       "image": null
     },
     {
-      "slug": "rectangular-duct",
+      "slug": "aluminium-ducts",
       "cat": "duct",
       "specs": {
         "dimensions": null,
-        "material": null,
+        "material": {
+          "fr": "Aluminium",
+          "en": "Aluminium",
+          "ar": "ألمنيوم"
+        },
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
+    },
+    {
+      "slug": "black-steel-ducts",
+      "cat": "duct",
+      "specs": {
+        "dimensions": null,
+        "material": {
+          "fr": "Acier noir",
+          "en": "Black steel",
+          "ar": "فولاذ أسود"
+        },
         "thickness": null,
         "finish": null,
         "standard": null
@@ -192,15 +298,13 @@
       "image": null
     }
   ],
-  "industriesConfirmed": false,
+  "industriesConfirmed": true,
   "industries": [
-    "commercial",
-    "industrial",
+    "tertiary",
     "health",
     "hospitality",
-    "logistics",
-    "infrastructure",
-    "special"
+    "industrial",
+    "retail"
   ],
   "quality": [
     {
@@ -213,10 +317,6 @@
     },
     {
       "id": "tolerances",
-      "evidence": null
-    },
-    {
-      "id": "standards",
       "evidence": null
     },
     {
@@ -251,11 +351,7 @@
     }
   ],
   "legal": {
-    "host": null,
-    "publicationDirector": null,
-    "dataRetention": null,
-    "applicableLaw": null,
-    "privacyContact": null
+    "_note": "Owner decision (2026-10-25): no host, publication director, retention period, applicable law or separate privacy contact on the legal pages."
   },
   "ductAssembly": {
     "_readme": "DEMONSTRATION ASSEMBLY for the 3D viewer (/fr/assembly/). Every geometry value is a demo dimension (demo: true), shown under the \"Modèle de démonstration\" label, never as a LIBALSTAL specification. Verified specifications come ONLY from products[].specs through productSlug. Coordinates: mm, +Y up, origin = centre of the first part inlet. The first component is the root; connections must form a tree. Checked by scripts/assembly-validate.mjs (build + lint).",
@@ -469,5 +565,290 @@
   "display": {
     "_note": "hideIncomplete: true hides home-page blocks that still have no verified data (empty key facts, quality items without evidence, unconfirmed industries, no projects). MISSING-INFO.md still lists everything.",
     "hideIncomplete": true
+  },
+  "standards": [
+    "smacna",
+    "ashrae",
+    "dw144"
+  ],
+  "references": [
+    {
+      "org": "Clinique Inaya",
+      "project": {
+        "fr": "Clinique Inaya",
+        "en": "Inaya Clinic",
+        "ar": "عيادة عناية"
+      },
+      "place": {
+        "fr": "El Kouba, Alger",
+        "en": "El Kouba, Algiers",
+        "ar": "القبة، الجزائر"
+      },
+      "sector": "health"
+    },
+    {
+      "org": "Mohammed Bin Nayef Medical Center",
+      "project": {
+        "fr": "Centre médical Mohammed Bin Nayef",
+        "en": "Mohammed Bin Nayef Medical Center",
+        "ar": "المركز الطبي محمد بن نايف"
+      },
+      "place": {
+        "fr": "Béchar",
+        "en": "Bechar",
+        "ar": "بشار"
+      },
+      "sector": "health"
+    },
+    {
+      "org": "Marriott",
+      "project": {
+        "fr": "Hôtel Marriott Bab Ezzouar",
+        "en": "Marriott Hotel Bab Ezzouar",
+        "ar": "فندق ماريوت باب الزوار"
+      },
+      "place": {
+        "fr": "Bab Ezzouar, Alger",
+        "en": "Bab Ezzouar, Algiers",
+        "ar": "باب الزوار، الجزائر"
+      },
+      "sector": "hospitality"
+    },
+    {
+      "org": "Trust Bank",
+      "project": {
+        "fr": "Trust Bank",
+        "en": "Trust Bank",
+        "ar": "ترست بنك"
+      },
+      "place": {
+        "fr": "Bab Ezzouar, Alger",
+        "en": "Bab Ezzouar, Algiers",
+        "ar": "باب الزوار، الجزائر"
+      },
+      "sector": "tertiary"
+    },
+    {
+      "org": null,
+      "project": {
+        "fr": "Centre commercial Bab Ezzouar",
+        "en": "Bab Ezzouar shopping centre",
+        "ar": "المركز التجاري باب الزوار"
+      },
+      "place": {
+        "fr": "Bab Ezzouar, Alger",
+        "en": "Bab Ezzouar, Algiers",
+        "ar": "باب الزوار، الجزائر"
+      },
+      "sector": "retail"
+    },
+    {
+      "org": "Sonatrach",
+      "project": {
+        "fr": "South West Gas Fields Development Project",
+        "en": "South West Gas Fields Development Project",
+        "ar": "مشروع تطوير حقول الغاز للجنوب الغربي"
+      },
+      "place": {
+        "fr": "Timimoun",
+        "en": "Timimoun",
+        "ar": "تيميمون"
+      },
+      "sector": "industrial"
+    },
+    {
+      "org": "CRAPC",
+      "project": {
+        "fr": "Siège, laboratoires et annexes du Centre de recherche CRAPC",
+        "en": "CRAPC research centre: headquarters, laboratories and annexes",
+        "ar": "مقر ومخابر وملحقات مركز البحث CRAPC"
+      },
+      "place": {
+        "fr": "Tipaza",
+        "en": "Tipaza",
+        "ar": "تيبازة"
+      },
+      "sector": "tertiary"
+    },
+    {
+      "org": null,
+      "project": {
+        "fr": "Résidence Victoria",
+        "en": "Victoria Residence",
+        "ar": "إقامة فيكتوريا"
+      },
+      "place": {
+        "fr": "Aïn Naadja, Alger",
+        "en": "Ain Naadja, Algiers",
+        "ar": "عين النعجة، الجزائر"
+      },
+      "sector": "hospitality"
+    },
+    {
+      "org": "Institut Pasteur",
+      "project": {
+        "fr": "Institut Pasteur",
+        "en": "Pasteur Institute",
+        "ar": "معهد باستور"
+      },
+      "place": {
+        "fr": "Dely Ibrahim, Alger",
+        "en": "Dely Ibrahim, Algiers",
+        "ar": "دالي إبراهيم، الجزائر"
+      },
+      "sector": "health"
+    }
+  ],
+  "ductSystems": {
+    "spiral": {
+      "id": "demo-spiral",
+      "demo": true,
+      "settings": {
+        "sheetMm": 3,
+        "flangeWidthMm": 22,
+        "flangeDepthMm": 20,
+        "demo": true,
+        "finish": "galvanised"
+      },
+      "components": [
+        {
+          "id": "round-1",
+          "type": "spiral-straight",
+          "productSlug": "spiral-round-duct",
+          "name": {
+            "fr": "Tronçon circulaire 1",
+            "en": "Round duct segment 1",
+            "ar": "مجرى دائري — الجزء 1"
+          },
+          "geometry": {
+            "diameterMm": 400,
+            "lengthMm": 1000,
+            "pitchMm": 140,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 200
+          },
+          "description": {
+            "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+            "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+            "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+          }
+        },
+        {
+          "id": "round-bend",
+          "type": "round-elbow",
+          "productSlug": "elbows",
+          "name": {
+            "fr": "Coude circulaire 90°",
+            "en": "Round 90° elbow",
+            "ar": "كوع دائري 90°"
+          },
+          "geometry": {
+            "diameterMm": 400,
+            "innerRadiusMm": 200,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 200
+          },
+          "description": {
+            "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+            "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+            "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+          }
+        },
+        {
+          "id": "round-2",
+          "type": "spiral-straight",
+          "productSlug": "spiral-round-duct",
+          "name": {
+            "fr": "Tronçon circulaire 2",
+            "en": "Round duct segment 2",
+            "ar": "مجرى دائري — الجزء 2"
+          },
+          "geometry": {
+            "diameterMm": 400,
+            "lengthMm": 700,
+            "pitchMm": 140,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 200
+          },
+          "description": {
+            "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+            "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+            "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+          }
+        },
+        {
+          "id": "round-reduction",
+          "type": "round-reducer",
+          "productSlug": "reducers-transitions",
+          "name": {
+            "fr": "Réduction circulaire",
+            "en": "Round reducer",
+            "ar": "مخفض دائري"
+          },
+          "geometry": {
+            "inletDiameterMm": 400,
+            "outletDiameterMm": 300,
+            "lengthMm": 400,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 200
+          },
+          "description": {
+            "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+            "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+            "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+          }
+        },
+        {
+          "id": "round-3",
+          "type": "spiral-straight",
+          "productSlug": "spiral-round-duct",
+          "name": {
+            "fr": "Tronçon circulaire 3",
+            "en": "Round duct segment 3",
+            "ar": "مجرى دائري — الجزء 3"
+          },
+          "geometry": {
+            "diameterMm": 300,
+            "lengthMm": 600,
+            "pitchMm": 140,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 200
+          },
+          "description": {
+            "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+            "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+            "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+          }
+        }
+      ],
+      "connections": [
+        [
+          "round-1.outlet",
+          "round-bend.inlet"
+        ],
+        [
+          "round-bend.outlet",
+          "round-2.inlet"
+        ],
+        [
+          "round-2.outlet",
+          "round-reduction.inlet"
+        ],
+        [
+          "round-reduction.outlet",
+          "round-3.inlet"
+        ]
+      ]
+    }
   }
 }
