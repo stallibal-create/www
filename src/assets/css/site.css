@@ -752,3 +752,36 @@ html:not(.js) .asm-pick { cursor: default; }
 .asm-view.is-heat .asm-stage { --stage: #211d1a; --stage-line: #433126; }
 .asm-view.is-heat .asm-preview { filter: brightness(.48) sepia(.18); }
 .asm-effects-controls .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* Transparent reference marks adapt their dark lettering to the active theme. */
+.ref-logo { display: flex; align-items: center; justify-content: center; height: 112px; padding: 12px 18px; margin-bottom: .7rem; overflow: hidden; }
+.ref-logo img { display: block; max-width: 100%; max-height: 88px; width: auto; height: auto; object-fit: contain; }
+.ref-logo .ref-logo-light { display: none; }
+:root[data-theme="light"] .ref-logo .ref-logo-light { display: block; }
+:root[data-theme="light"] .ref-logo .ref-logo-dark { display: none; }
+
+.ref-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .ref-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .ref-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.ref-logo-dark[src*="inaya-dark"] { filter: brightness(3) saturate(.65); }
+.ref-logo-dark[src*="trust-bank-dark"] { filter: brightness(1.5); }
+
+:root[data-theme="light"] .ref-logo-light[src*="victoria-restored"] { filter: brightness(.62) saturate(.85); }
+.ref-logo-dark[src*="pasteur-owner"] { filter: brightness(1.5); }
+
+/* Architectural industry pictograms and clear, multilingual service descriptions. */
+.ind-grid li { min-height: 306px; gap: 1.8rem; position: relative; overflow: hidden; transition: border-color .2s ease, background-color .2s ease; }
+.ind-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+.ind-icon { width: 86px; height: 86px; flex: 0 0 auto; color: var(--text); }
+.ind-icon-fill { fill: var(--accent); fill-opacity: .09; stroke: none; }
+.ind-icon-air { color: var(--accent); stroke-width: 2.2; }
+.ind-card-top .ind-n { padding-top: .5rem; opacity: .7; font-size: .7rem; }
+.ind-card-copy h3 { font-size: 1rem; line-height: 1.45; margin: 0 0 .7rem; color: var(--text); }
+.ind-card-copy p { margin: 0; color: var(--muted); font-size: .82rem; font-weight: 400; line-height: 1.7; }
+@media (hover: hover) { .ind-grid li:hover { background: var(--surface); } .ind-grid li:hover .ind-icon { color: var(--accent); } }
+@media (prefers-reduced-motion: reduce) { .ind-grid li { transition: none; } }
+@media (max-width: 420px) { .ind-grid li { min-height: 240px; gap: 1rem; } .ind-icon { width: 76px; height: 76px; } }
+
+.ind-card-copy { flex: 1; }
+.ind-card-copy h3 { min-height: 2.9em; }

@@ -298,7 +298,14 @@
       "tertiary": "Office & service buildings",
       "retail": "Shopping centres"
     },
-    "cta": "Tell us about your project"
+    "cta": "Tell us about your project",
+    "descriptions": {
+      "tertiary": "Ductwork for offices, service buildings and research spaces — from fabrication to installation.",
+      "health": "Ventilation and air-conditioning ductwork for hospitals, clinics and healthcare buildings.",
+      "hospitality": "Air distribution networks for hotels and residences, serving guest rooms and shared spaces.",
+      "industrial": "Sheet-metal duct systems for industrial facilities, workshops and technical spaces.",
+      "retail": "Ventilation and air-conditioning networks for shopping centres, retail units and common areas."
+    }
   },
   "projects": {
     "title": "Projects",

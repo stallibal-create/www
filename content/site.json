@@ -584,21 +584,15 @@
         "en": "El Kouba, Algiers",
         "ar": "القبة، الجزائر"
       },
-      "sector": "health"
-    },
-    {
-      "org": "Mohammed Bin Nayef Medical Center",
-      "project": {
-        "fr": "Centre médical Mohammed Bin Nayef",
-        "en": "Mohammed Bin Nayef Medical Center",
-        "ar": "المركز الطبي محمد بن نايف"
-      },
-      "place": {
-        "fr": "Béchar",
-        "en": "Bechar",
-        "ar": "بشار"
-      },
-      "sector": "health"
+      "sector": "health",
+      "logo": {
+        "file": "inaya.webp",
+        "name": "Clinique Inaya",
+        "width": 400,
+        "height": 85,
+        "lightFile": "inaya-light.svg",
+        "darkFile": "inaya-dark.svg"
+      }
     },
     {
       "org": "Marriott",
@@ -612,7 +606,15 @@
         "en": "Bab Ezzouar, Algiers",
         "ar": "باب الزوار، الجزائر"
       },
-      "sector": "hospitality"
+      "sector": "hospitality",
+      "logo": {
+        "file": "marriott.jpg",
+        "name": "Marriott Hotels",
+        "width": 240,
+        "height": 180,
+        "lightFile": "marriott-light.svg",
+        "darkFile": "marriott-dark.svg"
+      }
     },
     {
       "org": "Trust Bank",
@@ -626,7 +628,15 @@
         "en": "Bab Ezzouar, Algiers",
         "ar": "باب الزوار، الجزائر"
       },
-      "sector": "tertiary"
+      "sector": "tertiary",
+      "logo": {
+        "file": "trust-bank.png",
+        "name": "Trust Bank Algeria",
+        "width": 106,
+        "height": 127,
+        "lightFile": "trust-bank-light.svg",
+        "darkFile": "trust-bank-dark.svg"
+      }
     },
     {
       "org": null,
@@ -640,7 +650,15 @@
         "en": "Bab Ezzouar, Algiers",
         "ar": "باب الزوار، الجزائر"
       },
-      "sector": "retail"
+      "sector": "retail",
+      "logo": {
+        "file": "bab-ezzouar.jpg",
+        "name": "Bab Ezzouar — Centre commercial & de loisirs",
+        "width": 1120,
+        "height": 470,
+        "lightFile": "bab-ezzouar-light.svg",
+        "darkFile": "bab-ezzouar-dark.svg"
+      }
     },
     {
       "org": "Sonatrach",
@@ -654,7 +672,15 @@
         "en": "Timimoun",
         "ar": "تيميمون"
       },
-      "sector": "industrial"
+      "sector": "industrial",
+      "logo": {
+        "file": "sonatrach.svg",
+        "name": "Sonatrach",
+        "width": 628,
+        "height": 902,
+        "lightFile": "sonatrach-light.svg",
+        "darkFile": "sonatrach-dark.svg"
+      }
     },
     {
       "org": "CRAPC",
@@ -668,7 +694,15 @@
         "en": "Tipaza",
         "ar": "تيبازة"
       },
-      "sector": "tertiary"
+      "sector": "tertiary",
+      "logo": {
+        "file": "crapc.png",
+        "name": "CRAPC",
+        "width": 305,
+        "height": 300,
+        "lightFile": "crapc-light.svg",
+        "darkFile": "crapc-dark.svg"
+      }
     },
     {
       "org": null,
@@ -682,7 +716,13 @@
         "en": "Ain Naadja, Algiers",
         "ar": "عين النعجة، الجزائر"
       },
-      "sector": "hospitality"
+      "sector": "hospitality",
+      "logo": {
+        "file": "victoria-restored.png",
+        "name": "Victoria Résidence",
+        "width": 2172,
+        "height": 724
+      }
     },
     {
       "org": "Institut Pasteur",
@@ -696,7 +736,15 @@
         "en": "Dely Ibrahim, Algiers",
         "ar": "دالي إبراهيم، الجزائر"
       },
-      "sector": "health"
+      "sector": "health",
+      "logo": {
+        "file": "pasteur-owner.jpg",
+        "name": "Institut Pasteur d’Algérie",
+        "width": 1180,
+        "height": 1060,
+        "lightFile": "pasteur-owner-light.svg",
+        "darkFile": "pasteur-owner-dark.svg"
+      }
     }
   ],
   "ductSystems": {

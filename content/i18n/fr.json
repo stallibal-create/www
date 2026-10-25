@@ -298,7 +298,14 @@
       "tertiary": "Bâtiments tertiaires",
       "retail": "Centres commerciaux"
     },
-    "cta": "Parlez-nous de votre projet"
+    "cta": "Parlez-nous de votre projet",
+    "descriptions": {
+      "tertiary": "Réseaux aérauliques pour bureaux, bâtiments de services et espaces de recherche, de la fabrication à la pose.",
+      "health": "Gaines de ventilation et de climatisation pour hôpitaux, cliniques et bâtiments de santé.",
+      "hospitality": "Réseaux de distribution d’air pour hôtels et résidences, des chambres aux espaces communs.",
+      "industrial": "Réseaux de gaines métalliques pour sites industriels, ateliers et locaux techniques.",
+      "retail": "Réseaux de ventilation et de climatisation pour centres commerciaux, boutiques et espaces communs."
+    }
   },
   "projects": {
     "title": "Réalisations",

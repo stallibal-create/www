@@ -7,6 +7,7 @@ import { gzipSync, brotliCompressSync, constants as ZLIB } from 'node:zlib';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { icons } from './icons.mjs';
+import { industryIcon } from './industry-icons.mjs';
 import { validateAssembly } from './assembly-validate.mjs';
 import { assemblySvg } from './assembly-svg.mjs';
 import { modelProblems } from './assembly-model.mjs';
@@ -313,13 +314,17 @@ function industriesGrid(ctx) {
   const { D } = ctx;
   if (!site.industriesConfirmed) note('industriesConfirmed', 'Confirmer la liste des secteurs réellement servis');
   return `${site.industriesConfirmed ? '' : `<p class="flag">${esc(D.industries.unconfirmed)}</p>`}
-<ul class="ind-grid" role="list">${site.industries.map((k, i) => `<li><span class="ind-n">${String(i + 1).padStart(2, '0')}</span>${esc(D.industries.items[k])}</li>`).join('')}</ul>`;
+<ul class="ind-grid" role="list">${site.industries.map((k, i) => `<li><div class="ind-card-top">${industryIcon(k)}<span class="ind-n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span></div><div class="ind-card-copy"><h3>${esc(D.industries.items[k])}</h3><p>${esc(D.industries.descriptions[k])}</p></div></li>`).join('')}</ul>`;
 }
 
 function referencesBlock(ctx, headingId, level = 2) {
   const { lang, D } = ctx, R = D.references;
   if (!site.references?.length) return '';
-  const items = site.references.map(r => `<li><span class="ref-sector">${esc(D.industries.items[r.sector] || '')}</span><span class="ref-name">${esc(tv(r.project, lang))}</span>${r.org && r.org !== tv(r.project, lang) ? `<span class="ref-org">${esc(r.org)}</span>` : ''}<span class="ref-place">${esc(tv(r.place, lang))}</span></li>`).join('');
+  const items = site.references.map((r, i) => {
+    if (!r.logo) note(`references.${i}.logo`, `Logo officiel — ${tv(r.project, 'fr')}`);
+    const logo = r.logo ? `<span class="ref-logo"><img class="ref-logo-light" src="${A('/assets/img/references/' + (r.logo.lightFile || r.logo.file))}" alt="${esc(r.logo.name)}" width="${r.logo.width}" height="${r.logo.height}" loading="lazy" decoding="async"><img class="ref-logo-dark" src="${A('/assets/img/references/' + (r.logo.darkFile || r.logo.file))}" alt="${esc(r.logo.name)}" width="${r.logo.width}" height="${r.logo.height}" loading="lazy" decoding="async"></span>` : '';
+    return `<li>${logo}<span class="ref-sector">${esc(D.industries.items[r.sector] || '')}</span><span class="ref-name">${esc(tv(r.project, lang))}</span>${r.org && r.org !== tv(r.project, lang) ? `<span class="ref-org">${esc(r.org)}</span>` : ''}<span class="ref-place">${esc(tv(r.place, lang))}</span></li>`;
+  }).join('');
   return `<div class="sh rv"><h${level} id="${headingId}">${esc(R.title)}</h${level}><p>${esc(R.intro)}</p></div>
 <ul class="ref-grid rv" role="list">${items}</ul>
 <p class="small muted ref-note">${esc(R.note)}</p>`;
