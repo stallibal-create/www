@@ -601,9 +601,9 @@ function quality(ctx) {
 ${site.standards?.length ? `<section class="sec alt" aria-labelledby="std-h" id="normes"><div class="wrap two">
   <div><h2 id="std-h">${esc(D.standards.title)}</h2><p class="lead">${esc(D.standards.intro)}</p></div>
   <dl class="std-list">${site.standards.map(k => {
-    const logos = { smacna: ['smacna.png', 'SMACNA', 896, 487], ashrae: ['ashrae.jpg', 'ASHRAE', 600, 415], dw144: ['besa.png', 'BESA', 345, 201] };
+    const logos = { smacna: ['smacna-transparent.svg', 'SMACNA', 896, 487], ashrae: ['ashrae-transparent.svg', 'ASHRAE', 600, 415], dw144: ['besa.png', 'BESA', 345, 201] };
     const logo = logos[k];
-    return `<div><dt>${logo ? `<span class="std-logo"><img src="${A('/assets/img/standards/' + logo[0])}" alt="${logo[1]}" width="${logo[2]}" height="${logo[3]}" loading="lazy" decoding="async"></span>` : ''}<span>${esc(D.standards.items[k].t)}</span></dt><dd>${esc(D.standards.items[k].d)}</dd></div>`;
+    return `<div><dt>${logo ? `<span class="std-logo"><img  src="${A('/assets/img/standards/' + logo[0])}" alt="${logo[1]}" width="${logo[2]}" height="${logo[3]}" loading="lazy" decoding="async"></span>` : ''}<span>${esc(D.standards.items[k].t)}</span></dt><dd>${esc(D.standards.items[k].d)}</dd></div>`;
   }).join('')}</dl>
 </div></section>` : ''}
 ${rfqBand(ctx)}`;

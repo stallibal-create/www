@@ -179,8 +179,8 @@
       "summary": "Concentric or eccentric reducers and round-to-rectangular transition pieces."
     },
     "tees-branches": {
-      "name": "Tees & branches",
-      "summary": "Tees, take-offs and plenums for the branches of the air distribution network."
+      "name": "Tees, take-offs & Y-branches",
+      "summary": "Tees, take-offs, rectangular Y-branches and plenums for branching air distribution networks."
     },
     "flanges-connectors": {
       "name": "Flanges & connectors",
@@ -611,7 +611,7 @@
         "d": "American Society of Heating, Refrigerating and Air-Conditioning Engineers: design references and guides for HVAC installations, including duct sizing."
       },
       "dw144": {
-        "t": "DW/144",
+        "t": "BESA — DW/144",
         "d": "BESA (UK) specification for sheet metal ductwork: construction, air-tightness classes and testing."
       }
     }

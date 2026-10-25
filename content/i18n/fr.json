@@ -179,8 +179,8 @@
       "summary": "Réductions concentriques ou excentriques et pièces de transition rond-rectangulaire."
     },
     "tees-branches": {
-      "name": "Piquages & tés",
-      "summary": "Tés, piquages et plénums pour les dérivations du réseau aéraulique."
+      "name": "Tés, piquages & branchements en Y",
+      "summary": "Tés, piquages, branchements rectangulaires en Y et plénums pour les dérivations du réseau aéraulique."
     },
     "flanges-connectors": {
       "name": "Brides & raccords",
@@ -611,7 +611,7 @@
         "d": "American Society of Heating, Refrigerating and Air-Conditioning Engineers : référentiels et guides de conception des installations de chauffage, ventilation et climatisation, dont le dimensionnement des réseaux."
       },
       "dw144": {
-        "t": "DW/144",
+        "t": "BESA — DW/144",
         "d": "Spécification britannique de la BESA pour les réseaux de gaines en tôle : construction, classes d'étanchéité et essais."
       }
     }
