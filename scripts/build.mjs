@@ -11,7 +11,7 @@ import { validateAssembly } from './assembly-validate.mjs';
 import { assemblySvg } from './assembly-svg.mjs';
 import { modelProblems } from './assembly-model.mjs';
 import { storySvgs } from './story-svg.mjs';
-import { socialLinks, missingNetworks, socialDock } from './social.mjs';
+import { socialLinks, missingNetworks, socialDock, socialItems, socialItem, contactIcon } from './social.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -21,6 +21,9 @@ const RFQ_ENDPOINT = process.env.RFQ_ENDPOINT || '/api/rfq';
 // Where browsers upload drawings with presigned URLs (Cloudflare Pages + R2): the R2 S3 endpoint, allowed in connect-src.
 // e.g. RFQ_UPLOAD_ORIGIN=https://<account_id>.r2.cloudflarestorage.com  (without it, uploads to R2 are blocked by the CSP)
 const RFQ_UPLOAD_ORIGIN = process.env.RFQ_UPLOAD_ORIGIN ? new URL(process.env.RFQ_UPLOAD_ORIGIN).origin : '';
+// Drawing uploads need private storage: R2 on Cloudflare Pages (RFQ_UPLOAD_ORIGIN) or the Node server (RFQ_ATTACHMENTS=1).
+// Without it the form has no file field and asks for drawings by e-mail instead (never offer what cannot work).
+const RFQ_ATTACHMENTS = !!RFQ_UPLOAD_ORIGIN || process.env.RFQ_ATTACHMENTS === '1';
 const THREE_VERSION = '0.170.0';
 // Self-hosting: copy three's build/ and examples/jsm/ into src/assets/vendor/three/ and the CDN is no longer used.
 // Montserrat: self-hosted if src/assets/fonts/montserrat.css exists (with its .woff2 files), otherwise Google Fonts.
@@ -45,14 +48,15 @@ const missing = new Map(); // key -> label (fr) for MISSING-INFO.md
 function note(path, labelFr) { if (!missing.has(path)) missing.set(path, labelFr); }
 const SOCIAL = socialLinks(site.social); // the only source of social profile URLs
 const FB = SOCIAL.find(n => n.key === 'facebook')?.url || null;
-for (const n of missingNetworks(site.social)) note(`social.${n.key}`, `${n.name} : URL du profil LIBALSTAL (bouton masqué tant qu'elle manque)`);
+for (const n of missingNetworks(site.social)) note(`social.${n.key}`, `${n.name} : URL du profil LIBALSTAL (icône inactive tant qu'elle manque)`);
 const fmt = (str, vars) => str.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? vars[k] : `{${k}}`));
 const hash = buf => createHash('sha256').update(buf).digest('hex').slice(0, 10);
 const url = (lang, path = '') => `/${lang}/${path ? path.replace(/^\/|\/$/g, '') + '/' : ''}`;
 
 function makeCtx(lang) {
   const D = DICT[lang];
-  const ph = (label, kind = 'missing') => `<span class="ph">[${esc(label)} — ${esc(D.meta[kind])}]</span>`;
+  const ph = (label, kind = 'missing') => site.display?.hideIncomplete ? `<span class="na">${esc(D.meta.onRequest)}</span>` // public site: neutral wording
+    : `<span class="ph">[${esc(label)} — ${esc(D.meta[kind])}]</span>`;
   // value or placeholder; path used for MISSING-INFO
   const val = (v, fieldKey, path, kind = 'missing') => {
     const s = tv(v, lang);
@@ -111,7 +115,7 @@ const IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(IMPORT_MAP).dige
 let ASM_IMPORT_MAP_HASH = '';
 function asmImportMap() {
   const m = JSON.parse(IMPORT_MAP);
-  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion', 'glb', 'spangle']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
+  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion', 'glb', 'spangle', 'flow', 'flow-effects']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
   const s = JSON.stringify(m);
   ASM_IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(s).digest('base64');
   return s;
@@ -218,8 +222,13 @@ function footer(ctx, path) {
       <div class="foot-brand">
         <img src="${A('/assets/img/logo-480.webp')}" width="240" height="72" alt="LIBALSTAL" loading="lazy">
         <p class="tagline">${esc(D.meta.tagline)}.</p>
-        <address>${cv('address')}<br>${ctx.phones()}<br>${esc(D.fields.whatsapp)}${ctx.colon} ${ctx.wa()}<br>${email ? `<a href="mailto:${esc(email)}">${esc(email)}</a>` : cv('email')}</address>
-        ${FB ? `<p><a href="${esc(FB)}" rel="noopener" target="_blank">${esc(D.footer.facebook)}<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>` : ''}
+        <address class="foot-contact">
+          <div class="foot-contact-row">${contactIcon('address')}<span>${c.mapUrl ? `<a href="${esc(c.mapUrl)}" target="_blank" rel="noopener noreferrer">${cv('address')}<span class="sr"> ${esc(D.footer.newTab)}</span></a>` : cv('address')}</span></div>
+          <div class="foot-contact-row">${contactIcon('phone')}<span><span class="sr">${esc(D.fields.phone)}${ctx.colon} </span>${ctx.phones()}</span></div>
+          <div class="foot-contact-row">${contactIcon('whatsapp')}<span><span class="sr">${esc(D.fields.whatsapp)}${ctx.colon} </span>${ctx.wa()}</span></div>
+          <div class="foot-contact-row">${contactIcon('email')}<span>${email ? `<a href="mailto:${esc(email)}">${esc(email)}</a>` : cv('email')}</span></div>
+        </address>
+        <nav class="foot-social" aria-label="${esc(D.social.label)}">${socialItems(site.social).map(n => socialItem(n, { ...D.social, newTab: D.footer.newTab }, 'foot-social-btn')).join('')}</nav>
       </div>
       <div><h2 class="foot-h">${esc(D.footer.nav)}</h2><ul>${nav}</ul></div>
       <div><h2 class="foot-h">${esc(D.footer.legal)}</h2><ul><li><a href="${url(lang, 'quality')}">${esc(D.nav.quality)}</a></li><li><a href="${url(lang, 'privacy')}">${esc(D.footer.privacy)}</a></li><li><a href="${url(lang, 'legal')}">${esc(D.footer.legalNotice)}</a></li></ul></div>
@@ -245,7 +254,8 @@ function orgLd() {
   if (c.legalName) o.legalName = tv(c.legalName, 'fr');
   if (c.email) o.email = c.email;
   if (c.phone) o.telephone = c.phone;
-  const cps = [c.phone, c.phone2].filter(Boolean).map(t => ({ '@type': 'ContactPoint', telephone: t.replace(/\s/g, ''), contactType: 'sales', availableLanguage: ['fr', 'ar', 'en'] }));
+  const cps = [c.phone, c.phone2, c.whatsapp].filter(Boolean).map(t => ({ '@type': 'ContactPoint', telephone: t.replace(/\s/g, ''), contactType: 'sales', availableLanguage: ['fr', 'ar', 'en'],
+    ...(c.hoursSpec ? { hoursAvailable: { '@type': 'OpeningHoursSpecification', ...c.hoursSpec } } : {}) }));
   if (cps.length) o.contactPoint = cps;
   if (c.founded) o.foundingDate = String(c.founded);
   if (c.address) o.address = { '@type': 'PostalAddress', streetAddress: tv(c.address, 'fr'), addressLocality: tv(c.city, 'fr') || undefined, addressCountry: tv(c.country, 'fr') || undefined };
@@ -261,7 +271,7 @@ ${opts.beforeHeader || ''}${header(ctx, active, path)}
 ${body}
 </main>
 ${footer(ctx, path)}
-${socialDock({ links: SOCIAL, t: { ...ctx.D.social, newTab: ctx.D.footer.newTab } })}
+${socialDock({ links: socialItems(site.social, site.company, ctx.D.fields.email), t: { ...ctx.D.social, newTab: ctx.D.footer.newTab } })}
 </body>
 </html>
 `;
@@ -306,12 +316,22 @@ function industriesGrid(ctx) {
 <ul class="ind-grid" role="list">${site.industries.map((k, i) => `<li><span class="ind-n">${String(i + 1).padStart(2, '0')}</span>${esc(D.industries.items[k])}</li>`).join('')}</ul>`;
 }
 
+function referencesBlock(ctx, headingId, level = 2) {
+  const { lang, D } = ctx, R = D.references;
+  if (!site.references?.length) return '';
+  const items = site.references.map(r => `<li><span class="ref-sector">${esc(D.industries.items[r.sector] || '')}</span><span class="ref-name">${esc(tv(r.project, lang))}</span>${r.org && r.org !== tv(r.project, lang) ? `<span class="ref-org">${esc(r.org)}</span>` : ''}<span class="ref-place">${esc(tv(r.place, lang))}</span></li>`).join('');
+  return `<div class="sh rv"><h${level} id="${headingId}">${esc(R.title)}</h${level}><p>${esc(R.intro)}</p></div>
+<ul class="ref-grid rv" role="list">${items}</ul>
+<p class="small muted ref-note">${esc(R.note)}</p>`;
+}
+
 function publishedProjects() { return site.projects.filter(p => !p.draft); }
 
 function projectsList(ctx) {
   const { lang, D, arr } = ctx;
   const list = publishedProjects();
-  if (!list.length) return `<div class="empty"><p><strong>${esc(D.projects.empty)}</strong></p><p>${esc(D.projects.emptyHint)}</p></div>`;
+  if (!list.length) return site.references?.length ? `<p class="muted">${esc(D.projects.emptyRefs)}</p>` // the reference list is the content
+    : `<div class="empty"><p><strong>${esc(D.projects.empty)}</strong></p><p>${esc(D.projects.emptyHint)}</p></div>`;
   return `<ul class="proj-grid" role="list">${list.map(p => `<li><a class="proj-card" href="${url(lang, 'projects/' + p.slug)}">
     ${p.images?.[0] ? `<img src="/assets/img/${esc(p.images[0].src)}" alt="${esc(tv(p.images[0].alt, lang) || '')}" loading="lazy" width="800" height="600">` : `<span class="ph-box" aria-hidden="true"></span>`}
     <span class="proj-meta">${esc(tv(p.sector, lang) || '')} ${p.year ? '· ' + esc(p.year) : ''}</span>
@@ -406,7 +426,7 @@ ${story}
 ${ASM_RENDER ? `
 <section class="sec asm-band" aria-labelledby="asm-h"><div class="wrap">
   <figure class="asm-band-fig rv">${renderImg('assembly', { alt: H.asmAlt, sizes: '(max-width: 860px) 92vw, 760px' })}<span class="asm-tag">${esc(D.assembly.demoLabel)}</span></figure>
-  <div class="rv"><h2 id="asm-h">${esc(H.asmTitle)}</h2><p class="lead">${esc(H.asmText)}</p><p><a class="btn btn-primary" href="${url(lang, 'assembly')}">${esc(S.cta3d)} <span class="arr" aria-hidden="true">${arr}</span></a></p></div>
+  <div class="rv"><h2 id="asm-h">${esc(H.asmTitle)}</h2><p class="lead">${esc(H.asmText)}</p><p><a class="btn btn-primary" href="${url(lang, 'assembly')}">${esc(S.cta3d)} <span class="arr" aria-hidden="true">${arr}</span></a></p><div class="asm-systems"><a class="btn" href="${url(lang, 'assembly/spiral')}">${esc(D.assembly.systems.spiral)}</a></div></div>
 </div></section>` : ''}
 ${qual ? `
 <section class="sec" aria-labelledby="q-h"><div class="wrap two">
@@ -416,7 +436,8 @@ ${qual ? `
 <section class="sec alt" aria-labelledby="ind-h"><div class="wrap">
   <div class="sh rv"><h2 id="ind-h">${esc(H.indTitle)}</h2><p>${esc(D.industries.intro)}</p></div>
   <div class="rv">${industriesGrid(ctx)}</div>
-</div></section>` : ''}${showProj ? `
+</div></section>` : ''}${site.references?.length ? `
+<section class="sec" aria-labelledby="ref-h"><div class="wrap">${referencesBlock(ctx, 'ref-h')}</div></section>` : ''}${showProj ? `
 <section class="sec" aria-labelledby="pj-h"><div class="wrap">
   <div class="sh rv"><h2 id="pj-h">${esc(H.projTitle)}</h2><p>${esc(D.projects.intro)}</p></div>
   <div class="rv">${projectsList(ctx)}</div>
@@ -442,7 +463,7 @@ function products(ctx) {
     <button type="button" class="chip" aria-pressed="true" data-filter="all">${esc(D.products.all)}</button>
     ${cats.map(c => `<button type="button" class="chip" aria-pressed="false" data-filter="${c}">${esc(D.products.cats[c])}</button>`).join('')}
   </div>
-  <p class="count" role="status" data-template="${esc(D.products.count)}">${esc(fmt(D.products.count, { n: site.products.length }))}</p>
+  <p class="count" role="status" data-template="${esc(D.products.count)}" data-template-one="${esc(D.products.countOne)}">${esc(fmt(site.products.length === 1 ? D.products.countOne : D.products.count, { n: site.products.length }))}</p>
   <div class="grid" id="product-grid">${site.products.map(p => productCard(ctx, p, 2)).join('')}</div>
   <p class="empty" id="product-empty" hidden>${esc(D.products.empty)}</p>
   <p class="more"><a class="btn" href="${url(lang, 'assembly')}">${esc(D.home.story.cta3d)} <span class="arr" aria-hidden="true">${D.meta.arrow}</span></a></p>
@@ -471,8 +492,9 @@ ${rfqBand(ctx)}`;
     <h2 class="h3">${esc(D.product.specs)}</h2>
     <dl class="spec">${specs}</dl>
     <p class="small muted">${esc(D.product.specsNote)}</p>
+    ${['spiral-round-duct', 'black-steel-ducts'].includes(p.slug) ? `<p><a class="btn" href="${url(lang, 'assembly/' + 'spiral') + (p.slug === 'black-steel-ducts' ? '?heat=1' : '')}">${esc(D.assembly.title)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></p>` : ''}
     <h2 class="h3">${esc(D.product.downloads)}</h2>
-    <p>${p.datasheet ? `<a class="btn" href="/assets/docs/${esc(p.datasheet)}" download>${esc(D.product.datasheet)}</a>` : ctx.ph(D.product.noDownloads, 'toProvide')}</p>
+    <p>${p.datasheet ? `<a class="btn" href="/assets/docs/${esc(p.datasheet)}" download>${esc(D.product.datasheet)}</a>` : site.display?.hideIncomplete ? esc(D.product.datasheetRequest) : ctx.ph(D.product.noDownloads, 'toProvide')}</p>
     <div class="cta-box"><h2 class="h3">${esc(D.product.ctaTitle)}</h2><p>${esc(D.product.ctaText)}</p><a class="btn btn-primary" href="${url(lang, 'contact')}?product=${p.slug}">${esc(D.products.quote)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></div>
   </div>
 </div></section>
@@ -500,11 +522,15 @@ function capabilities(ctx) {
     : `<p>${ph(D.capabilities.equipmentEmpty)}</p>`;
   const body = `${pageHead(ctx, D.nav.capabilities, D.capabilities.h1, D.capabilities.intro, cr.html)}
 <section class="sec tight"><div class="wrap"><ul class="caps caps-lg" role="list">${rows}</ul></div></section>
-<section class="sec alt" aria-labelledby="eq-h"><div class="wrap two">
-  <div><h2 id="eq-h">${esc(D.capabilities.equipmentTitle)}</h2></div><div>${equip}</div>
+<section class="sec alt" aria-labelledby="why-h"><div class="wrap two">
+  <div><h2 id="why-h">${esc(D.capabilities.why.title)}</h2></div>
+  <ul class="why-list" role="list">${D.capabilities.why.items.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
 </div></section>
+${site.equipment.length || !site.display?.hideIncomplete ? `<section class="sec alt" aria-labelledby="eq-h"><div class="wrap two">
+  <div><h2 id="eq-h">${esc(D.capabilities.equipmentTitle)}</h2></div><div>${equip}</div>
+</div></section>` : ''}
 <section class="sec" aria-labelledby="pr-h"><div class="wrap">
-  <div class="sh"><h2 id="pr-h">${esc(D.capabilities.processTitle)}</h2><p class="flag">${esc(D.capabilities.processNote)}</p></div>
+  <div class="sh"><h2 id="pr-h">${esc(D.capabilities.processTitle)}</h2>${site.display?.hideIncomplete ? '' : `<p class="flag">${esc(D.capabilities.processNote)}</p>`}</div>
   <ol class="process">${D.capabilities.process.map((s, i) => `<li><span class="n">${String(i + 1).padStart(2, '0')}</span><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p></li>`).join('')}</ol>
 </div></section>
 ${rfqBand(ctx)}`;
@@ -523,8 +549,9 @@ function industries(ctx) {
 function projects(ctx) {
   const { lang, D, val } = ctx;
   const cr = crumbs(ctx, [[D.nav.projects, 'projects']]);
-  if (!publishedProjects().length) note('projects', 'Réalisations vérifiées (photos, périmètre, matériaux, accord client)');
+  if (!publishedProjects().length) note('projects', 'Études de cas détaillées (photos, périmètre, matériaux, accord client)');
   const body = `${pageHead(ctx, D.nav.projects, D.projects.h1, D.projects.intro, cr.html)}
+${site.references?.length ? `<section class="sec tight" aria-labelledby="ref-h"><div class="wrap">${referencesBlock(ctx, 'ref-h')}</div></section>` : ''}
 <section class="sec tight"><div class="wrap">${projectsList(ctx)}</div></section>
 ${rfqBand(ctx)}`;
   emit(lang, 'projects', page(ctx, { title: D.projects.title, description: D.projects.intro, path: 'projects', active: 'projects', jsonld: [cr.ld] }, body));
@@ -559,13 +586,21 @@ function quality(ctx) {
   const cr = crumbs(ctx, [[D.nav.quality, 'quality']]);
   const rows = site.quality.map(q => {
     if (!q.evidence) note(`quality.${q.id}`, `Justificatif qualité — ${DICT.fr.quality.items[q.id].t}`);
-    return `<li><div><h2 class="h3">${esc(D.quality.items[q.id].t)}</h2><p>${esc(D.quality.items[q.id].d)}</p></div>${q.evidence ? `<a class="btn" href="${esc(q.evidence)}">${esc(D.quality.evidenceLink)}</a>` : `<em class="badge">${esc(D.quality.evidenceMissing)}</em>`}</li>`;
+    return `<li><div><h2 class="h3">${esc(D.quality.items[q.id].t)}</h2><p>${esc(D.quality.items[q.id].d)}</p></div>${q.evidence ? `<a class="btn" href="${esc(q.evidence)}">${esc(D.quality.evidenceLink)}</a>` : site.display?.hideIncomplete ? '' : `<em class="badge">${esc(D.quality.evidenceMissing)}</em>`}</li>`;
   }).join('');
   const body = `${pageHead(ctx, D.nav.quality, D.quality.h1, '', cr.html)}
 <section class="sec tight"><div class="wrap two">
   <div><p class="display">${esc(D.quality.lead)}</p><p class="lead">${esc(D.quality.intro)}</p></div>
   <ul class="qa qa-lg" role="list">${rows}</ul>
 </div></section>
+${site.standards?.length ? `<section class="sec alt" aria-labelledby="std-h" id="normes"><div class="wrap two">
+  <div><h2 id="std-h">${esc(D.standards.title)}</h2><p class="lead">${esc(D.standards.intro)}</p></div>
+  <dl class="std-list">${site.standards.map(k => {
+    const logos = { smacna: ['smacna.png', 'SMACNA', 896, 487], ashrae: ['ashrae.jpg', 'ASHRAE', 600, 415], dw144: ['besa.png', 'BESA', 345, 201] };
+    const logo = logos[k];
+    return `<div><dt>${logo ? `<span class="std-logo"><img src="${A('/assets/img/standards/' + logo[0])}" alt="${logo[1]}" width="${logo[2]}" height="${logo[3]}" loading="lazy" decoding="async"></span>` : ''}<span>${esc(D.standards.items[k].t)}</span></dt><dd>${esc(D.standards.items[k].d)}</dd></div>`;
+  }).join('')}</dl>
+</div></section>` : ''}
 ${rfqBand(ctx)}`;
   emit(lang, 'quality', page(ctx, { title: D.quality.title, description: D.quality.intro, path: 'quality', active: 'quality', jsonld: [cr.ld] }, body));
 }
@@ -574,10 +609,12 @@ function company(ctx) {
   const { lang, D, cv, ph } = ctx;
   const cr = crumbs(ctx, [[D.nav.company, 'company']]);
   const c = site.company;
-  const dl = ['legalName', 'founded', 'registration', 'director', 'address', 'city', 'country', 'phone', 'whatsapp', 'email', 'hours'].map(k => `<div><dt>${esc(D.fields[k])}</dt><dd>${k === 'phone' ? ctx.phones() : k === 'whatsapp' ? ctx.wa() : cv(k)}</dd></div>`).join('');
+  const regShown = c.registrationPublic !== false; // the owner chose not to publish the RC (2026-10-24)
+  const dl = ['legalName', 'founded', ...(regShown ? ['registration'] : []), 'director', 'address', 'city', 'country', 'phone', 'whatsapp', 'email', 'hours'].map(k => `<div><dt>${esc(D.fields[k])}</dt><dd>${k === 'phone' ? ctx.phones() : k === 'whatsapp' ? ctx.wa() : cv(k)}</dd></div>`).join('');
   const body = `${pageHead(ctx, D.nav.company, D.company.h1, D.company.intro, cr.html)}
 <section class="sec tight"><div class="wrap two">
   <div><h2>${esc(D.company.aboutTitle)}</h2><p class="lead">${cv('about')}</p>
+    ${c.services?.length ? `<h2 class="h3">${esc(D.services.title)}</h2><p class="services">${c.services.map(k => esc(D.services[k])).join(' · ')}</p>` : ''}
     <h2 class="h3">${esc(D.company.findUs)}</h2><p>${cv('address')}</p><p>${c.mapUrl ? `<a class="btn" href="${esc(c.mapUrl)}" rel="noopener" target="_blank">${esc(D.company.map)}<span class="sr"> ${esc(D.footer.newTab)}</span></a>` : cv('mapUrl')}</p>
     <h2 class="h3">${esc(D.company.social)}</h2><p>${SOCIAL.map(n => `<a href="${esc(n.url)}" rel="noopener" target="_blank">${esc(n.url.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, ''))}<span class="sr"> ${esc(D.footer.newTab)}</span></a>`).join('<br>')}</p>
   </div>
@@ -596,7 +633,8 @@ function contact(ctx) {
   const opts = site.products.map(p => `<option value="${p.slug}">${esc(D.productItems[p.slug].name)}</option>`).join('') + `<option value="other">${lang === 'fr' ? 'Autre / plusieurs' : lang === 'en' ? 'Other / several' : 'أخرى / عدة منتجات'}</option>`;
   const i18n = { ...R, arrow: arr, back: D.meta.back, ...RFQ_LIMITS, products: Object.fromEntries(site.products.map(p => [p.slug, D.productItems[p.slug].name])) };
   const email = tv(c.email, lang), phone = tv(c.phone, lang);
-  const ts = TURNSTILE_SITE_KEY ? `<div class="cf-turnstile" data-sitekey="${esc(TURNSTILE_SITE_KEY)}" data-language="${lang}" data-theme="auto"></div>` : '';
+  // rendered by rfq.js (explicit mode) so a widget failure shows a recovery message instead of an uncaught error
+  const ts = TURNSTILE_SITE_KEY ? `<div class="ts-slot" data-sitekey="${esc(TURNSTILE_SITE_KEY)}" data-language="${lang}"></div><p class="ts-error small" role="alert" hidden>${esc(fmt(R.captchaLoadError, { email: tv(c.email, lang) }))}</p>` : '';
   const body = `${pageHead(ctx, D.nav.contact, D.contact.h1, D.contact.intro, cr.html)}
 <section class="sec tight"><div class="wrap rfq-layout">
 <form id="rfq" class="rfq" action="${esc(RFQ_ENDPOINT)}" method="post" enctype="multipart/form-data" novalidate aria-label="${esc(R.formLabel)}">
@@ -630,7 +668,7 @@ function contact(ctx) {
       <div class="field"><label for="f-quantity">${esc(R.quantity)}</label><input id="f-quantity" name="quantity" maxlength="60"></div>
     </div>
     <div class="field"><label for="f-req">${esc(R.requirements)}</label><textarea id="f-req" name="requirements" rows="5" maxlength="5000"></textarea></div>
-    <div class="field"><label for="f-files">${esc(fmt(R.files, { max: RFQ_LIMITS.maxFiles, mb: RFQ_LIMITS.maxFileMB }))}</label><input id="f-files" name="files" type="file" multiple accept=".pdf,.dwg,.dxf,application/pdf" aria-describedby="h-files e-files"><p class="hint" id="h-files">${esc(R.filesHint)}</p><p class="err" id="e-files"></p></div>
+    ${RFQ_ATTACHMENTS ? `<div class="field"><label for="f-files">${esc(fmt(R.files, { max: RFQ_LIMITS.maxFiles, mb: RFQ_LIMITS.maxFileMB }))}</label><input id="f-files" name="files" type="file" multiple accept=".pdf,.dwg,.dxf,application/pdf" aria-describedby="h-files e-files"><p class="hint" id="h-files">${esc(R.filesHint)}</p><p class="err" id="e-files"></p></div>` : `<p class="hint files-by-email">${esc(fmt(R.filesByEmail, { email: site.company.email }))}</p>`}
   </fieldset>
 
   <fieldset class="step" data-step="2">
@@ -660,19 +698,19 @@ function contact(ctx) {
   ${FB ? `<p><a href="${esc(FB)}" rel="noopener" target="_blank">Facebook — Libalstal<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>` : ''}
 </aside>
 </div></section>`;
-  const extraHead = `<script type="module" src="${A('/assets/js/rfq.js')}"></script>${TURNSTILE_SITE_KEY ? '\n<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>' : ''}`;
+  const extraHead = `<script type="module" src="${A('/assets/js/rfq.js')}"></script>${TURNSTILE_SITE_KEY ? '\n<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>' : ''}`;
   emit(lang, 'contact', page(ctx, { title: D.contact.title, description: D.contact.intro, path: 'contact', active: 'contact', jsonld: [cr.ld], extraHead, bodyClass: 'contact' }, body));
 }
 
 function legalPages(ctx) {
   const { lang, D, cv, lv } = ctx;
-  const vars = { legalName: cv('legalName'), address: cv('address'), phone: ctx.phones(' / '), email: cv('email'), registration: cv('registration'),
-    host: lv('host'), publicationDirector: lv('publicationDirector'), dataRetention: lv('dataRetention'), applicableLaw: lv('applicableLaw'), privacyContact: lv('privacyContact') };
+  const regShown = site.company.registrationPublic !== false;
+  const vars = { legalName: cv('legalName'), address: cv('address'), phone: ctx.phones(' / '), email: cv('email'), registration: regShown ? cv('registration') : '' };
   for (const [key, path, extra] of [['privacy', 'privacy', `<p class="muted small">${esc(D.privacy.updated)}${ctx.colon} <time datetime="${BUILD_DATE}">${BUILD_DATE}</time></p>`], ['legalNotice', 'legal', '']]) {
     const P = D[key];
     const cr = crumbs(ctx, [[P.title, path]]);
     const body = `${pageHead(ctx, P.title, P.h1, '', cr.html)}
-<section class="sec tight"><div class="wrap prose">${extra}${P.sections.map(s => `<h2 class="h3">${esc(s.h)}</h2><p>${fmt(esc(s.p), vars)}</p>`).join('')}</div></section>`;
+<section class="sec tight"><div class="wrap prose">${extra}${P.sections.map(s => `<h2 class="h3">${esc(s.h)}</h2><p>${fmt(esc(regShown ? s.p : s.p.replace(/\s*[^.:]*[:：]?\s*\{registration\}\./, '')), vars)}</p>`).join('')}</div></section>`;
     emit(lang, path, page(ctx, { title: P.title, path, jsonld: [cr.ld] }, body));
   }
 }
@@ -689,16 +727,23 @@ function sectionDrawing(w, h) { // inlet section with dimension lines (decorativ
 <text class="asm-dt" x="${(x + rw / 2).toFixed(1)}" y="${(y + rh + 34).toFixed(1)}" text-anchor="middle">${w}</text><text class="asm-dt" x="${(x + rw + 24).toFixed(1)}" y="${(y + rh / 2 + 4).toFixed(1)}">${h}</text></svg>`;
 }
 
-function assembly(ctx) {
+function assembly(ctx, system = 'rectangular') {
   const { lang, D, arr } = ctx;
-  const T = D.assembly;
-  const a = site.ductAssembly, st = a.settings;
-  const cr = crumbs(ctx, [[T.title, 'assembly']]);
+  const base = D.assembly, alternative = system !== 'rectangular';
+  const path = alternative ? 'assembly/' + system : 'assembly';
+  const T = { ...base, ...(alternative ? { h1: system === 'spiral' ? base.systems.spiralTitle : base.systems.heatTitle, intro: system === 'spiral' ? base.systems.spiralIntro : base.systems.heatIntro, previewAlt: system === 'spiral' ? base.systems.spiralTitle : base.systems.heatTitle } : {}) };
+  const a = alternative ? site.ductSystems[system] : site.ductAssembly, st = a.settings;
+  const cr = crumbs(ctx, alternative ? [[base.title, 'assembly'], [T.h1, path]] : [[T.title, 'assembly']]);
+  const systemLinks = `<nav class="asm-systems" aria-label="${esc(base.systems.label)}">${['rectangular', 'spiral'].map(k => `<a class="btn${k === system ? ' btn-primary' : ''}" href="${url(lang, k === 'rectangular' ? 'assembly' : 'assembly/' + k)}"${k === system ? ' aria-current="page"' : ''}>${esc(base.systems[k])}</a>`).join('')}</nav>`;
   const pending = `<span class="ph">${esc(T.pending)}</span>`;
   const row = (k, v) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`;
   const geoRows = c => {
     const g = c.geometry, G = T.geo;
     switch (c.type) {
+      case 'spiral-straight': return row(G.diameter, mmL(g.diameterMm)) + row(G.length, mmL(g.lengthMm)) + row(G.pitch, mmL(g.pitchMm));
+      case 'round-straight': return row(G.diameter, mmL(g.diameterMm)) + row(G.length, mmL(g.lengthMm));
+      case 'round-elbow': return row(G.diameter, mmL(g.diameterMm)) + row(G.innerRadius, mmL(g.innerRadiusMm)) + row(G.angle, ltr('90°'));
+      case 'round-reducer': return row(G.inletDiameter, mmL(g.inletDiameterMm)) + row(G.outletDiameter, mmL(g.outletDiameterMm)) + row(G.length, mmL(g.lengthMm));
       case 'straight': case 'branch': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.length, mmL(g.lengthMm));
       case 'elbow90': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.innerRadius, mmL(g.innerRadiusMm)) + row(G.angle, ltr('90°'));
       case 'reducer': return row(G.inlet, mmS(g.inletWidthMm, g.inletHeightMm)) + row(G.outlet, mmS(g.outletWidthMm, g.outletHeightMm)) + row(G.length, mmL(g.lengthMm));
@@ -706,30 +751,34 @@ function assembly(ctx) {
       case 'flange': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.flangeWidth, mmL(st.flangeWidthMm)) + row(G.flangeDepth, mmL(st.flangeDepthMm));
     }
   };
-  const inletOf = c => c.type === 'reducer' ? [c.geometry.inletWidthMm, c.geometry.inletHeightMm] : [c.geometry.widthMm, c.geometry.heightMm];
+  const inletOf = c => c.geometry.diameterMm || c.geometry.inletDiameterMm ? [c.geometry.diameterMm || c.geometry.inletDiameterMm, c.geometry.diameterMm || c.geometry.inletDiameterMm] : c.type === 'reducer' ? [c.geometry.inletWidthMm, c.geometry.inletHeightMm] : [c.geometry.widthMm, c.geometry.heightMm];
   const products = new Map(site.products.map(p => [p.slug, p]));
   const cards = a.components.map(c => {
     const p = products.get(c.productSlug), pname = D.productItems[p.slug].name;
     const specs = Object.entries(p.specs).map(([k, v]) => row(D.fields[k], v == null ? pending : esc(tv(v, lang)))).join('');
     const desc = tv(c.description, lang);
+    const heatProduct = products.get('black-steel-ducts');
+    const heatSpecs = Object.entries(heatProduct.specs).map(([k, v]) => row(D.fields[k], v == null ? pending : esc(tv(v, lang)))).join('');
     return `<article class="asm-part" id="part-${c.id}" data-part="${c.id}" aria-labelledby="part-${c.id}-h">
   <div class="asm-part-top"><p class="eyebrow">${esc(T.types[c.type])}</p><button type="button" class="icon-btn asm-close" aria-label="${esc(T.close)}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2"/></svg></button></div>
   <h3 class="asm-part-h" id="part-${c.id}-h" tabindex="-1">${esc(tv(c.name, lang))}</h3>
   <p><em class="badge">${esc(T.demoLabel)}</em></p>
   <h4>${esc(T.geometryTitle)}</h4>
-  <div class="asm-dim">${sectionDrawing(...inletOf(c))}</div>
+  <div class="asm-dim">${c.geometry.diameterMm || c.geometry.inletDiameterMm ? `<svg viewBox="0 0 210 150" aria-hidden="true"><circle class="ln" cx="105" cy="65" r="48"/><path class="dim" d="M57 65h96"/><text class="asm-dt" x="105" y="135" text-anchor="middle">Ø ${inletOf(c)[0]} mm</text></svg>` : sectionDrawing(...inletOf(c))}</div>
   <dl class="spec">${geoRows(c)}</dl>
   <p class="small muted">${esc(T.demoNote)}</p>
   <h4>${esc(T.productTitle)}</h4>
-  <dl class="spec">${specs}</dl>
+  <div class="asm-product-standard"><dl class="spec">${specs}</dl>
+  <p><a href="${url(lang, 'products/' + p.slug)}">${esc(T.productLink)}${ctx.colon} ${esc(pname)}</a></p></div>
+  <div class="asm-product-heat" hidden><dl class="spec">${heatSpecs}</dl>
+  <p><a href="${url(lang, 'products/black-steel-ducts')}">${esc(T.productLink)}${ctx.colon} ${esc(D.productItems['black-steel-ducts'].name)}</a></p></div>
   <p class="small muted">${esc(D.product.specsNote)}</p>
-  <p><a href="${url(lang, 'products/' + p.slug)}">${esc(T.productLink)}${ctx.colon} ${esc(pname)}</a></p>
   <h4>${esc(T.description)}</h4>
   <p>${desc ? esc(desc) : pending}</p>
-  <p><a class="btn btn-primary" href="${url(lang, 'contact')}?product=${p.slug}">${esc(T.cta)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
+  <p><a class="btn btn-primary asm-part-quote" data-normal-href="${url(lang, 'contact')}?product=${p.slug}" data-heat-href="${url(lang, 'contact')}?product=black-steel-ducts" href="${url(lang, 'contact')}?product=${p.slug}">${esc(T.cta)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
 </article>`;
   }).join('\n');
-  const list = a.components.map((c, i) => `<li><button type="button" class="asm-pick" data-part="${c.id}" aria-pressed="false" aria-controls="part-${c.id}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span><strong>${esc(tv(c.name, lang))}</strong><span class="asm-pick-sub">${esc(T.types[c.type])} · ${mmS(...inletOf(c))}</span></span></button></li>`).join('');
+  const list = a.components.map((c, i) => `<li><button type="button" class="asm-pick" data-part="${c.id}" aria-pressed="false" aria-controls="part-${c.id}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span><strong>${esc(tv(c.name, lang))}</strong><span class="asm-pick-sub">${esc(T.types[c.type])} · ${c.geometry.diameterMm || c.geometry.inletDiameterMm ? ltr('Ø ' + inletOf(c)[0] + ' mm') : mmS(...inletOf(c))}</span></span></button></li>`).join('');
   const tool = (cmd, label, path) => `<button type="button" class="icon-btn" data-cmd="${cmd}" aria-label="${esc(label)}"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"><path d="${path}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
   const tools = [
     tool('skip', T.skip, 'M5 5v14l11-7zM19 5v14'),
@@ -743,11 +792,20 @@ function assembly(ctx) {
     tool('replay', T.replay, 'M5 5v5h5M5 10a8 8 0 1 1 1.5 6M11 8l6 4-6 4z'),
   ].join('');
   // client data: geometry and connections only (names and specs are already in the HTML)
-  const clientData = { assembly: { settings: st, components: a.components.map(({ id, type, geometry, explode }) => ({ id, type, geometry, explode })), connections: a.connections }, model: MODEL_URL,
+  const clientData = { assembly: { id: a.id, settings: st, components: a.components.map(({ id, type, geometry, explode }) => ({ id, type, geometry, explode })), connections: a.connections }, model: alternative ? null : MODEL_URL,
     strings: { loading: T.loading, unavailable: T.unavailable, lost: T.lost, saveData: T.saveData, playing: T.playing } };
   const body = `${pageHead(ctx, T.eyebrow, T.h1, T.intro, cr.html)}
+<div class="wrap">${systemLinks}</div>
 <section class="sec tight" id="asm" aria-label="${esc(T.title)}"><div class="wrap asm-layout">
   <figure class="asm-view" data-state="preview">
+    <div class="asm-effects-controls" role="group" aria-label="${esc(T.effects.label)}">
+      <button type="button" class="btn asm-air" aria-pressed="true">${esc(T.effects.air)}</button>
+      <button type="button" class="btn asm-heat" aria-pressed="false">${esc(T.systems['high-temperature'])}</button>
+      <button type="button" class="btn asm-pause" aria-pressed="false" data-play="${esc(T.effects.play)}" data-pause="${esc(T.effects.pause)}">${esc(T.effects.pause)}</button>
+      <button type="button" class="btn asm-cutaway" aria-pressed="true">${esc(T.effects.cutaway)}</button>
+    </div>
+    <p class="small muted asm-effects-note">${esc(T.effects.note)}</p>
+    <p class="small asm-heat-note" hidden>${esc(T.effects.heatNote)}</p>
     <div class="asm-stage">
       <div class="asm-preview">${assemblySvg(a, { title: T.previewAlt, id: 'asm-svg-t' })}</div>
       <div class="asm-canvas" role="img" aria-label="${esc(T.viewLabel)}"></div>
@@ -772,7 +830,12 @@ ${cards}
 ${rfqBand(ctx)}`;
   const extraHead = `<script type="importmap">${asmImportMap()}</script>
 <script type="module" src="${A('/assets/js/assembly/boot.js')}"></script>`;
-  emit(lang, 'assembly', page(ctx, { title: T.title, description: T.intro, path: 'assembly', jsonld: [cr.ld], extraHead }, body));
+  emit(lang, path, page(ctx, { title: alternative ? T.h1 : T.title, description: T.intro, path, jsonld: [cr.ld], extraHead }, body));
+}
+
+function legacyHeatPage(lang) {
+  const target = url(lang, 'assembly/spiral') + '?heat=1';
+  write(join(lang, 'assembly/high-temperature/index.html'), `<!doctype html><html lang="${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${target}"><title>LIBALSTAL</title></head><body><h1><a href="${target}">${esc(DICT[lang].assembly.systems.spiralTitle)}</a></h1></body></html>`);
 }
 
 function notFound(ctx) {
@@ -787,6 +850,9 @@ function notFound(ctx) {
 // ---------- root, SEO files, headers ----------
 function rootFiles() {
   write('index.html', `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LIBALSTAL</title><meta http-equiv="refresh" content="0; url=/fr/"><link rel="canonical" href="${SITE_URL}/fr/"><meta name="robots" content="noindex"></head><body><p><a href="/fr/" hreflang="fr" lang="fr">Français</a> · <a href="/en/" hreflang="en" lang="en">English</a> · <a href="/ar/" hreflang="ar" lang="ar">العربية</a></p></body></html>`);
+  // RFC 9116: how to report a security problem (contact = the company's public address in site.json)
+  const expires = new Date(Date.now() + 365 * 864e5).toISOString().replace(/\.\d+Z$/, 'Z');
+  write('.well-known/security.txt', `Contact: mailto:${site.company.email}\nExpires: ${expires}\nPreferred-Languages: fr, en, ar\nCanonical: ${SITE_URL}/.well-known/security.txt\n`);
   write('robots.txt', `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
   const urls = sitemap.map(p => `  <url>\n    <loc>${SITE_URL + url('fr', p)}</loc>\n    <lastmod>${BUILD_DATE}</lastmod>\n${[...LANGS, 'x-default'].map(l => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL + url(l === 'x-default' ? 'fr' : l, p)}"/>`).join('\n')}\n  </url>`);
   const urlsOther = LANGS.slice(1).flatMap(l => sitemap.map(p => `  <url>\n    <loc>${SITE_URL + url(l, p)}</loc>\n    <lastmod>${BUILD_DATE}</lastmod>\n${[...LANGS, 'x-default'].map(x => `    <xhtml:link rel="alternate" hreflang="${x}" href="${SITE_URL + url(x === 'x-default' ? 'fr' : x, p)}"/>`).join('\n')}\n  </url>`));
@@ -861,7 +927,7 @@ copyAssets();
 checkModel();
 for (const lang of LANGS) {
   const ctx = makeCtx(lang);
-  home(ctx); products(ctx); capabilities(ctx); industries(ctx); projects(ctx); quality(ctx); company(ctx); contact(ctx); legalPages(ctx); assembly(ctx); notFound(ctx);
+  home(ctx); products(ctx); capabilities(ctx); industries(ctx); projects(ctx); quality(ctx); company(ctx); contact(ctx); legalPages(ctx); assembly(ctx); assembly(ctx, 'spiral'); legacyHeatPage(lang); notFound(ctx);
 }
 rootFiles();
 const n = missingReport();

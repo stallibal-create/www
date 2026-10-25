@@ -55,3 +55,5 @@ export const icons = {
     <path class="dim" d="M70 36a14 14 0 0 1 10 10"/>
     ${dimH(16, 56, 88)}${dimV(150, 36, 70)}`),
 };
+// material variants of the duct families share the rectangular duct drawing
+for (const k of ['stainless-ducts', 'aluminium-ducts', 'black-steel-ducts']) icons[k] = icons['rectangular-duct'];

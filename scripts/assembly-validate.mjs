@@ -13,6 +13,7 @@ const isText3 = v => v && typeof v === 'object' && LANGS.every(l => typeof v[l] 
 /** @param {any} site parsed site.json @returns {string[]} problems (empty = valid) */
 export function validateAssembly(site) {
   const err = [];
+  if (site?.ductSystems) for (const [key, a] of Object.entries(site.ductSystems)) for (const issue of validateAssembly({ products: site.products, ductAssembly: a })) err.push(`ductSystems.${key}: ${issue}`);
   const a = site && site.ductAssembly;
   if (!a) return ['ductAssembly missing'];
   if (typeof a.id !== 'string' || !a.id) err.push('ductAssembly.id must be a non-empty string');

@@ -41,5 +41,5 @@ export function assemblySvg(asm, { title, id, width = 1200 }) {
     if (p.cls !== cur) { if (cur) out += `<path class="${cur}" d="${d}"/>`; cur = p.cls; d = seg; } else d += seg;
   }
   if (cur) out += `<path class="${cur}" d="${d}"/>`;
-  return `<svg class="asm-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-labelledby="${id}" focusable="false" direction="ltr"><title id="${id}">${esc(title)}</title>${out}</svg>`;
+  return `<svg class="asm-svg${asm.settings.finish === 'black-steel' ? ' asm-black' : ''}" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-labelledby="${id}" focusable="false" direction="ltr"><title id="${id}">${esc(title)}</title>${out}</svg>`;
 }
