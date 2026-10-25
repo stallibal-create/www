@@ -1,14 +1,12 @@
 # Informations manquantes — LIBALSTAL
 
-Généré automatiquement par `npm run build` le 2026-10-22. Chaque ligne correspond à un espace réservé visible sur le site.
+Généré automatiquement par `npm run build` le 2026-10-25. Chaque ligne correspond à un espace réservé visible sur le site.
 Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque ligne), puis relancez le build : la ligne disparaît.
 
 ## Savoir-faire
 
 - [ ] Gamme — Raccords & transitions  
   `capabilities.fittings.range`
-- [ ] Pose / accompagnement : service proposé oui ou non ?  
-  `capabilities.install.offered`
 - [ ] Valider le déroulé type d'une commande (page Savoir-faire)  
   `capabilities.process`
 - [ ] Gamme — Gaines rectangulaires  
@@ -18,54 +16,37 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
 - [ ] Gamme — Gaines circulaires spiralées  
   `capabilities.spiral.range`
 
-## Entreprise & contact
-
-- [ ] Dirigeant  
-  `company.director`
-- [ ] Horaires  
-  `company.hours`
-- [ ] Immatriculation (RC / identifiants fiscaux)  
-  `company.registration`
-
 ## Équipements
 
 - [ ] Parc machines (type, marque, capacités)  
   `equipment`
 
-## Visuel d'accueil
-
-- [ ] Photo d'atelier ou rendu 3D réel pour la page d'accueil (sinon visuel 3D conceptuel)  
-  `heroVisual.photo`
-
-## Secteurs
-
-- [ ] Confirmer la liste des secteurs réellement servis  
-  `industriesConfirmed`
-
-## Chiffres clés (accueil)
-
-- [ ] Marchés desservis  
-  `keyFacts.markets`
-- [ ] Matériaux travaillés  
-  `keyFacts.materials`
-- [ ] Normes appliquées  
-  `keyFacts.standards`
-
-## Mentions légales & confidentialité
-
-- [ ] Cadre légal applicable  
-  `legal.applicableLaw`
-- [ ] Durée de conservation  
-  `legal.dataRetention`
-- [ ] Hébergeur  
-  `legal.host`
-- [ ] Contact données personnelles  
-  `legal.privacyContact`
-- [ ] Directeur de la publication  
-  `legal.publicationDirector`
-
 ## Produits
 
+- [ ] Fiche technique PDF — Gaines aluminium  
+  `products.aluminium-ducts.datasheet`
+- [ ] Photo produit — Gaines aluminium  
+  `products.aluminium-ducts.image`
+- [ ] Dimensions — Gaines aluminium  
+  `products.aluminium-ducts.specs.dimensions`
+- [ ] Finition — Gaines aluminium  
+  `products.aluminium-ducts.specs.finish`
+- [ ] Norme — Gaines aluminium  
+  `products.aluminium-ducts.specs.standard`
+- [ ] Épaisseur — Gaines aluminium  
+  `products.aluminium-ducts.specs.thickness`
+- [ ] Fiche technique PDF — Gaines en acier noir  
+  `products.black-steel-ducts.datasheet`
+- [ ] Photo produit — Gaines en acier noir  
+  `products.black-steel-ducts.image`
+- [ ] Dimensions — Gaines en acier noir  
+  `products.black-steel-ducts.specs.dimensions`
+- [ ] Finition — Gaines en acier noir  
+  `products.black-steel-ducts.specs.finish`
+- [ ] Norme — Gaines en acier noir  
+  `products.black-steel-ducts.specs.standard`
+- [ ] Épaisseur — Gaines en acier noir  
+  `products.black-steel-ducts.specs.thickness`
 - [ ] Fiche technique PDF — Fabrication métallique sur mesure  
   `products.custom-assemblies.datasheet`
 - [ ] Photo produit — Fabrication métallique sur mesure  
@@ -126,16 +107,10 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
   `products.rectangular-duct.datasheet`
 - [ ] Photo produit — Gaine rectangulaire  
   `products.rectangular-duct.image`
-- [ ] Dimensions — Gaine rectangulaire  
-  `products.rectangular-duct.specs.dimensions`
 - [ ] Finition — Gaine rectangulaire  
   `products.rectangular-duct.specs.finish`
-- [ ] Matière — Gaine rectangulaire  
-  `products.rectangular-duct.specs.material`
 - [ ] Norme — Gaine rectangulaire  
   `products.rectangular-duct.specs.standard`
-- [ ] Épaisseur — Gaine rectangulaire  
-  `products.rectangular-duct.specs.thickness`
 - [ ] Fiche technique PDF — Réductions & transitions  
   `products.reducers-transitions.datasheet`
 - [ ] Photo produit — Réductions & transitions  
@@ -154,16 +129,22 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
   `products.spiral-round-duct.datasheet`
 - [ ] Photo produit — Gaine circulaire spiralée  
   `products.spiral-round-duct.image`
-- [ ] Dimensions — Gaine circulaire spiralée  
-  `products.spiral-round-duct.specs.dimensions`
 - [ ] Finition — Gaine circulaire spiralée  
   `products.spiral-round-duct.specs.finish`
-- [ ] Matière — Gaine circulaire spiralée  
-  `products.spiral-round-duct.specs.material`
 - [ ] Norme — Gaine circulaire spiralée  
   `products.spiral-round-duct.specs.standard`
-- [ ] Épaisseur — Gaine circulaire spiralée  
-  `products.spiral-round-duct.specs.thickness`
+- [ ] Fiche technique PDF — Gaines spéciales inox 304 / 316  
+  `products.stainless-ducts.datasheet`
+- [ ] Photo produit — Gaines spéciales inox 304 / 316  
+  `products.stainless-ducts.image`
+- [ ] Dimensions — Gaines spéciales inox 304 / 316  
+  `products.stainless-ducts.specs.dimensions`
+- [ ] Finition — Gaines spéciales inox 304 / 316  
+  `products.stainless-ducts.specs.finish`
+- [ ] Norme — Gaines spéciales inox 304 / 316  
+  `products.stainless-ducts.specs.standard`
+- [ ] Épaisseur — Gaines spéciales inox 304 / 316  
+  `products.stainless-ducts.specs.thickness`
 - [ ] Fiche technique PDF — Piquages & tés  
   `products.tees-branches.datasheet`
 - [ ] Photo produit — Piquages & tés  
@@ -181,7 +162,7 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
 
 ## Réalisations
 
-- [ ] Réalisations vérifiées (photos, périmètre, matériaux, accord client)  
+- [ ] Études de cas détaillées (photos, périmètre, matériaux, accord client)  
   `projects`
 
 ## Qualité & justificatifs
@@ -192,8 +173,6 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
   `quality.dimensional`
 - [ ] Justificatif qualité — Plans & documentation technique  
   `quality.drawings`
-- [ ] Justificatif qualité — Normes applicables  
-  `quality.standards`
 - [ ] Justificatif qualité — Tolérances de fabrication  
   `quality.tolerances`
 - [ ] Justificatif qualité — Traçabilité des matières  
@@ -201,9 +180,11 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
 
 ## Réseaux sociaux (URL de profil réelles)
 
-- [ ] Instagram : URL du profil LIBALSTAL (bouton masqué tant qu'elle manque)  
+- [ ] Instagram : URL du profil LIBALSTAL (icône inactive tant qu'elle manque)  
   `social.instagram`
-- [ ] TikTok : URL du profil LIBALSTAL (bouton masqué tant qu'elle manque)  
+- [ ] LinkedIn : URL du profil LIBALSTAL (icône inactive tant qu'elle manque)  
+  `social.linkedin`
+- [ ] TikTok : URL du profil LIBALSTAL (icône inactive tant qu'elle manque)  
   `social.tiktok`
 
 ## Configuration (variables d'environnement)
