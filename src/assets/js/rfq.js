@@ -42,7 +42,7 @@ if (form) {
   }
 
   function fileErrors() {
-    const list = [...(files.files || [])];
+    const list = files ? [...(files.files || [])] : [];
     if (list.length > T.maxFiles) return fmt(T.errFileCount, { max: T.maxFiles });
     for (const f of list) {
       const ext = (f.name.split('.').pop() || '').toLowerCase();
@@ -63,7 +63,7 @@ if (form) {
       setErr(el, msg);
       if (msg) { bad.push([el, msg]); if (!first) first = el; }
     }
-    if (fs.contains(files)) { const m = fileErrors(); setErr(files, m); if (m) { bad.push([files, m]); if (!first) first = files; } }
+    if (files && fs.contains(files)) { const m = fileErrors(); setErr(files, m); if (m) { bad.push([files, m]); if (!first) first = files; } }
     summary.replaceChildren();
     summary.hidden = !first;
     if (first) {
@@ -85,7 +85,7 @@ if (form) {
 
   // live-clear errors
   form.addEventListener('input', e => { if (e.target.getAttribute('aria-invalid') === 'true') setErr(e.target, ''); });
-  files.addEventListener('change', () => setErr(files, fileErrors()));
+  if (files) files.addEventListener('change', () => setErr(files, fileErrors())); // no field when attachments are off (drawings by e-mail)
 
   function buildReview() {
     const d = new FormData(form);
@@ -95,7 +95,7 @@ if (form) {
       [T.name, d.get('name'), 0], [T.company, d.get('company'), 0], [T.email, d.get('email'), 0], [T.phone, d.get('phone'), 0], [T.country, d.get('country'), 0],
       [T.category, cat.value ? cat.options[cat.selectedIndex].text : '', 1], [T.timeline, tl.options[tl.selectedIndex].text, 1],
       [T.material, d.get('material'), 1], [T.quantity, d.get('quantity'), 1], [T.requirements, d.get('requirements'), 1],
-      [T.files.split('(')[0].trim(), [...files.files].map(f => `${f.name} (${(f.size / 1048576).toFixed(1)} MB)`).join('\n') || T.noFiles, 1],
+      ...(files ? [[T.files.split('(')[0].trim(), [...files.files].map(f => `${f.name} (${(f.size / 1048576).toFixed(1)} MB)`).join('\n') || T.noFiles, 1]] : []),
     ];
     const dl = document.getElementById('rfq-review');
     dl.replaceChildren();
@@ -173,7 +173,7 @@ if (form) {
     btnSubmit.disabled = true; btnBack.disabled = true;
     const label = btnSubmit.textContent; btnSubmit.textContent = T.sending;
     const d = new FormData(form); d.set('sid', sid);
-    const list = [...(files.files || [])];
+    const list = files ? [...(files.files || [])] : [];
     if (!list.length) d.delete('files');
     const { res, body } = list.length ? await sendWithFiles(list, d) : await post(form.action, d);
     btnSubmit.disabled = false; btnBack.disabled = false; btnSubmit.textContent = label;
@@ -197,6 +197,23 @@ if (form) {
     showResult(false, T.failTitle, msg);
     if (window.turnstile) try { window.turnstile.reset(); } catch { /* ignore */ }
   });
+
+  // Turnstile, explicit mode: render when its script is ready; on failure say so instead of throwing
+  const slot = form.querySelector('.ts-slot');
+  if (slot) {
+    const tsErr = form.querySelector('.ts-error');
+    const fail = () => { tsErr.hidden = false; return true; }; // true: handled, Turnstile does not throw
+    let tries = 0;
+    const tick = setInterval(() => {
+      if (window.turnstile) {
+        clearInterval(tick);
+        try {
+          window.turnstile.render(slot, { sitekey: slot.dataset.sitekey, language: slot.dataset.language, theme: 'auto',
+            'error-callback': fail, 'callback': () => { tsErr.hidden = true; } });
+        } catch { fail(); }
+      } else if (++tries > 75) { clearInterval(tick); fail(); } // 15 s: script blocked or offline
+    }, 200);
+  }
 
   show(0, false);
 }

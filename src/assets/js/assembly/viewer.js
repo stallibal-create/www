@@ -14,6 +14,7 @@ import { createMotion, smoothstep, INTRO_DURATION_MS, INTRO_ORBIT_RAD, INTRO_EXP
 import { toScene, vNorm } from './units.js';
 import { readGlb, mergePrimitives } from './glb.js';
 import { spangle } from './spangle.js';
+import { createFlowEffects } from './flow-effects.js';
 
 /** @typedef {{ host: HTMLElement, assembly: any, onSelect: (id: string) => void, onLost?: () => void, onRestored?: () => void,
  *  onDiag?: (patch: object) => void, onMotion?: (state: object) => void, debug?: boolean, simulate?: string|null, modelUrl?: string|null }} ViewerOptions
@@ -208,6 +209,9 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
   const zincMap = tex(zinc.color, true), zincRough = tex(zinc.rough, false);
   const sheet = new THREE.MeshStandardMaterial({ color: 0xe2e7eb, map: zincMap, roughnessMap: zincRough, metalness: 1, roughness: 1 });
   const flange = new THREE.MeshStandardMaterial({ color: 0xa4acb4, map: zincMap, roughnessMap: zincRough, metalness: 1, roughness: 1.15 });
+  if (assembly.settings.finish === 'black-steel') {
+    for (const m of [sheet, flange]) { m.map = null; m.roughnessMap = null; m.color.set(0x424a54); m.metalness = .72; m.roughness = .48; }
+  }
   const hardware = new THREE.MeshStandardMaterial({ color: 0x9da5ad, metalness: 1, roughness: 0.3 });
   const gasket = new THREE.MeshStandardMaterial({ color: 0x141618, metalness: 0, roughness: 0.85 });
   const pick = m => { const c = m.clone(); c.emissive.set(0x0066cc); c.emissiveIntensity = 0.45; return c; };
@@ -219,6 +223,27 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
   scene.add(root);
   const solved = solveAssembly(assembly);
   const offsets = explodeOffsets(assembly, solved);
+  const flow = createFlowEffects(THREE, assembly, meshes, dpr, profile === PROFILES.mobile, model.parts ? solved : null);
+  let heatMode = false, heatBlend = 0, effectsPaused = matchMedia('(prefers-reduced-motion: reduce)').matches, cutaway = true;
+  flow.setPaused(effectsPaused);
+  const warmLight = new THREE.PointLight(0xff7024, 0, 8, 2); warmLight.position.copy(center); warmLight.position.y += .35; scene.add(warmLight);
+  const coldSheet = new THREE.Color(0xe2e7eb), coldFlange = new THREE.Color(0xa4acb4), blackMetal = new THREE.Color(0x252d36);
+  function appearance(dt) {
+    const target = heatMode ? 1 : 0;
+    heatBlend += (target - heatBlend) * Math.min(1, dt / 180);
+    if (Math.abs(target - heatBlend) < .002) heatBlend = target;
+    for (let i = 0; i < 2; i++) {
+      const m = BASE[i], selectedMat = SELECTED[i];
+      m.color.copy(i ? coldFlange : coldSheet).lerp(blackMetal, heatBlend);
+      m.transparent = true; m.opacity = cutaway ? (i ? .86 : .28 + heatBlend * .24) : 1; m.depthWrite = !cutaway;
+      m.emissive.setRGB(.012 * heatBlend, .003 * heatBlend, .001 * heatBlend);
+      selectedMat.color.copy(m.color); selectedMat.opacity = m.opacity; selectedMat.transparent = true; selectedMat.depthWrite = m.depthWrite;
+    }
+    warmLight.intensity = heatBlend * (effectsPaused ? 1.6 : 1.6 + .22 * Math.sin(performance.now() * .006));
+    return target !== heatBlend;
+  }
+  appearance(0);
+
   const applyExplode = factor => applyPose(meshes, solved, offsets, factor, root);
   // soft contact shadow under the assembly (one textured quad, no shadow maps)
   const shTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,.5)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
@@ -295,10 +320,12 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
     const dt = lastFrame ? Math.min(80, Math.max(0, now - lastFrame)) : 0;
     const animating = motion.state().running ? updateMotion(dt) : false;
     const moving = controls.update();
+    const changingFinish = appearance(dt);
+    const flowing = flow.update(dt / 1000, motion.state().factor);
     draw();
     if (lastFrame && now - lastFrame < 100) adapt(now - lastFrame); else frames = [];
     lastFrame = now;
-    if (moving || animating) invalidate();
+    if (moving || animating || flowing || changingFinish) invalidate();
   }
   function adapt(dt) {
     frames.push(dt);
@@ -370,7 +397,7 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
     canvas.removeEventListener('wheel', onWheel);
     canvas.removeEventListener('pointerdown', onDown); canvas.removeEventListener('pointerup', onUp); canvas.removeEventListener('pointercancel', onCancel);
     canvas.removeEventListener('webglcontextlost', onLostEv); canvas.removeEventListener('webglcontextrestored', onRestoredEv);
-    controls.dispose();
+    controls.dispose(); flow.destroy();
     for (const g of geometries) g.dispose();
     for (const m of [...BASE, ...SELECTED, shadowMat]) m.dispose();
     zincMap.dispose(); zincRough.dispose();
@@ -409,6 +436,15 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
 
   /** @type {Viewer} */
   const api = {
+    setIllustration({ heat = false, paused = false, cutaway: seeInside = true } = {}) {
+      heatMode = heat; effectsPaused = paused; cutaway = seeInside;
+      flow.setMode(heat); flow.setPaused(paused); flow.setEnabled(seeInside);
+      for (let i = 0; i < 2; i++) for (const m of [BASE[i], SELECTED[i]]) {
+        m.map = heat ? null : zincMap; m.roughnessMap = heat ? null : zincRough;
+        m.metalness = heat ? .82 : 1; m.roughness = heat ? .5 : (i ? 1 : .76); m.needsUpdate = true;
+      }
+      lastFrame = 0; invalidate();
+    },
     setSelected(id) {
       selectedId = id || null;
       if (selected) selected.material = BASE;
@@ -444,7 +480,7 @@ export async function createViewer({ host, assembly, onSelect, onLost, onRestore
     interrupt: stopMotion,
     destroy,
     stats: () => ({
-      initMs, geometry: model.source, dpr, profile: profile === PROFILES.mobile ? 'mobile' : 'desktop', frames: rendered, painted, selected: selectedId, motion: motion.state().mode, explodeFactor: motion.state().factor,
+      heat: heatMode, effectsPaused, cutaway, initMs, geometry: model.source, dpr, profile: profile === PROFILES.mobile ? 'mobile' : 'desktop', frames: rendered, painted, selected: selectedId, motion: motion.state().mode, explodeFactor: motion.state().factor,
       camera: { distance: camera.position.distanceTo(controls.target), homeDistance: homeDist, elevation: Math.asin(viewDirNow().y) },
       calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures,
       buffer: [renderer.getContext().drawingBufferWidth, renderer.getContext().drawingBufferHeight], css: [host.clientWidth, host.clientHeight],

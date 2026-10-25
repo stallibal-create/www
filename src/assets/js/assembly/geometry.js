@@ -39,6 +39,10 @@ export class GeometryError extends Error {}
 
 /** Required geometry fields per part type. 'mm' = finite positive number of millimetres; arrays = allowed values. */
 export const GEOMETRY_SCHEMA = {
+  'spiral-straight': { diameterMm: 'mm', lengthMm: 'mm', pitchMm: 'mm' },
+  'round-straight': { diameterMm: 'mm', lengthMm: 'mm' },
+  'round-elbow': { diameterMm: 'mm', innerRadiusMm: 'mm' },
+  'round-reducer': { inletDiameterMm: 'mm', outletDiameterMm: 'mm', lengthMm: 'mm' },
   straight: { widthMm: 'mm', heightMm: 'mm', lengthMm: 'mm' },
   branch: { widthMm: 'mm', heightMm: 'mm', lengthMm: 'mm' },
   elbow90: { widthMm: 'mm', heightMm: 'mm', innerRadiusMm: 'mm', bendPlane: ['horizontal', 'vertical'] },
@@ -48,7 +52,7 @@ export const GEOMETRY_SCHEMA = {
 };
 export const PART_TYPES = Object.keys(GEOMETRY_SCHEMA);
 /** Connector names per part type. */
-export const CONNECTORS = { straight: ['inlet', 'outlet'], branch: ['inlet', 'outlet'], elbow90: ['inlet', 'outlet'], reducer: ['inlet', 'outlet'], tee: ['inlet', 'outlet', 'branch'], flange: ['inlet', 'outlet'] };
+export const CONNECTORS = { 'spiral-straight': ['inlet', 'outlet'], 'round-straight': ['inlet', 'outlet'], 'round-elbow': ['inlet', 'outlet'], 'round-reducer': ['inlet', 'outlet'], straight: ['inlet', 'outlet'], branch: ['inlet', 'outlet'], elbow90: ['inlet', 'outlet'], reducer: ['inlet', 'outlet'], tee: ['inlet', 'outlet', 'branch'], flange: ['inlet', 'outlet'] };
 
 const isMm = x => typeof x === 'number' && Number.isFinite(x) && x > 0;
 
@@ -66,6 +70,9 @@ export function validatePart(c, s) {
   }
   for (const k of Object.keys(g)) if (k !== 'demo' && !(k in schema)) err.push(`geometry.${k} is not a ${c.type} parameter`);
   if (err.length) return err;
+  if (c.type === 'round-reducer' && g.inletDiameterMm === g.outletDiameterMm) err.push('round reducer diameters must differ');
+  if (c.type === 'round-elbow' && g.innerRadiusMm < s.sheetMm + s.flangeWidthMm + s.flangeDepthMm) err.push('round elbow inner radius is too small for its joints');
+  if (c.type === 'spiral-straight' && g.pitchMm < 20) err.push('spiral pitch must be at least 20 mm in the demonstration');
   const t = s.sheetMm, F = s.flangeWidthMm, D = s.flangeDepthMm;
   // degenerate shapes
   if ('lengthMm' in schema && g.lengthMm <= 2 * D) err.push(`lengthMm (${g.lengthMm}) must exceed both end flanges (2 × ${D} mm)`);
@@ -90,6 +97,12 @@ export function connectorsFor(c, s) {
   const g = c.geometry;
   const X = [1, 0, 0], NX = [-1, 0, 0], Y = [0, 1, 0];
   switch (c.type) {
+    case 'spiral-straight': case 'round-straight': case 'round-reducer': case 'round-elbow': {
+      const d0 = g.diameterMm || g.inletDiameterMm, d1 = g.diameterMm || g.outletDiameterMm;
+      const inlet = { o: [0, 0, 0], n: NX, u: Y, w: d0, h: d0 };
+      if (c.type === 'round-elbow') { const R = g.innerRadiusMm + d0 / 2; return { inlet, outlet: { o: [R, 0, R], n: [0, 0, 1], u: Y, w: d0, h: d0 } }; }
+      return { inlet, outlet: { o: [g.lengthMm, 0, 0], n: X, u: Y, w: d1, h: d1 } };
+    }
     case 'straight': case 'branch':
       return { inlet: { o: [0, 0, 0], n: NX, u: Y, w: g.widthMm, h: g.heightMm }, outlet: { o: [g.lengthMm, 0, 0], n: X, u: Y, w: g.widthMm, h: g.heightMm } };
     case 'reducer':
@@ -277,6 +290,48 @@ function elbowFrame(g, a) {
     : frame([R * s0, R - R * c0, 0], [c0, s0, 0], [-s0, c0, 0], g.widthMm, g.heightMm); // bend about +Z towards +Y
 }
 
+// Hollow circular skins and annular rims. Every section has a real open airway.
+function circularTube(m, frames, wall, mat = 'sheet', sides = 48) {
+  const radial = (f, a) => vAdd(vScale(f.y, Math.cos(a)), vScale(f.z, Math.sin(a)));
+  const point = (f, a, grow) => vAdd(f.p, vScale(radial(f, a), f.w / 2 + grow));
+  for (let i = 0; i < sides; i++) {
+    const a = i * 2 * Math.PI / sides, b = (i + 1) * 2 * Math.PI / sides;
+    for (const [grow, sign] of [[wall, 1], [0, -1]]) m.strip(mat, frames.map(f => [point(f, a, grow), point(f, b, grow)]), k => vScale(radial(frames[k], (a + b) / 2), sign));
+    for (const [f, sign] of [[frames[0], -1], [frames.at(-1), 1]]) m.quad(mat, point(f, a, 0), point(f, b, 0), point(f, b, wall), point(f, a, wall), vScale(f.x, sign));
+  }
+}
+
+function circularPart(m, c, s, segments) {
+  const g = c.geometry, d0 = g.diameterMm || g.inletDiameterMm, d1 = g.diameterMm || g.outletDiameterMm;
+  const X = [1, 0, 0], Y = [0, 1, 0], t = s.sheetMm;
+  let frames;
+  if (c.type === 'round-elbow') {
+    const R = g.innerRadiusMm + d0 / 2;
+    frames = Array.from({ length: segments + 1 }, (_, i) => {
+      const a = i * Math.PI / (2 * segments);
+      return frame([R * Math.sin(a), 0, R * (1 - Math.cos(a))], [Math.cos(a), 0, Math.sin(a)], Y, d0, d0);
+    });
+    frames[0] = frame([0, 0, 0], X, Y, d0, d0);
+    frames[segments] = frame([R, 0, R], [0, 0, 1], Y, d0, d0);
+  } else frames = [frame([0, 0, 0], X, Y, d0, d0), frame([g.lengthMm, 0, 0], X, Y, d1, d1)];
+  circularTube(m, frames, t);
+  // Annular joints: visual proportions only, not a flange specification.
+  for (const [f, sign] of [[frames[0], 1], [frames.at(-1), -1]]) {
+    const a = { ...f, w: f.w + 2 * t, h: f.h + 2 * t };
+    circularTube(m, [a, { ...a, p: vAdd(a.p, vScale(a.x, sign * s.flangeDepthMm)) }], s.flangeWidthMm, 'flange');
+  }
+  if (c.type === 'spiral-straight') {
+    const margin = s.flangeDepthMm + 6, L = g.lengthMm - 2 * margin;
+    if (L <= 0) return;
+    const n = Math.ceil(L / g.pitchMm * 64), radius = d0 / 2 + t + 1.2;
+    const edges = Array.from({ length: n + 1 }, (_, i) => {
+      const x = margin + L * i / n, a = (x - margin) * 2 * Math.PI / g.pitchMm;
+      return [[x - 2, radius * Math.cos(a), radius * Math.sin(a)], [x + 2, radius * Math.cos(a), radius * Math.sin(a)]];
+    });
+    m.strip('flange', edges, k => { const a = L * k / n * 2 * Math.PI / g.pitchMm; return [0, Math.cos(a), Math.sin(a)]; });
+  }
+}
+
 /** Build a part mesh in local mm coordinates. @param {Component} c @param {Settings} s
  *  @param {{ segments?: number, keepQuads?: boolean, details?: boolean }} [opts] segments = elbow subdivisions; keepQuads
  *  also returns planar quads (SVG preview); details adds the construction details (DETAIL). @returns {PartMesh} */
@@ -287,6 +342,8 @@ export function buildPart(c, s, { segments = 16, keepQuads = false, details = fa
   const m = meshBuilder(keepQuads);
   const X = [1, 0, 0], NX = [-1, 0, 0], Y = [0, 1, 0];
   switch (c.type) {
+    case 'spiral-straight': case 'round-straight': case 'round-elbow': case 'round-reducer':
+      circularPart(m, c, s, segments); break;
     case 'straight': case 'branch': case 'reducer': {
       const [w0, h0, w1, h1] = c.type === 'reducer' ? [g.inletWidthMm, g.inletHeightMm, g.outletWidthMm, g.outletHeightMm] : [g.widthMm, g.heightMm, g.widthMm, g.heightMm];
       const f0 = frame([0, 0, 0], X, Y, w0, h0), f1 = frame([g.lengthMm, 0, 0], X, Y, w1, h1);

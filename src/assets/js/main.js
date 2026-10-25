@@ -113,7 +113,7 @@
       chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.filter === f)); });
       cards.forEach(function (c) { var show = f === 'all' || c.dataset.cat === f; c.hidden = !show; if (show) n++; });
       empty.hidden = n > 0;
-      if (count) count.textContent = count.dataset.template.replace('{n}', n);
+      if (count) count.textContent = (n === 1 ? count.dataset.templateOne : count.dataset.template).replace('{n}', n);
       if (push) history.replaceState(null, '', f === 'all' ? location.pathname : '#cat=' + f);
     };
     chips.forEach(function (c) { c.addEventListener('click', function () { apply(c.dataset.filter, true); }); });

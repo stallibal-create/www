@@ -24,8 +24,37 @@ function init() {
   const diag = debug ? diagnostics(fig) : null;
   let current = null, viewer = null;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const airButton = root.querySelector('.asm-air'), heatButton = root.querySelector('.asm-heat');
+  const pauseButton = root.querySelector('.asm-pause'), cutawayButton = root.querySelector('.asm-cutaway');
+  let heatMode = params.get('heat') === '1', effectsPaused = reducedMotion.matches, cutaway = true;
+  function applyIllustration() {
+    airButton.setAttribute('aria-pressed', String(!heatMode)); heatButton.setAttribute('aria-pressed', String(heatMode));
+    pauseButton.setAttribute('aria-pressed', String(effectsPaused)); pauseButton.textContent = effectsPaused ? pauseButton.dataset.play : pauseButton.dataset.pause;
+    cutawayButton.setAttribute('aria-pressed', String(cutaway));
+    fig.classList.toggle('is-heat', heatMode); fig.classList.toggle('is-cutaway', cutaway);
+    for (const link of document.querySelectorAll('.asm-systems[aria-label] a')) {
+      const target = new URL(link.href); if (heatMode) target.searchParams.set('heat', '1'); else target.searchParams.delete('heat'); link.href = target.href;
+    }
+    const locationState = new URL(location.href); if (heatMode) locationState.searchParams.set('heat', '1'); else locationState.searchParams.delete('heat');
+    history.replaceState(history.state, '', locationState);
+
+    root.querySelector('.asm-heat-note').hidden = !heatMode;
+    for (const card of cards.values()) {
+      card.querySelector('.asm-product-standard').hidden = heatMode;
+      card.querySelector('.asm-product-heat').hidden = !heatMode;
+      const quote = card.querySelector('.asm-part-quote'); quote.href = heatMode ? quote.dataset.heatHref : quote.dataset.normalHref;
+    }
+    if (viewer) viewer.setIllustration({ heat: heatMode, paused: effectsPaused, cutaway });
+  }
+  airButton.addEventListener('click', () => { heatMode = false; applyIllustration(); });
+  heatButton.addEventListener('click', () => { heatMode = !heatMode; applyIllustration(); });
+  pauseButton.addEventListener('click', () => { effectsPaused = !effectsPaused; applyIllustration(); });
+  cutawayButton.addEventListener('click', () => { cutaway = !cutaway; applyIllustration(); });
+  reducedMotion.addEventListener?.('change', e => { if (e.matches) { effectsPaused = true; applyIllustration(); } });
+  applyIllustration();
+
   // Do not autoplay repeatedly within one browser tab. Storage is optional (e.g. private mode).
-  const introKey = 'libalstal-assembly-intro-v12';
+  const introKey = 'libalstal-assembly-intro-v12-' + (data.assembly.id || 'rectangular');
   const introSeen = () => { try { return sessionStorage.getItem(introKey) === '1'; } catch { return false; } };
   const rememberIntro = () => { try { sessionStorage.setItem(introKey, '1'); } catch { /* storage restricted */ } };
   const controls = new Map([...root.querySelectorAll('.asm-tools [data-cmd]')].map(b => [b.dataset.cmd, b]));
@@ -100,7 +129,7 @@ function init() {
         onMotion,
       }))
       .then(v => {
-        viewer = v; setState('3d'); if (current) v.setSelected(current);
+        viewer = v; applyIllustration(); setState('3d'); if (current) v.setSelected(current);
         onMotion({ mode: 'idle', factor: 0 });
         if (!current && !reducedMotion.matches && !introSeen()) { rememberIntro(); v.playIntro(); }
         if (diag) { diag.set({ status: `rendered — first frame verified (${v.stats().initMs} ms)` }); diag.poll(v); }
