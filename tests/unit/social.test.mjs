@@ -2,16 +2,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { NETWORKS, socialLinks, missingNetworks, socialDock } from '../../scripts/social.mjs';
+import { NETWORKS, socialLinks, missingNetworks, socialDock, socialItems } from '../../scripts/social.mjs';
 
 const T = { label: 'LIBALSTAL sur les réseaux sociaux', open: 'Afficher', close: 'Masquer', newTab: '(nouvel onglet)' };
-const ALL = { facebook: 'https://www.facebook.com/example', instagram: 'https://www.instagram.com/example/', tiktok: 'https://www.tiktok.com/@example' };
+const ALL = { facebook: 'https://www.facebook.com/example', instagram: 'https://www.instagram.com/example/', tiktok: 'https://www.tiktok.com/@example', linkedin: 'https://www.linkedin.com/company/example/' };
 
 test('only real https profile URLs are used, in a fixed order; the rest is reported missing', () => {
   assert.deepEqual(socialLinks({ tiktok: ALL.tiktok, facebook: ALL.facebook }).map(n => n.key), ['facebook', 'tiktok']);
   for (const bad of [null, '', '   ', 'http://www.instagram.com/x', 'instagram.com/x', 'https://x" onmouseover="a', 'À compléter'])
     assert.equal(socialLinks({ instagram: bad }).length, 0, String(bad));
-  assert.deepEqual(missingNetworks({ facebook: ALL.facebook }).map(n => n.key), ['instagram', 'tiktok']);
+  assert.deepEqual(missingNetworks({ facebook: ALL.facebook }).map(n => n.key), ['instagram', 'tiktok', 'linkedin']);
   assert.equal(socialLinks(undefined).length, 0);
 });
 
@@ -42,7 +42,7 @@ test('several links: Lucide toggle with state, controls the list; every brand ma
   assert.match(h, /class="social-dock is-multi"/);
   assert.match(h, /<button type="button" class="sd-btn sd-toggle" aria-expanded="false" aria-controls="sd-list" data-open="Afficher" data-close="Masquer" aria-label="Afficher">/);
   assert.match(h, /<ul class="sd-list" id="sd-list">/);
-  assert.equal((h.match(/class="sd-btn sd-(facebook|instagram|tiktok)"/g) || []).length, 3);
+  assert.equal((h.match(/class="sd-btn sd-(facebook|instagram|tiktok|linkedin)"/g) || []).length, 4);
   assert.match(h, /<circle cx="18" cy="5" r="3"\/>/, 'Lucide share-2 geometry');
   assert.match(h, /<path d="M18 6 6 18"\/>/, 'Lucide x geometry');
   assert.match(h, /stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/);
@@ -55,6 +55,18 @@ test('labels and URLs are escaped', () => {
 });
 
 test('brand marks are single-path 24×24 glyphs (Simple Icons), small enough to inline', () => {
-  assert.deepEqual(NETWORKS.map(n => n.key), ['facebook', 'instagram', 'tiktok']);
+  assert.deepEqual(NETWORKS.map(n => n.key), ['facebook', 'instagram', 'tiktok', 'linkedin']);
   for (const n of NETWORKS) { assert.match(n.d, /^M[\d.]/); assert.ok(n.d.length < 4000, n.name); }
+});
+
+test('future profiles are visible but never link to a guessed or placeholder URL', () => {
+  const links = socialItems({ facebook: ALL.facebook }, { email: 'team@example.invalid', whatsapp: '+213 555 000 000' }, 'Email');
+  const h = socialDock({ links, t: { ...T, pending: 'Link coming soon' } });
+  for (const key of ['instagram', 'tiktok', 'linkedin']) {
+    assert.match(h, new RegExp(`<span class="sd-btn sd-${key} is-pending" role="img"`));
+    assert.doesNotMatch(h, new RegExp(`<a[^>]+sd-${key}`));
+  }
+  assert.match(h, /href="https:\/\/wa.me\/213555000000" target="_blank" rel="noopener noreferrer"/);
+  assert.match(h, /href="mailto:team@example.invalid"><svg/);
+  assert.doesNotMatch(h, /href="#"/);
 });

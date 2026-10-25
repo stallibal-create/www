@@ -281,7 +281,7 @@ await test('product renders: every card and product page shows its illustrative 
   const p = await newPage();
   await p.goto(A + '/fr/products/');
   const cards = await p.$$eval('#product-grid .card-render img', imgs => imgs.map(i => i.getAttribute('srcset')));
-  assert.equal(cards.length, 8, 'a render on every product card');
+  assert.equal(cards.length, 11, 'a render on every product card');
   for (const l of ['fr', 'en', 'ar']) {
     await p.goto(`${A}/${l}/products/elbows/`);
     await p.waitForFunction(() => { const i = document.querySelector('.drawing-render img'); return i.complete && i.naturalWidth > 0; }, null, { timeout: 10000 });
@@ -301,11 +301,39 @@ await test('product filter updates cards, count and URL', async () => {
   const p = await newPage(); await p.goto(A + '/fr/products/');
   await p.click('.chip[data-filter="fit"]');
   assert.equal(await p.locator('.card:visible').count(), 3);
-  assert.equal(await p.textContent('.count'), '3 produit(s)');
+  assert.equal(await p.textContent('.count'), '3 produits');
   assert.match(p.url(), /#cat=fit$/);
   await p.reload(); assert.equal(await p.locator('.card:visible').count(), 3, 'state from hash');
-  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), 8);
+  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), 11);
   await p.context().close();
+});
+await test('v5.3 brochure content: specs as printed, 9 references (no defence sites), contacts; no RC, no gmail, no fire claim', async () => {
+  const get = async path => (await fetch(A + path)).text();
+  const rect = await get('/fr/products/rectangular-duct/'), spiral = await get('/fr/products/spiral-round-duct/');
+  for (const t of ['0,4 à 2 mm', 'longueurs standard 1 m et 1,25 m', 'acier galvanisée']) assert.ok(rect.includes(t), `rectangular: ${t}`);
+  for (const t of ['0,4 à 1,2 mm', 'Toutes dimensions', 'acier galvanisée']) assert.ok(spiral.includes(t), `spiral: ${t}`);
+  assert.ok((await get('/fr/products/stainless-ducts/')).includes('304 / 316'), 'stainless grades');
+  for (const l of ['fr', 'en', 'ar']) {
+    for (const path of [`/${l}/`, `/${l}/projects/`]) {
+      const h = await get(path);
+      assert.equal((h.match(/<li[^>]*>\s*<span class="ref-sector"/g) || []).length, 9, `${path}: 9 references`);
+      assert.doesNotMatch(h, /ERSSMS|Hammaguir|militaire|military|عسكري/i, `${path}: defence sites not named`);
+      assert.doesNotMatch(h, /Alziwar|Alnaaja|Tipasa/i, `${path}: brochure spellings normalised`);
+    }
+    const legal = await get(`/${l}/legal/`), company = await get(`/${l}/company/`), contact = await get(`/${l}/contact/`);
+    for (const h of [legal, company, contact]) {
+      assert.doesNotMatch(h, /09\/01-1013913B18|\{registration\}/, `${l}: RC not shown`);
+      assert.doesNotMatch(h, /gmail\.com/, `${l}: no gmail address`);
+      assert.doesNotMatch(h, /1366|coupe-feu|400\s*°C|fire-rated|fire resistant/i, `${l}: fire claim held`);
+    }
+    assert.ok(contact.includes('commercial@libalstal.com'), `${l}: commercial e-mail`);
+    for (const tel of ['tel:+213776980064', 'tel:+213553098214', 'wa.me/213561631942']) assert.ok(contact.includes(tel), `${l}: ${tel}`);
+    const q = await get(`/${l}/quality/`);
+    for (const t of ['SMACNA', 'ASHRAE', 'DW/144']) assert.ok(q.includes(t), `${l} quality: ${t}`);
+  }
+  const ld = JSON.parse((await get('/fr/')).match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  const org = [ld].flat().concat(ld['@graph'] || []).find(n => n['@type'] === 'Organization') || ld;
+  assert.ok(JSON.stringify(org).includes('commercial@libalstal.com'), 'JSON-LD e-mail');
 });
 await test('product page CTA pre-fills the quote form', async () => {
   const p = await newPage(); await p.goto(A + '/en/products/elbows/');
@@ -477,7 +505,7 @@ await test('hide incomplete (site.json display.hideIncomplete): no placeholders 
     assert.doesNotMatch(main, /class="badge"/, `${l}: missing-evidence badge on home`);
   }
   const mi = readFileSync(join(ROOT, 'MISSING-INFO.md'), 'utf8');
-  assert.match(mi, /keyFacts\.materials/); assert.match(mi, /industriesConfirmed/);
+  assert.match(mi, /capabilities\.process/); assert.match(mi, /equipment/);
 });
 await test('lazy loading: no 3D code elsewhere; on the page nothing 3D until the view approaches', async () => {
   const p = await newPage({ viewport: { width: 390, height: 200 } }); const reqs = [];

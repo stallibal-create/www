@@ -8,6 +8,10 @@ const S = { sheetMm: 3, flangeWidthMm: 30, flangeDepthMm: 30 };
 const T = 3, F = 30, D = 30, OUT = T + F; // sheet and flange stand outside the internal section
 const TOL = 1e-3; // mm, float32 storage
 const P = {
+  'spiral-straight': { diameterMm: 400, lengthMm: 1000, pitchMm: 140 },
+  'round-straight': { diameterMm: 400, lengthMm: 700 },
+  'round-elbow': { diameterMm: 400, innerRadiusMm: 200 },
+  'round-reducer': { inletDiameterMm: 400, outletDiameterMm: 300, lengthMm: 400 },
   straight: { widthMm: 400, heightMm: 300, lengthMm: 1000 },
   branch: { widthMm: 250, heightMm: 200, lengthMm: 600 },
   elbow90: { widthMm: 400, heightMm: 300, innerRadiusMm: 150, bendPlane: 'horizontal' },
@@ -75,7 +79,8 @@ for (const [name, c] of cases) {
       for (let i = 0; i < m.positions.length / 3; i++) { const p = pt(m, i); if (Math.abs(vDot(vSub(p, k.o), k.n)) < TOL) inPlane.push(p); }
       const sideAxis = vCross(k.n, k.u);
       const minHalfW = Math.min(...inPlane.map(p => Math.max(Math.abs(vDot(vSub(p, k.o), sideAxis)) - k.w / 2, Math.abs(vDot(vSub(p, k.o), k.u)) - k.h / 2)));
-      if (c.type !== 'flange') near(minHalfW, 0); // duct rim begins exactly at the internal edge
+      if (c.geometry.diameterMm || c.geometry.inletDiameterMm) near(Math.min(...inPlane.map(p => Math.hypot(vDot(vSub(p, k.o), sideAxis), vDot(vSub(p, k.o), k.u)) - k.w / 2)), 0);
+      else if (c.type !== 'flange') near(minHalfW, 0); // duct rim begins exactly at the internal edge
     }
   });
 }
