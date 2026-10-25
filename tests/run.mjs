@@ -137,7 +137,8 @@ await test('external links are only the declared ones', async () => {
 await test('root redirects by Accept-Language; unknown paths 404 in the right language', async () => {
   const r = await fetch(A + '/', { redirect: 'manual', headers: { 'Accept-Language': 'ar-DZ,ar;q=0.9' } });
   assert.equal(r.status, 302); assert.equal(r.headers.get('location'), '/ar/');
-  const r2 = await fetch(A + '/', { redirect: 'manual', headers: { 'Accept-Language': 'de-DE' } }); assert.equal(r2.headers.get('location'), '/fr/');
+  const r2 = await fetch(A + '/', { redirect: 'manual', headers: { 'Accept-Language': 'de-DE' } }); assert.equal(r2.headers.get('location'), '/en/');
+  const french = await fetch(A + '/', { redirect: 'manual', headers: { 'Accept-Language': 'fr-FR,en;q=0.8' } }); assert.equal(french.headers.get('location'), '/fr/');
   const nf = await fetch(A + '/en/does-not-exist/'); assert.equal(nf.status, 404); assert.match(await nf.text(), /<title>Page not found \| LIBALSTAL<\/title>/);
   const tr = await fetch(A + '/..%2f..%2fpackage.json'); assert.ok([403, 404].includes(tr.status));
 });
