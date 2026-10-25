@@ -849,7 +849,7 @@ function notFound(ctx) {
 
 // ---------- root, SEO files, headers ----------
 function rootFiles() {
-  write('index.html', `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LIBALSTAL</title><meta http-equiv="refresh" content="0; url=/fr/"><link rel="canonical" href="${SITE_URL}/fr/"><meta name="robots" content="noindex"></head><body><p><a href="/fr/" hreflang="fr" lang="fr">Français</a> · <a href="/en/" hreflang="en" lang="en">English</a> · <a href="/ar/" hreflang="ar" lang="ar">العربية</a></p></body></html>`);
+  write('index.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LIBALSTAL</title><meta http-equiv="refresh" content="0; url=/en/"><link rel="canonical" href="${SITE_URL}/en/"><meta name="robots" content="noindex"></head><body><p><a href="/fr/" hreflang="fr" lang="fr">Français</a> · <a href="/en/" hreflang="en" lang="en">English</a> · <a href="/ar/" hreflang="ar" lang="ar">العربية</a></p></body></html>`);
   // RFC 9116: how to report a security problem (contact = the company's public address in site.json)
   const expires = new Date(Date.now() + 365 * 864e5).toISOString().replace(/\.\d+Z$/, 'Z');
   write('.well-known/security.txt', `Contact: mailto:${site.company.email}\nExpires: ${expires}\nPreferred-Languages: fr, en, ar\nCanonical: ${SITE_URL}/.well-known/security.txt\n`);
@@ -885,7 +885,7 @@ function rootFiles() {
   writeFileSync(join(ROOT, '.build/headers.json'), JSON.stringify(headers, null, 2));
   // Netlify / Cloudflare Pages formats
   write('_headers', `/*\n${Object.entries({ ...headers, 'Content-Security-Policy': csp + '; upgrade-insecure-requests', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' }).map(([k, v]) => `  ${k}: ${v}`).join('\n')}\n/assets/*\n  Cache-Control: public, max-age=604800\n`);
-  write('_redirects', `/  /fr/  302\n/en/*  /en/404.html  404\n/ar/*  /ar/404.html  404\n/*  /404.html  404\n`);
+  write('_redirects', `/en/*  /en/404.html  404\n/ar/*  /ar/404.html  404\n/*  /404.html  404\n`);
 }
 
 function missingReport() {
