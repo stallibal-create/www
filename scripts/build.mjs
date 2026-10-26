@@ -310,6 +310,13 @@ function rfqBand(ctx) {
 </div></section>`;
 }
 
+function companyMap(ctx) {
+  const src = site.company.mapEmbedUrl;
+  if (!src) return '';
+  const localized = src.replaceAll('!1sfr!', `!1s${ctx.lang}!`);
+  return `<div class="company-map"><iframe src="${esc(localized)}" title="${esc(ctx.D.company.findUs)} — LIBALSTAL" width="600" height="360" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
+}
+
 function industriesGrid(ctx) {
   const { D } = ctx;
   if (!site.industriesConfirmed) note('industriesConfirmed', 'Confirmer la liste des secteurs réellement servis');
@@ -621,6 +628,7 @@ function company(ctx) {
   <div><h2>${esc(D.company.aboutTitle)}</h2><p class="lead">${cv('about')}</p>
     ${c.services?.length ? `<h2 class="h3">${esc(D.services.title)}</h2><p class="services">${c.services.map(k => esc(D.services[k])).join(' · ')}</p>` : ''}
     <h2 class="h3">${esc(D.company.findUs)}</h2><p>${cv('address')}</p><p>${c.mapUrl ? `<a class="btn" href="${esc(c.mapUrl)}" rel="noopener" target="_blank">${esc(D.company.map)}<span class="sr"> ${esc(D.footer.newTab)}</span></a>` : cv('mapUrl')}</p>
+    ${companyMap(ctx)}
     <h2 class="h3">${esc(D.company.social)}</h2><p>${SOCIAL.map(n => `<a href="${esc(n.url)}" rel="noopener" target="_blank">${esc(n.url.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, ''))}<span class="sr"> ${esc(D.footer.newTab)}</span></a>`).join('<br>')}</p>
   </div>
   <aside class="factbox" aria-labelledby="lf-h"><h2 id="lf-h" class="h3">${esc(D.company.factsTitle)}</h2><dl class="spec">${dl}</dl></aside>
@@ -700,6 +708,7 @@ function contact(ctx) {
     <div><dt>${esc(D.fields.address)}</dt><dd>${cv('address')}</dd></div>
     <div><dt>${esc(D.fields.hours)}</dt><dd>${cv('hours')}</dd></div>
   </dl>
+  ${companyMap(ctx)}
   ${FB ? `<p><a href="${esc(FB)}" rel="noopener" target="_blank">Facebook — Libalstal<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>` : ''}
 </aside>
 </div></section>`;
@@ -871,7 +880,7 @@ function rootFiles() {
     "img-src 'self' data: blob:",
     `font-src 'self'${FONT_LOCAL ? '' : ' https://fonts.gstatic.com'}`,
     `connect-src 'self'${RFQ_ENDPOINT.startsWith('http') ? ' ' + new URL(RFQ_ENDPOINT).origin : ''}${RFQ_UPLOAD_ORIGIN ? ' ' + RFQ_UPLOAD_ORIGIN : ''}`,
-    `frame-src ${TURNSTILE_SITE_KEY ? 'https://challenges.cloudflare.com' : "'none'"}`,
+    `frame-src https://www.google.com ${TURNSTILE_SITE_KEY ? 'https://challenges.cloudflare.com' : ''}`,
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",

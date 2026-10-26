@@ -53,14 +53,15 @@
       "en": "Libal Stal SARL manufactures metal duct systems for ventilation and smoke extraction. The company has been in operation since 2018.",
       "ar": "تصنع شركة Libal Stal SARL أنظمة مجاري معدنية للتهوية واستخراج الدخان. تمارس الشركة نشاطها منذ 2018."
     },
-    "mapUrl": "https://www.google.com/maps/search/?api=1&query=Zaouia%20Center%2C%20Beni%20Tamou%2C%20Blida%2C%20Algeria",
+    "mapUrl": "https://www.google.com/maps?cid=14870507933311400548",
     "registrationPublic": false,
     "_registrationNote": "RC known (brochure) but not published, by the owner's decision (2026-10-24).",
     "services": [
       "fabrication",
       "supply",
       "installation"
-    ]
+    ],
+    "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3206.2238607728746!2d2.8067070999999992!3d36.5245933!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x128f0b8eb4d0a62f%3A0xce5ea82d92a77a64!2sLibalstal!5e1!3m2!1sfr!2sdz!4v1793037374848!5m2!1sfr!2sdz"
   },
   "keyFacts": [
     {
