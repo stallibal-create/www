@@ -1,6 +1,6 @@
 # Informations manquantes — LIBALSTAL
 
-Généré automatiquement par `npm run build` le 2026-10-25. Chaque ligne correspond à un espace réservé visible sur le site.
+Généré automatiquement par `npm run build` le 2026-10-27. Chaque ligne correspond à un espace réservé visible sur le site.
 Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque ligne), puis relancez le build : la ligne disparaît.
 
 ## Savoir-faire
@@ -79,16 +79,10 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
   `products.flanges-connectors.datasheet`
 - [ ] Photo produit — Brides & raccords  
   `products.flanges-connectors.image`
-- [ ] Dimensions — Brides & raccords  
-  `products.flanges-connectors.specs.dimensions`
 - [ ] Finition — Brides & raccords  
   `products.flanges-connectors.specs.finish`
-- [ ] Matière — Brides & raccords  
-  `products.flanges-connectors.specs.material`
 - [ ] Norme — Brides & raccords  
   `products.flanges-connectors.specs.standard`
-- [ ] Épaisseur — Brides & raccords  
-  `products.flanges-connectors.specs.thickness`
 - [ ] Fiche technique PDF — Grilles, registres & accessoires  
   `products.grilles-dampers.datasheet`
 - [ ] Photo produit — Grilles, registres & accessoires  
@@ -145,19 +139,19 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
   `products.stainless-ducts.specs.standard`
 - [ ] Épaisseur — Gaines spéciales inox 304 / 316  
   `products.stainless-ducts.specs.thickness`
-- [ ] Fiche technique PDF — Piquages & tés  
+- [ ] Fiche technique PDF — Tés, piquages & branchements en Y  
   `products.tees-branches.datasheet`
-- [ ] Photo produit — Piquages & tés  
+- [ ] Photo produit — Tés, piquages & branchements en Y  
   `products.tees-branches.image`
-- [ ] Dimensions — Piquages & tés  
+- [ ] Dimensions — Tés, piquages & branchements en Y  
   `products.tees-branches.specs.dimensions`
-- [ ] Finition — Piquages & tés  
+- [ ] Finition — Tés, piquages & branchements en Y  
   `products.tees-branches.specs.finish`
-- [ ] Matière — Piquages & tés  
+- [ ] Matière — Tés, piquages & branchements en Y  
   `products.tees-branches.specs.material`
-- [ ] Norme — Piquages & tés  
+- [ ] Norme — Tés, piquages & branchements en Y  
   `products.tees-branches.specs.standard`
-- [ ] Épaisseur — Piquages & tés  
+- [ ] Épaisseur — Tés, piquages & branchements en Y  
   `products.tees-branches.specs.thickness`
 
 ## Réalisations
