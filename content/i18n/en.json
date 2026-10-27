@@ -138,7 +138,7 @@
       "cta3d": "Explore the assembly in 3D"
     },
     "asmTitle": "A complete run, part by part",
-    "asmText": "Explore rectangular and spiral round systems in 3D. Follow the airflow, or enable the high-temperature option for a black-steel heat illustration.",
+    "asmText": "Explore ductwork in 3D, part by part: straight ducts, elbows, tees, Y-branches, frame profiles and corner pieces. View the illustrative airflow or smoke extraction.",
     "asmAlt": "Illustrative 3D render of an assembled rectangular duct run: straight ducts, elbow, tee with take-off, reducer and flange.",
     "videoAlt": "Welcome video: a duct network assembles, then the LIBALSTAL logo appears.",
     "videoReplay": "Replay the video"
@@ -180,11 +180,11 @@
     },
     "tees-branches": {
       "name": "Tees, take-offs & Y-branches",
-      "summary": "Tees, take-offs, rectangular Y-branches and plenums for branching air distribution networks."
+      "summary": "Tees, take-offs and Y-branches for network branches."
     },
     "flanges-connectors": {
       "name": "Flanges & connectors",
-      "summary": "Flanges, frames, corners and connecting elements between duct sections."
+      "summary": "Flanges, frame profiles, corner pieces and connections between duct sections."
     },
     "grilles-dampers": {
       "name": "Grilles, dampers & accessories",
@@ -510,12 +510,12 @@
   "assembly": {
     "title": "3D ductwork assembly",
     "eyebrow": "3D model",
-    "h1": "Rectangular ductwork assembly",
+    "h1": "3D ductwork assembly",
     "intro": "Rotate the assembly, select a part and read its sheet. Dimensions belong to a demonstration model; verified characteristics come from the product sheets.",
     "demoLabel": "Demonstration model",
     "demoNote": "Demonstration geometry: these dimensions illustrate the model and are not LIBALSTAL specifications.",
     "pending": "Specification pending",
-    "previewAlt": "Isometric drawing of the demonstration assembly: rectangular ducts, 90° elbow, tee with take-off, reducer and flange.",
+    "previewAlt": "Demonstration assembly combining rectangular and spiral round ducts, a tee, a Y-branch, a transition, reducers and a profile frame.",
     "viewLabel": "Interactive 3D view of the demonstration assembly. The parts list gives access to the same information.",
     "loading": "Loading the 3D view…",
     "unavailable": "The 3D view is not available on this device. The drawing and the parts list remain available.",
@@ -551,7 +551,9 @@
       "diameter": "Internal diameter",
       "inletDiameter": "Inlet diameter",
       "outletDiameter": "Outlet diameter",
-      "pitch": "Spiral pitch (demonstration)"
+      "pitch": "Spiral pitch (demonstration)",
+      "trunkLength": "Trunk length",
+      "branchAngle": "Angle between branches"
     },
     "types": {
       "straight": "Straight duct",
@@ -563,7 +565,10 @@
       "spiral-straight": "Spiral round",
       "round-straight": "Round duct",
       "round-elbow": "Round 90° elbow",
-      "round-reducer": "Round reducer"
+      "round-reducer": "Round reducer",
+      "y": "Y-branch fitting",
+      "profile-frame": "Profiles and corner pieces",
+      "rect-round": "Rectangular-to-round transition"
     },
     "explode": "Explode parts",
     "reassemble": "Reassemble",
@@ -574,11 +579,14 @@
       "label": "Choose a duct system",
       "rectangular": "Rectangular",
       "spiral": "Spiral round",
-      "high-temperature": "High temperature",
+      "high-temperature": "Smoke extraction",
       "spiralTitle": "Spiral round duct system",
       "heatTitle": "Black-steel industrial duct system",
       "spiralIntro": "Explore a round duct run with a spiral seam, elbow and reducer. Dimensions and joints illustrate a demonstration model.",
-      "heatIntro": "Explore a black-steel duct example for high-temperature industrial applications, subject to project specifications. This model declares no operating temperature or fire-resistance rating."
+      "heatIntro": "Explore a black-steel network with an illustration of smoke extraction. This model declares no operating temperature or fire-resistance rating.",
+      "branches": "Tees and Y-branches",
+      "branchesTitle": "Tee and Y-branch assembly",
+      "branchesIntro": "Explore the connections of a tee and a Y-branch. Sections, angles and airflow belong to a demonstration model."
     },
     "effects": {
       "label": "Flow and material illustration",
@@ -587,7 +595,7 @@
       "pause": "Pause motion",
       "cutaway": "See inside",
       "note": "Animated illustration of flow direction. Not a fluid simulation or performance test.",
-      "heatNote": "Black-steel / heat illustration. Operating limits and fire resistance must be established for the actual project."
+      "heatNote": "Illustrative smoke extraction in black steel. Airflow and geometry are illustrative; performance and fire resistance must be established for the actual project."
     }
   },
   "intro": {

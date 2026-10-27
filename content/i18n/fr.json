@@ -138,7 +138,7 @@
       "cta3d": "Explorer l'assemblage en 3D"
     },
     "asmTitle": "Un réseau complet, pièce par pièce",
-    "asmText": "Explorez les réseaux rectangulaires et circulaires spiralés en 3D. Visualisez la circulation d’air ou activez l’option haute température pour une illustration en acier noir avec effet de chaleur.",
+    "asmText": "Explorez l’assemblage de gaines en 3D, pièce par pièce : tronçons, coudes, tés, dérivations en Y, profilés et équerres. Visualisez la circulation d’air ou le désenfumage illustratif.",
     "asmAlt": "Rendu 3D illustratif d'un réseau de gaines rectangulaires assemblé : gaines droites, coude, té avec piquage, réduction et bride.",
     "videoAlt": "Vidéo de bienvenue : un réseau de gaines s'assemble, puis le logo LIBALSTAL apparaît.",
     "videoReplay": "Rejouer la vidéo"
@@ -180,11 +180,11 @@
     },
     "tees-branches": {
       "name": "Tés, piquages & branchements en Y",
-      "summary": "Tés, piquages, branchements rectangulaires en Y et plénums pour les dérivations du réseau aéraulique."
+      "summary": "Tés, piquages et dérivations en Y pour les ramifications du réseau."
     },
     "flanges-connectors": {
       "name": "Brides & raccords",
-      "summary": "Brides, cadres, angles et éléments d'assemblage entre tronçons."
+      "summary": "Brides, profilés de cadre, équerres d’assemblage et raccords entre tronçons."
     },
     "grilles-dampers": {
       "name": "Grilles, registres & accessoires",
@@ -510,12 +510,12 @@
   "assembly": {
     "title": "Assemblage de gaines en 3D",
     "eyebrow": "Modèle 3D",
-    "h1": "Assemblage de gaines rectangulaires",
+    "h1": "Assemblage de gaines en 3D",
     "intro": "Faites pivoter l'assemblage, sélectionnez une pièce et consultez sa fiche. Les dimensions sont celles d'un modèle de démonstration ; les caractéristiques vérifiées proviennent des fiches produits.",
     "demoLabel": "Modèle de démonstration",
     "demoNote": "Géométrie de démonstration : ces dimensions illustrent le modèle et ne sont pas des spécifications LIBALSTAL.",
     "pending": "Spécification à confirmer",
-    "previewAlt": "Dessin isométrique de l'assemblage de démonstration : gaines rectangulaires, coude à 90°, té avec piquage, réduction et bride.",
+    "previewAlt": "Assemblage de démonstration combinant gaines rectangulaires et circulaires spiralées, té, dérivation en Y, transition, réduction et cadre.",
     "viewLabel": "Vue 3D interactive de l'assemblage de démonstration. La liste des pièces donne accès aux mêmes informations.",
     "loading": "Chargement de la vue 3D…",
     "unavailable": "La vue 3D n'est pas disponible sur cet appareil. Le dessin et la liste des pièces restent consultables.",
@@ -551,7 +551,9 @@
       "diameter": "Diamètre intérieur",
       "inletDiameter": "Diamètre d’entrée",
       "outletDiameter": "Diamètre de sortie",
-      "pitch": "Pas de spirale (démonstration)"
+      "pitch": "Pas de spirale (démonstration)",
+      "trunkLength": "Longueur du tronc",
+      "branchAngle": "Angle entre les branches"
     },
     "types": {
       "straight": "Gaine droite",
@@ -563,7 +565,10 @@
       "spiral-straight": "Circulaire spiralé",
       "round-straight": "Gaine circulaire",
       "round-elbow": "Coude circulaire 90°",
-      "round-reducer": "Réduction circulaire"
+      "round-reducer": "Réduction circulaire",
+      "y": "Dérivation en Y",
+      "profile-frame": "Profilés et équerres",
+      "rect-round": "Transition rectangulaire / circulaire"
     },
     "explode": "Éclater les pièces",
     "reassemble": "Réassembler",
@@ -574,11 +579,14 @@
       "label": "Choisir un réseau",
       "rectangular": "Rectangulaire",
       "spiral": "Circulaire spiralé",
-      "high-temperature": "Haute température",
+      "high-temperature": "Désenfumage",
       "spiralTitle": "Réseau de gaines circulaires spiralées",
       "heatTitle": "Réseau industriel en acier noir",
       "spiralIntro": "Explorez un réseau circulaire avec joint spiralé, coude et réduction. Les dimensions et les assemblages illustrent un modèle de démonstration.",
-      "heatIntro": "Explorez un exemple de réseau en acier noir pour applications industrielles à haute température, selon les spécifications du projet. Aucune température admissible ni résistance au feu n’est déclarée par ce modèle."
+      "heatIntro": "Explorez un réseau en acier noir avec une illustration du désenfumage. Aucune température admissible ni résistance au feu n’est déclarée par ce modèle.",
+      "branches": "Tés et Y",
+      "branchesTitle": "Assemblage de tés et de dérivations en Y",
+      "branchesIntro": "Explorez les raccordements d’un té et d’une dérivation en Y. Les sections, les angles et le flux sont ceux d’un modèle de démonstration."
     },
     "effects": {
       "label": "Illustration du flux et de la matière",
@@ -587,7 +595,7 @@
       "pause": "Pause",
       "cutaway": "Voir l’intérieur",
       "note": "Illustration animée du sens de circulation. Ni simulation des fluides ni essai de performance.",
-      "heatNote": "Illustration acier noir / chaleur. Les limites de fonctionnement et la résistance au feu doivent être établies pour le projet réel."
+      "heatNote": "Illustration du désenfumage en acier noir. Le flux et la géométrie sont illustratifs ; les performances et la résistance au feu doivent être établies pour le projet réel."
     }
   },
   "intro": {
