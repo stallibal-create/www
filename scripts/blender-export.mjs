@@ -10,7 +10,10 @@ import { spangle } from '../src/assets/js/assembly/spangle.js';
 import { MODEL_SEGMENTS } from './assembly-model.mjs';
 
 const root = new URL('../', import.meta.url);
-const asm = JSON.parse(fs.readFileSync(new URL('content/site.json', root))).ductAssembly;
+const site = JSON.parse(fs.readFileSync(new URL('content/site.json', root)));
+const system = process.argv.includes('--branches') ? 'branches' : 'rectangular';
+const suffix = system === 'branches' ? '-branches' : '';
+const asm = system === 'branches' ? site.ductSystems.branches : site.ductAssembly;
 const solved = solveAssembly(asm);
 const errors = checkConnections(asm, solved);
 if (errors.length) throw new Error(errors.join('\n'));
@@ -28,7 +31,7 @@ const parts = asm.components.map(c => {
 });
 const out = new URL('brand/blender/', root);
 fs.mkdirSync(out, { recursive: true });
-fs.writeFileSync(new URL('assembly.json', out), JSON.stringify({ demo: true, parts }));
+fs.writeFileSync(new URL(`assembly${suffix}.json`, out), JSON.stringify({ demo: true, parts }));
 
 // Single parts for the product renders (scripts/blender-products.py), in their own frame: the assembly's components.
 const single = id => {
@@ -41,7 +44,7 @@ const single = id => {
   for (let i = 0; i < m.uvs.length; i += 2) uvs.push([m.uvs[i] / UV_TILE_MM, m.uvs[i + 1] / UV_TILE_MM]);
   return { id, vertices, normals, uvs, indices: Array.from(m.indices), groups: m.groups };
 };
-fs.writeFileSync(new URL('products.json', out), JSON.stringify({ demo: true, parts: ['duct-1', 'elbow-1', 'tee-1', 'reducer-1', 'flange-1'].map(single) }));
+fs.writeFileSync(new URL(`products${suffix}.json`, out), JSON.stringify({ demo: true, parts: (system === 'branches' ? asm.components.map(c => c.id) : ['duct-1', 'elbow-1', 'tee-1', 'reducer-1', 'flange-1']).map(single) }));
 
 // Minimal PNG writer (8-bit RGBA) for the spangle textures.
 const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });

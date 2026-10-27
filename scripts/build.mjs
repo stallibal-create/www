@@ -85,14 +85,20 @@ function copyAssets() {
 const A = p => `${p}?v=${assetVer[p] || 'dev'}`;
 
 // Blender-exported assembly model: used by the 3D view only while it matches site.json (else procedural geometry).
-const MODEL_PATH = '/assets/models/duct-assembly-demo.glb';
-let MODEL_URL = null, MODEL_NOTE = 'none';
+const MODEL_PATHS = { rectangular: '/assets/models/duct-assembly-demo.glb', branches: '/assets/models/duct-assembly-branches.glb' };
+const MODEL_URLS = {};
+let MODEL_NOTE = 'none';
 function checkModel() {
-  const f = join(ROOT, 'src', MODEL_PATH);
-  if (!existsSync(f)) return;
-  const b = readFileSync(f), problems = modelProblems(site.ductAssembly, b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength));
-  if (problems.length) { MODEL_NOTE = 'left out, procedural geometry used'; console.warn(`⚠ ${MODEL_PATH} does not match content/site.json:\n  ${problems.join('\n  ')}`); return; }
-  MODEL_URL = A(MODEL_PATH); MODEL_NOTE = `${Math.round(b.length / 1024)} KB GLB`;
+  const notes = [];
+  for (const [system, path] of Object.entries(MODEL_PATHS)) {
+    const f = join(ROOT, 'src', path);
+    if (!existsSync(f)) continue;
+    const a = system === 'rectangular' ? site.ductAssembly : site.ductSystems[system];
+    const b = readFileSync(f), problems = modelProblems(a, b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength));
+    if (problems.length) { console.warn(`⚠ ${path} does not match content/site.json:\n  ${problems.join('\n  ')}\n  Procedural geometry used.`); continue; }
+    MODEL_URLS[system] = A(path); notes.push(`${system}: ${Math.round(b.length / 1024)} KB GLB`);
+  }
+  MODEL_NOTE = notes.join(', ') || 'procedural geometry';
 }
 
 // Illustrative product renders (scripts/blender-products.py): shown when no product photo has been supplied.
@@ -116,7 +122,7 @@ const IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(IMPORT_MAP).dige
 let ASM_IMPORT_MAP_HASH = '';
 function asmImportMap() {
   const m = JSON.parse(IMPORT_MAP);
-  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion', 'glb', 'spangle', 'flow', 'flow-effects']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
+  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion', 'glb', 'spangle', 'flow', 'flow-effects', 'fittings']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
   const s = JSON.stringify(m);
   ASM_IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(s).digest('base64');
   return s;
@@ -235,7 +241,7 @@ function footer(ctx, path) {
       <div><h2 class="foot-h">${esc(D.footer.legal)}</h2><ul><li><a href="${url(lang, 'quality')}">${esc(D.nav.quality)}</a></li><li><a href="${url(lang, 'privacy')}">${esc(D.footer.privacy)}</a></li><li><a href="${url(lang, 'legal')}">${esc(D.footer.legalNotice)}</a></li></ul></div>
       <div><h2 class="foot-h">${esc(D.footer.languages)}</h2><ul>${langs}</ul></div>
     </div>
-    <p class="copy">© ${new Date().getFullYear()} LIBALSTAL. ${esc(D.footer.rights)}</p>
+    <p class="copy">© <span data-copyright-year>${new Date().getFullYear()}</span> LIBALSTAL. ${esc(D.footer.rights)}</p>
   </div>
 </footer>`;
 }
@@ -438,7 +444,7 @@ ${story}
 ${ASM_RENDER ? `
 <section class="sec asm-band" aria-labelledby="asm-h"><div class="wrap">
   <figure class="asm-band-fig rv">${renderImg('assembly', { alt: H.asmAlt, sizes: '(max-width: 860px) 92vw, 760px' })}<span class="asm-tag">${esc(D.assembly.demoLabel)}</span></figure>
-  <div class="rv"><h2 id="asm-h">${esc(H.asmTitle)}</h2><p class="lead">${esc(H.asmText)}</p><p><a class="btn btn-primary" href="${url(lang, 'assembly')}">${esc(S.cta3d)} <span class="arr" aria-hidden="true">${arr}</span></a></p><div class="asm-systems"><a class="btn" href="${url(lang, 'assembly/spiral')}">${esc(D.assembly.systems.spiral)}</a></div></div>
+  <div class="rv"><h2 id="asm-h">${esc(H.asmTitle)}</h2><p class="lead">${esc(H.asmText)}</p><p><a class="btn btn-primary" href="${url(lang, 'assembly')}">${esc(S.cta3d)} <span class="arr" aria-hidden="true">${arr}</span></a></p></div>
 </div></section>` : ''}
 ${qual ? `
 <section class="sec" aria-labelledby="q-h"><div class="wrap two">
@@ -504,7 +510,7 @@ ${rfqBand(ctx)}`;
     <h2 class="h3">${esc(D.product.specs)}</h2>
     <dl class="spec">${specs}</dl>
     <p class="small muted">${esc(D.product.specsNote)}</p>
-    ${['spiral-round-duct', 'black-steel-ducts'].includes(p.slug) ? `<p><a class="btn" href="${url(lang, 'assembly/' + 'spiral') + (p.slug === 'black-steel-ducts' ? '?heat=1' : '')}">${esc(D.assembly.title)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></p>` : ''}
+    ${['spiral-round-duct', 'black-steel-ducts'].includes(p.slug) ? `<p><a class="btn" href="${url(lang, 'assembly') + (p.slug === 'black-steel-ducts' ? '?heat=1' : '')}">${esc(D.assembly.title)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></p>` : ''}
     <h2 class="h3">${esc(D.product.downloads)}</h2>
     <p>${p.datasheet ? `<a class="btn" href="/assets/docs/${esc(p.datasheet)}" download>${esc(D.product.datasheet)}</a>` : site.display?.hideIncomplete ? esc(D.product.datasheetRequest) : ctx.ph(D.product.noDownloads, 'toProvide')}</p>
     <div class="cta-box"><h2 class="h3">${esc(D.product.ctaTitle)}</h2><p>${esc(D.product.ctaText)}</p><a class="btn btn-primary" href="${url(lang, 'contact')}?product=${p.slug}">${esc(D.products.quote)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></div>
@@ -629,7 +635,6 @@ function company(ctx) {
     ${c.services?.length ? `<h2 class="h3">${esc(D.services.title)}</h2><p class="services">${c.services.map(k => esc(D.services[k])).join(' · ')}</p>` : ''}
     <h2 class="h3">${esc(D.company.findUs)}</h2><p>${cv('address')}</p><p>${c.mapUrl ? `<a class="btn" href="${esc(c.mapUrl)}" rel="noopener" target="_blank">${esc(D.company.map)}<span class="sr"> ${esc(D.footer.newTab)}</span></a>` : cv('mapUrl')}</p>
     ${companyMap(ctx)}
-    <h2 class="h3">${esc(D.company.social)}</h2><p>${SOCIAL.map(n => `<a href="${esc(n.url)}" rel="noopener" target="_blank">${esc(n.url.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, ''))}<span class="sr"> ${esc(D.footer.newTab)}</span></a>`).join('<br>')}</p>
   </div>
   <aside class="factbox" aria-labelledby="lf-h"><h2 id="lf-h" class="h3">${esc(D.company.factsTitle)}</h2><dl class="spec">${dl}</dl></aside>
 </div></section>
@@ -709,7 +714,6 @@ function contact(ctx) {
     <div><dt>${esc(D.fields.hours)}</dt><dd>${cv('hours')}</dd></div>
   </dl>
   ${companyMap(ctx)}
-  ${FB ? `<p><a href="${esc(FB)}" rel="noopener" target="_blank">Facebook — Libalstal<span class="sr"> ${esc(D.footer.newTab)}</span></a></p>` : ''}
 </aside>
 </div></section>`;
   const extraHead = `<script type="module" src="${A('/assets/js/rfq.js')}"></script>${TURNSTILE_SITE_KEY ? '\n<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>' : ''}`;
@@ -745,10 +749,10 @@ function assembly(ctx, system = 'rectangular') {
   const { lang, D, arr } = ctx;
   const base = D.assembly, alternative = system !== 'rectangular';
   const path = alternative ? 'assembly/' + system : 'assembly';
-  const T = { ...base, ...(alternative ? { h1: system === 'spiral' ? base.systems.spiralTitle : base.systems.heatTitle, intro: system === 'spiral' ? base.systems.spiralIntro : base.systems.heatIntro, previewAlt: system === 'spiral' ? base.systems.spiralTitle : base.systems.heatTitle } : {}) };
+  const T = { ...base, ...(alternative ? { h1: base.systems[system + 'Title'], intro: base.systems[system + 'Intro'], previewAlt: base.systems[system + 'Title'] } : {}) };
   const a = alternative ? site.ductSystems[system] : site.ductAssembly, st = a.settings;
   const cr = crumbs(ctx, alternative ? [[base.title, 'assembly'], [T.h1, path]] : [[T.title, 'assembly']]);
-  const systemLinks = `<nav class="asm-systems" aria-label="${esc(base.systems.label)}">${['rectangular', 'spiral'].map(k => `<a class="btn${k === system ? ' btn-primary' : ''}" href="${url(lang, k === 'rectangular' ? 'assembly' : 'assembly/' + k)}"${k === system ? ' aria-current="page"' : ''}>${esc(base.systems[k])}</a>`).join('')}</nav>`;
+
   const pending = `<span class="ph">${esc(T.pending)}</span>`;
   const row = (k, v) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`;
   const geoRows = c => {
@@ -760,12 +764,14 @@ function assembly(ctx, system = 'rectangular') {
       case 'round-reducer': return row(G.inletDiameter, mmL(g.inletDiameterMm)) + row(G.outletDiameter, mmL(g.outletDiameterMm)) + row(G.length, mmL(g.lengthMm));
       case 'straight': case 'branch': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.length, mmL(g.lengthMm));
       case 'elbow90': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.innerRadius, mmL(g.innerRadiusMm)) + row(G.angle, ltr('90°'));
+      case 'rect-round': return row(G.inlet, mmS(g.inletWidthMm, g.inletHeightMm)) + row(G.outletDiameter, mmL(g.outletDiameterMm)) + row(G.length, mmL(g.lengthMm));
       case 'reducer': return row(G.inlet, mmS(g.inletWidthMm, g.inletHeightMm)) + row(G.outlet, mmS(g.outletWidthMm, g.outletHeightMm)) + row(G.length, mmL(g.lengthMm));
       case 'tee': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.length, mmL(g.lengthMm)) + row(G.branch, mmS(g.branchWidthMm, g.branchHeightMm)) + row(G.branchLength, mmL(g.branchLengthMm));
-      case 'flange': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.flangeWidth, mmL(st.flangeWidthMm)) + row(G.flangeDepth, mmL(st.flangeDepthMm));
+      case 'y': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.trunkLength, mmL(g.trunkLengthMm)) + row(G.branch, mmS(g.branchWidthMm, g.heightMm)) + row(G.branchLength, mmL(g.branchLengthMm)) + row(G.branchAngle, ltr((2 * g.branchAngleDeg) + '°'));
+      case 'flange': case 'profile-frame': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.flangeWidth, mmL(st.flangeWidthMm)) + row(G.flangeDepth, mmL(st.flangeDepthMm));
     }
   };
-  const inletOf = c => c.geometry.diameterMm || c.geometry.inletDiameterMm ? [c.geometry.diameterMm || c.geometry.inletDiameterMm, c.geometry.diameterMm || c.geometry.inletDiameterMm] : c.type === 'reducer' ? [c.geometry.inletWidthMm, c.geometry.inletHeightMm] : [c.geometry.widthMm, c.geometry.heightMm];
+  const inletOf = c => (c.geometry.diameterMm || c.geometry.inletDiameterMm) ? [c.geometry.diameterMm || c.geometry.inletDiameterMm, c.geometry.diameterMm || c.geometry.inletDiameterMm] : ['reducer', 'rect-round'].includes(c.type) ? [c.geometry.inletWidthMm, c.geometry.inletHeightMm] : [c.geometry.widthMm, c.geometry.heightMm];
   const products = new Map(site.products.map(p => [p.slug, p]));
   const cards = a.components.map(c => {
     const p = products.get(c.productSlug), pname = D.productItems[p.slug].name;
@@ -778,7 +784,7 @@ function assembly(ctx, system = 'rectangular') {
   <h3 class="asm-part-h" id="part-${c.id}-h" tabindex="-1">${esc(tv(c.name, lang))}</h3>
   <p><em class="badge">${esc(T.demoLabel)}</em></p>
   <h4>${esc(T.geometryTitle)}</h4>
-  <div class="asm-dim">${c.geometry.diameterMm || c.geometry.inletDiameterMm ? `<svg viewBox="0 0 210 150" aria-hidden="true"><circle class="ln" cx="105" cy="65" r="48"/><path class="dim" d="M57 65h96"/><text class="asm-dt" x="105" y="135" text-anchor="middle">Ø ${inletOf(c)[0]} mm</text></svg>` : sectionDrawing(...inletOf(c))}</div>
+  <div class="asm-dim">${(c.geometry.diameterMm || c.geometry.inletDiameterMm) ? `<svg viewBox="0 0 210 150" aria-hidden="true"><circle class="ln" cx="105" cy="65" r="48"/><path class="dim" d="M57 65h96"/><text class="asm-dt" x="105" y="135" text-anchor="middle">Ø ${inletOf(c)[0]} mm</text></svg>` : sectionDrawing(...inletOf(c))}</div>
   <dl class="spec">${geoRows(c)}</dl>
   <p class="small muted">${esc(T.demoNote)}</p>
   <h4>${esc(T.productTitle)}</h4>
@@ -792,7 +798,7 @@ function assembly(ctx, system = 'rectangular') {
   <p><a class="btn btn-primary asm-part-quote" data-normal-href="${url(lang, 'contact')}?product=${p.slug}" data-heat-href="${url(lang, 'contact')}?product=black-steel-ducts" href="${url(lang, 'contact')}?product=${p.slug}">${esc(T.cta)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
 </article>`;
   }).join('\n');
-  const list = a.components.map((c, i) => `<li><button type="button" class="asm-pick" data-part="${c.id}" aria-pressed="false" aria-controls="part-${c.id}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span><strong>${esc(tv(c.name, lang))}</strong><span class="asm-pick-sub">${esc(T.types[c.type])} · ${c.geometry.diameterMm || c.geometry.inletDiameterMm ? ltr('Ø ' + inletOf(c)[0] + ' mm') : mmS(...inletOf(c))}</span></span></button></li>`).join('');
+  const list = a.components.map((c, i) => `<li><button type="button" class="asm-pick" data-part="${c.id}" aria-pressed="false" aria-controls="part-${c.id}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span><strong>${esc(tv(c.name, lang))}</strong><span class="asm-pick-sub">${esc(T.types[c.type])} · ${(c.geometry.diameterMm || c.geometry.inletDiameterMm) ? ltr('Ø ' + inletOf(c)[0] + ' mm') : mmS(...inletOf(c))}</span></span></button></li>`).join('');
   const tool = (cmd, label, path) => `<button type="button" class="icon-btn" data-cmd="${cmd}" aria-label="${esc(label)}"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"><path d="${path}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
   const tools = [
     tool('skip', T.skip, 'M5 5v14l11-7zM19 5v14'),
@@ -806,17 +812,18 @@ function assembly(ctx, system = 'rectangular') {
     tool('replay', T.replay, 'M5 5v5h5M5 10a8 8 0 1 1 1.5 6M11 8l6 4-6 4z'),
   ].join('');
   // client data: geometry and connections only (names and specs are already in the HTML)
-  const clientData = { assembly: { id: a.id, settings: st, components: a.components.map(({ id, type, geometry, explode }) => ({ id, type, geometry, explode })), connections: a.connections }, model: alternative ? null : MODEL_URL,
+  const clientData = { assembly: { id: a.id, settings: st, components: a.components.map(({ id, type, geometry, explode }) => ({ id, type, geometry, explode })), connections: a.connections }, model: MODEL_URLS[system] || null,
     strings: { loading: T.loading, unavailable: T.unavailable, lost: T.lost, saveData: T.saveData, playing: T.playing } };
+  const effect = (name, label, path, pressed, attrs = '') => `<button type="button" class="icon-btn asm-effect asm-${name}" aria-label="${esc(label)}" title="${esc(label)}" aria-pressed="${pressed}" ${attrs}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22"><path d="${path}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
   const body = `${pageHead(ctx, T.eyebrow, T.h1, T.intro, cr.html)}
-<div class="wrap">${systemLinks}</div>
+
 <section class="sec tight" id="asm" aria-label="${esc(T.title)}"><div class="wrap asm-layout">
   <figure class="asm-view" data-state="preview">
     <div class="asm-effects-controls" role="group" aria-label="${esc(T.effects.label)}">
-      <button type="button" class="btn asm-air" aria-pressed="true">${esc(T.effects.air)}</button>
-      <button type="button" class="btn asm-heat" aria-pressed="false">${esc(T.systems['high-temperature'])}</button>
-      <button type="button" class="btn asm-pause" aria-pressed="false" data-play="${esc(T.effects.play)}" data-pause="${esc(T.effects.pause)}">${esc(T.effects.pause)}</button>
-      <button type="button" class="btn asm-cutaway" aria-pressed="true">${esc(T.effects.cutaway)}</button>
+      ${effect('air', T.effects.air, 'M3 8h12a3 3 0 1 0-3-3M3 12h17M3 16h9a3 3 0 1 1-3 3', true)}
+      ${effect('heat', T.systems['high-temperature'], 'M4 18h16M7 14c-4-4 4-4 0-9M12 14c-4-4 4-4 0-9M17 14c-4-4 4-4 0-9', false)}
+      ${effect('pause', T.effects.pause, 'M8 5v14M16 5v14', false, `data-play="${esc(T.effects.play)}" data-pause="${esc(T.effects.pause)}"`)}
+      ${effect('cutaway', T.effects.cutaway, 'M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10M7 5l10 14', true)}
     </div>
     <p class="small muted asm-effects-note">${esc(T.effects.note)}</p>
     <p class="small asm-heat-note" hidden>${esc(T.effects.heatNote)}</p>
@@ -848,8 +855,10 @@ ${rfqBand(ctx)}`;
 }
 
 function legacyHeatPage(lang) {
-  const target = url(lang, 'assembly/spiral') + '?heat=1';
-  write(join(lang, 'assembly/high-temperature/index.html'), `<!doctype html><html lang="${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${target}"><title>LIBALSTAL</title></head><body><h1><a href="${target}">${esc(DICT[lang].assembly.systems.spiralTitle)}</a></h1></body></html>`);
+  for (const system of ['spiral', 'branches', 'high-temperature']) {
+    const target = url(lang, 'assembly') + (system === 'high-temperature' ? '?heat=1' : '');
+    write(join(lang, `assembly/${system}/index.html`), `<!doctype html><html lang="${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${target}"><title>LIBALSTAL</title></head><body><h1><a href="${target}">${esc(DICT[lang].assembly.h1)}</a></h1></body></html>`);
+  }
 }
 
 function notFound(ctx) {
@@ -899,7 +908,8 @@ function rootFiles() {
   writeFileSync(join(ROOT, '.build/headers.json'), JSON.stringify(headers, null, 2));
   // Netlify / Cloudflare Pages formats
   write('_headers', `/*\n${Object.entries({ ...headers, 'Content-Security-Policy': csp + '; upgrade-insecure-requests', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' }).map(([k, v]) => `  ${k}: ${v}`).join('\n')}\n/assets/*\n  Cache-Control: public, max-age=604800\n`);
-  write('_redirects', `/en/*  /en/404.html  404\n/ar/*  /ar/404.html  404\n/*  /404.html  404\n`);
+  const assemblyRedirects = LANGS.flatMap(l => ['spiral', 'branches', 'high-temperature'].map(k => `${url(l, 'assembly/' + k)}  ${url(l, 'assembly')}${k === 'high-temperature' ? '?heat=1' : ''}  301`)).join('\n');
+  write('_redirects', assemblyRedirects + `\n/en/*  /en/404.html  404\n/ar/*  /ar/404.html  404\n/*  /404.html  404\n`);
 }
 
 function missingReport() {
@@ -941,7 +951,7 @@ copyAssets();
 checkModel();
 for (const lang of LANGS) {
   const ctx = makeCtx(lang);
-  home(ctx); products(ctx); capabilities(ctx); industries(ctx); projects(ctx); quality(ctx); company(ctx); contact(ctx); legalPages(ctx); assembly(ctx); assembly(ctx, 'spiral'); legacyHeatPage(lang); notFound(ctx);
+  home(ctx); products(ctx); capabilities(ctx); industries(ctx); projects(ctx); quality(ctx); company(ctx); contact(ctx); legalPages(ctx); assembly(ctx); legacyHeatPage(lang); notFound(ctx);
 }
 rootFiles();
 const n = missingReport();

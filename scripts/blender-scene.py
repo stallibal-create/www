@@ -1,12 +1,15 @@
 """Run after node scripts/blender-export.mjs, using Blender --background --python.
 All dimensions are inherited demonstration values, not manufacturing specifications.
 """
-import bpy, json, math
+import bpy, json, math, sys
 from pathlib import Path
 from mathutils import Vector
 root = Path(__file__).resolve().parent.parent
 out = root / 'brand' / 'blender'
-data = json.loads((out / 'assembly.json').read_text())
+args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+branches = '--branches' in args
+suffix = '-branches' if branches else ''
+data = json.loads((out / f'assembly{suffix}.json').read_text())
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 import sys
@@ -42,7 +45,7 @@ span = max(hi - lo)
 scene = bpy.context.scene
 scene['notice'] = 'LIBALSTAL demonstration assembly — dimensions unverified'
 scene.unit_settings.system = 'METRIC'
-bpy.ops.object.camera_add(location=center + Vector((1.2, -1.6, 1.05))*span)
+bpy.ops.object.camera_add(location=center + Vector((.4, -1, .9))*span)
 camera = bpy.context.object
 camera.rotation_euler = (center-camera.location).to_track_quat('-Z', 'Y').to_euler()
 camera.data.type = 'ORTHO'
@@ -89,8 +92,15 @@ for obj in objects: obj.select_set(True)
 models = root / 'src' / 'assets' / 'models'
 models.mkdir(parents=True, exist_ok=True)
 # the 3D view generates its own zinc texture: no images in the GLB keeps it small
-bpy.ops.export_scene.gltf(filepath=str(models/'duct-assembly-demo.glb'), use_selection=True, export_format='GLB',
+bpy.ops.export_scene.gltf(filepath=str(models/('duct-assembly-branches.glb' if branches else 'duct-assembly-demo.glb')), use_selection=True, export_format='GLB',
                           export_texcoords=True, export_normals=True, export_image_format='NONE')
-bpy.ops.wm.save_as_mainfile(filepath=str(out/'duct-assembly-demo.blend'))
-scene.render.filepath = str(out/'duct-assembly-preview.png')
+# Keep all previous Blender scenes: save the next unused version.
+stem = 'duct-assembly-branches' if branches else 'duct-assembly-demo'
+version = 2
+blend = out / f'{stem}-v{version}.blend'
+while blend.exists():
+    version += 1
+    blend = out / f'{stem}-v{version}.blend'
+bpy.ops.wm.save_as_mainfile(filepath=str(blend))
+scene.render.filepath = str(out/f'{stem}-v{version}-preview.png')
 bpy.ops.render.render(write_still=True)

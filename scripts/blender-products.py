@@ -1,4 +1,4 @@
-"""Studio renders of the eight product families: ILLUSTRATIONS with demonstration dimensions, never specifications.
+"""Studio renders of the product families: ILLUSTRATIONS with demonstration dimensions, never specifications.
 Run after `node scripts/blender-export.mjs` (it writes products.json and the zinc textures):
     blender --background --factory-startup --python scripts/blender-products.py [-- slug ...]
 Writes src/assets/img/products/<slug>-1280.webp and <slug>-640.webp: transparent, with a soft contact shadow, so
@@ -18,6 +18,8 @@ folder = root / 'brand' / 'blender'
 dest = root / 'src' / 'assets' / 'img' / 'products'
 dest.mkdir(parents=True, exist_ok=True)
 PARTS = {p['id']: p for p in json.loads((folder / 'products.json').read_text())['parts']}
+if (folder / 'products-branches.json').exists():
+    PARTS.update({p['id']: p for p in json.loads((folder / 'products-branches.json').read_text())['parts']})
 MAT = detail_materials(folder)               # UV-mapped parts from geometry.js
 BOX = detail_materials(folder, box=True)     # modelled parts (texture from object coordinates)
 SLOT = {k: i for i, k in enumerate(MAT)}
@@ -249,13 +251,39 @@ def bent_part(name, profile, width, at, holes=(), thickness=0.003, bend=0.008):
 
 # ---------- products: each entry is a list of builders; each builder's objects are set down on the floor ----------
 ASSEMBLY = json.loads((folder / 'assembly.json').read_text())['parts']  # installed positions, as in the 3D view
+# material variants (v5.3 brochure families): same illustrative parts, other metal; demonstration only
+VARIANTS = {
+    'stainless': (material('Brushed stainless — illustrative', (.80, .81, .82), .18), material('Stainless frames', (.70, .71, .72), .25)),
+    'aluminium': (material('Aluminium sheet — illustrative', (.88, .89, .90), .38), material('Aluminium frames', (.78, .79, .80), .42)),
+    'black-steel': (material('Black steel — illustrative', (.03, .032, .036), .68, metallic=1.0), material('Black steel frames', (.022, .023, .026), .72, metallic=1.0)),  # mill-scale black: dark, low sheen
+}
+ZINC = {MAT['sheet'].name: 0, BOX['sheet'].name: 0, MAT['flange'].name: 1, BOX['flange'].name: 1}
+
+
+def variant(kind, builders):
+    """Run the builders, then swap the galvanised sheet and frame materials for the `kind` metal."""
+    def build():
+        before = set(scene.objects)
+        for b in builders:
+            b()
+        for o in set(scene.objects) - before:
+            for slot in o.material_slots:
+                if slot.material and slot.material.name in ZINC:
+                    slot.material = VARIANTS[kind][ZINC[slot.material.name]]
+    return build
+
+
+def duct_pair(kind):
+    return [variant(kind, [lambda: part('duct-1', (0, -0.2, 0)), lambda: spiral_duct(f'spiral-{kind}', 0.1, 0.8, (0.05, 0.5, 0))])]
+
+
 PRODUCTS = {
     'assembly': [lambda: [part_obj(p) for p in ASSEMBLY]],
     'spiral-round-duct': [lambda: spiral_duct('spiral-315', 0.1575, 1.25, (0, 0, 0)), lambda: spiral_duct('spiral-200', 0.1, 0.8, (0.05, 0.45, 0))],
     'rectangular-duct': [lambda: part('duct-1')],
     'elbows': [lambda: part('elbow-1', (-0.3, 0.2, 0), rz=0.35, rx=math.pi / 2), lambda: gored_elbow('gored-250', 0.125, 0.3125, (0.5, -0.35, 0))],
     'reducers-transitions': [lambda: part('reducer-1', (-0.45, 0.25, 0)), lambda: square_to_round('str', 0.4, 0.3, 0.125, 0.32, (0.45, -0.2, 0))],
-    'tees-branches': [lambda: part('tee-1')],
+    'tees-branches': [lambda: part('tee-1', (-.85, .45, 0)), lambda: part('family-y', (.1, -.25, 0))],
     'flanges-connectors': [lambda: part('flange-1', (-0.18, 0, 0), rz=math.pi / 2), lambda: coupling('coupling-200', 0.1, 0.16, (0.28, -0.18, 0))],
     'grilles-dampers': [lambda: grille('grille', 0.62, 0.32, (0, 0, 0))],
     'custom-assemblies': [
@@ -263,6 +291,9 @@ PRODUCTS = {
                           holes=[(2, 0.25, -0.06, 0.007), (2, 0.25, 0.06, 0.007), (2, 0.75, 0, 0.011), (0, 0.4, 0, 0.006)]),
         lambda: bent_part('channel', [(0.0, 0.07), (0.0, 0.0), (0.16, 0.0), (0.16, 0.07)], 0.3, (0.02, 0.5, 0),
                           holes=[(1, 0.3, -0.08, 0.008), (1, 0.7, 0.08, 0.008)])],
+    'stainless-ducts': duct_pair('stainless'),
+    'aluminium-ducts': duct_pair('aluminium'),
+    'black-steel-ducts': duct_pair('black-steel'),
 }
 
 
