@@ -450,11 +450,11 @@ address { font-style: normal; line-height: 1.9; margin-bottom: 1rem; }
 .foot-contact-row { display: flex; align-items: flex-start; gap: .7rem; min-width: 0; }
 .foot-contact-row > .sd-ico { flex: 0 0 20px; margin-top: .28rem; color: var(--accent); }
 .foot-contact-row > span { min-width: 0; overflow-wrap: anywhere; }
-.foot-social { display: flex; flex-wrap: wrap; gap: .6rem; }
-.foot-social-btn { position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line-2); border-radius: 50%; color: var(--text); background: var(--surface); text-decoration: none; }
+.foot-social { position: relative; display: flex; flex-wrap: wrap; gap: .6rem; }
+.foot-social-btn { position: static; display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line-2); border-radius: 50%; color: var(--text); background: var(--surface); text-decoration: none; }
 .foot-social-btn:hover, .foot-social-btn:focus-visible { color: #fff; background: var(--btn); border-color: var(--btn); }
 .foot-social-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-.foot-social-btn .sd-tip { top: auto; bottom: calc(100% + 10px); inset-inline-end: auto; inset-inline-start: 0; transform: none; }
+.foot-social-btn .sd-tip { width: max-content; max-width: 100%; white-space: normal; overflow-wrap: anywhere; top: auto; bottom: calc(100% + 10px); inset-inline-end: auto; inset-inline-start: 0; transform: none; }
 .foot-social-btn .sd-tip::after { display: none; }
 .foot-social-btn:hover .sd-tip, .foot-social-btn:focus-visible .sd-tip { opacity: 1; }
 .foot-social-btn.is-pending, .sd-btn.is-pending { color: var(--muted); border-style: dashed; cursor: default; box-shadow: none; }
@@ -744,14 +744,14 @@ html:not(.js) .asm-pick { cursor: default; }
 
 /* Airflow/thermal demonstration controls, separate from geometry selection. */
 .asm-effects-controls { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .75rem; }
-.asm-effects-controls .btn { min-height: 44px; padding: .65rem .85rem; font-size: .82rem; }
+.asm-effects-controls .asm-effect { width: 48px; height: 48px; flex: 0 0 48px; }
 .asm-effects-controls [aria-pressed="true"] { background: #073c56; border-color: #37b9e6; color: #e4f9ff; }
 .asm-effects-controls .asm-heat[aria-pressed="true"] { background: #542314; border-color: #ee8b4c; color: #ffeddc; }
 .asm-effects-note { margin-bottom: .75rem; }
 .asm-heat-note { border-inline-start: 2px solid #e88b4a; padding-inline-start: .7rem; margin-bottom: .8rem; }
 .asm-view.is-heat .asm-stage { --stage: #211d1a; --stage-line: #433126; }
 .asm-view.is-heat .asm-preview { filter: brightness(.48) sepia(.18); }
-.asm-effects-controls .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.asm-effects-controls .asm-effect:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
 /* Transparent reference marks adapt their dark lettering to the active theme. */
 .ref-logo { display: flex; align-items: center; justify-content: center; height: 112px; padding: 12px 18px; margin-bottom: .7rem; overflow: hidden; }
