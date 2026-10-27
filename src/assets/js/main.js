@@ -5,6 +5,17 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var root = document.documentElement;
 
+  // Refresh the footer year on visits and when a background tab is reopened.
+  function updateCopyrightYear() {
+    var year = String(new Date().getFullYear());
+    $$('[data-copyright-year]').forEach(function (el) { el.textContent = year; });
+  }
+  updateCopyrightYear();
+  window.addEventListener('pageshow', updateCopyrightYear);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) updateCopyrightYear();
+  });
+
   // ----- mobile menu -----
   var burger = $('.burger'), nav = $('#site-nav');
   if (burger && nav) {
