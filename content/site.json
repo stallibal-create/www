@@ -263,9 +263,21 @@
       "slug": "flanges-connectors",
       "cat": "acc",
       "specs": {
-        "dimensions": null,
-        "material": null,
-        "thickness": null,
+        "dimensions": {
+          "fr": "Profilés : hauteur 20–30 mm, longueur standard 3 m ; équerres : hauteur 20–30 mm.",
+          "en": "Profiles: height 20–30 mm, standard length 3 m; corners: height 20–30 mm.",
+          "ar": "المقاطع: ارتفاع 20–30 mm، طول قياسي 3 m؛ الزوايا: ارتفاع 20–30 mm."
+        },
+        "material": {
+          "fr": "Profilés et équerres : acier galvanisé.",
+          "en": "Profiles and corner pieces: galvanised steel.",
+          "ar": "المقاطع وزوايا التجميع: فولاذ مجلفن."
+        },
+        "thickness": {
+          "fr": "Équerres : 2 ou 3 mm.",
+          "en": "Corner pieces: 2 or 3 mm.",
+          "ar": "زوايا التجميع: 2 أو 3 mm."
+        },
         "finish": null,
         "standard": null
       },
@@ -356,7 +368,7 @@
   },
   "ductAssembly": {
     "_readme": "DEMONSTRATION ASSEMBLY for the 3D viewer (/fr/assembly/). Every geometry value is a demo dimension (demo: true), shown under the \"Modèle de démonstration\" label, never as a LIBALSTAL specification. Verified specifications come ONLY from products[].specs through productSlug. Coordinates: mm, +Y up, origin = centre of the first part inlet. The first component is the root; connections must form a tree. Checked by scripts/assembly-validate.mjs (build + lint).",
-    "id": "demo-assembly-01",
+    "id": "demo-unified-assembly-01",
     "demo": true,
     "settings": {
       "sheetMm": 3,
@@ -460,7 +472,7 @@
           "ar": "مُخفِّض"
         },
         "geometry": {
-          "inletWidthMm": 400,
+          "inletWidthMm": 300,
           "inletHeightMm": 300,
           "outletWidthMm": 300,
           "outletHeightMm": 200,
@@ -494,12 +506,12 @@
       },
       {
         "id": "flange-1",
-        "type": "flange",
+        "type": "profile-frame",
         "productSlug": "flanges-connectors",
         "name": {
-          "fr": "Bride",
-          "en": "Flange",
-          "ar": "شفة"
+          "fr": "Cadre — profilés et équerres",
+          "en": "Frame — profiles and corner pieces",
+          "ar": "إطار — مقاطع وزوايا التجميع"
         },
         "geometry": {
           "widthMm": 300,
@@ -509,7 +521,11 @@
         "explode": {
           "distanceMm": 120
         },
-        "description": null
+        "description": {
+          "fr": "Cadre composé de quatre profilés et de quatre équerres d’assemblage en acier galvanisé. Les équerres s’insèrent dans les extrémités des profilés. Hauteurs communiquées : 20 à 30 mm ; épaisseur des équerres : 2 ou 3 mm ; longueur standard des profilés : 3 m. La forme détaillée et la section du cadre en 3D restent illustratives.",
+          "en": "Frame made from four galvanised steel profiles and four corner pieces. The corners insert into the profile ends. Supplied heights: 20–30 mm; corner thickness: 2 or 3 mm; standard profile length: 3 m. The detailed shape and 3D frame section remain illustrative.",
+          "ar": "إطار من أربعة مقاطع وأربع زوايا تجميع من الفولاذ المجلفن. تُدخل الزوايا في أطراف المقاطع. الارتفاعات المقدمة: 20–30 mm؛ سماكة الزوايا: 2 أو 3 mm؛ الطول القياسي للمقاطع: 3 m. يبقى الشكل التفصيلي ومقطع الإطار ثلاثي الأبعاد توضيحيين."
+        }
       },
       {
         "id": "branch-1",
@@ -530,6 +546,177 @@
           "distanceMm": 200
         },
         "description": null
+      },
+      {
+        "id": "y-1",
+        "type": "y",
+        "productSlug": "tees-branches",
+        "name": {
+          "fr": "Dérivation en Y",
+          "en": "Y-branch fitting",
+          "ar": "وصلة تفرّع Y"
+        },
+        "geometry": {
+          "widthMm": 400,
+          "heightMm": 300,
+          "trunkLengthMm": 750,
+          "branchWidthMm": 300,
+          "branchLengthMm": 500,
+          "branchAngleDeg": 45,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 150
+        },
+        "description": {
+          "fr": "Une entrée se divise en deux branches inclinées. La géométrie et le sens du flux sont illustratifs ; ils ne constituent pas un dimensionnement aéraulique.",
+          "en": "One inlet divides into two angled branches. Geometry and airflow direction are illustrative and do not constitute an HVAC design.",
+          "ar": "ينقسم المدخل إلى فرعين مائلين. الشكل واتجاه التدفق توضيحيان ولا يمثلان تصميماً هندسياً للشبكة."
+        }
+      },
+      {
+        "id": "rect-round-1",
+        "type": "rect-round",
+        "productSlug": "reducers-transitions",
+        "name": {
+          "fr": "Transition rectangulaire / circulaire",
+          "en": "Rectangular-to-round transition",
+          "ar": "قطعة انتقال من مستطيل إلى دائري"
+        },
+        "geometry": {
+          "inletWidthMm": 300,
+          "inletHeightMm": 300,
+          "outletDiameterMm": 300,
+          "lengthMm": 450,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 140
+        },
+        "description": {
+          "fr": "Raccord de démonstration entre le réseau rectangulaire et le réseau circulaire spiralé.",
+          "en": "Demonstration transition connecting the rectangular and spiral round ductwork.",
+          "ar": "قطعة انتقال توضيحية تربط المجاري المستطيلة بالمجاري الدائرية الحلزونية."
+        }
+      },
+      {
+        "id": "round-1",
+        "type": "spiral-straight",
+        "productSlug": "spiral-round-duct",
+        "name": {
+          "fr": "Tronçon circulaire 1",
+          "en": "Round duct segment 1",
+          "ar": "مجرى دائري — الجزء 1"
+        },
+        "geometry": {
+          "diameterMm": 300,
+          "lengthMm": 700,
+          "pitchMm": 140,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 200
+        },
+        "description": {
+          "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+          "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+          "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+        }
+      },
+      {
+        "id": "round-bend",
+        "type": "round-elbow",
+        "productSlug": "elbows",
+        "name": {
+          "fr": "Coude circulaire 90°",
+          "en": "Round 90° elbow",
+          "ar": "كوع دائري 90°"
+        },
+        "geometry": {
+          "diameterMm": 300,
+          "innerRadiusMm": 200,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 200
+        },
+        "description": {
+          "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+          "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+          "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+        }
+      },
+      {
+        "id": "round-2",
+        "type": "spiral-straight",
+        "productSlug": "spiral-round-duct",
+        "name": {
+          "fr": "Tronçon circulaire 2",
+          "en": "Round duct segment 2",
+          "ar": "مجرى دائري — الجزء 2"
+        },
+        "geometry": {
+          "diameterMm": 300,
+          "lengthMm": 550,
+          "pitchMm": 140,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 200
+        },
+        "description": {
+          "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+          "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+          "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+        }
+      },
+      {
+        "id": "round-reduction",
+        "type": "round-reducer",
+        "productSlug": "reducers-transitions",
+        "name": {
+          "fr": "Réduction circulaire",
+          "en": "Round reducer",
+          "ar": "مخفض دائري"
+        },
+        "geometry": {
+          "inletDiameterMm": 300,
+          "outletDiameterMm": 250,
+          "lengthMm": 350,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 200
+        },
+        "description": {
+          "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+          "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+          "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+        }
+      },
+      {
+        "id": "round-3",
+        "type": "spiral-straight",
+        "productSlug": "spiral-round-duct",
+        "name": {
+          "fr": "Tronçon circulaire 3",
+          "en": "Round duct segment 3",
+          "ar": "مجرى دائري — الجزء 3"
+        },
+        "geometry": {
+          "diameterMm": 250,
+          "lengthMm": 450,
+          "pitchMm": 140,
+          "demo": true
+        },
+        "explode": {
+          "distanceMm": 200
+        },
+        "description": {
+          "fr": "Élément de démonstration : forme et raccordements illustratifs. La fabrication est définie selon les exigences du projet.",
+          "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
+          "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
+        }
       }
     ],
     "connections": [
@@ -547,7 +734,7 @@
       ],
       [
         "tee-1.outlet",
-        "reducer-1.inlet"
+        "y-1.inlet"
       ],
       [
         "reducer-1.outlet",
@@ -560,6 +747,34 @@
       [
         "tee-1.branch",
         "branch-1.inlet"
+      ],
+      [
+        "y-1.outlet",
+        "reducer-1.inlet"
+      ],
+      [
+        "y-1.branch",
+        "rect-round-1.inlet"
+      ],
+      [
+        "rect-round-1.outlet",
+        "round-1.inlet"
+      ],
+      [
+        "round-1.outlet",
+        "round-bend.inlet"
+      ],
+      [
+        "round-bend.outlet",
+        "round-2.inlet"
+      ],
+      [
+        "round-2.outlet",
+        "round-reduction.inlet"
+      ],
+      [
+        "round-reduction.outlet",
+        "round-3.inlet"
       ]
     ]
   },
@@ -896,6 +1111,171 @@
         [
           "round-reduction.outlet",
           "round-3.inlet"
+        ]
+      ]
+    },
+    "branches": {
+      "id": "demo-tees-y",
+      "demo": true,
+      "settings": {
+        "sheetMm": 3,
+        "flangeWidthMm": 30,
+        "flangeDepthMm": 30,
+        "demo": true
+      },
+      "components": [
+        {
+          "id": "family-inlet",
+          "type": "straight",
+          "productSlug": "rectangular-duct",
+          "name": {
+            "fr": "Gaine d’entrée",
+            "en": "Inlet duct",
+            "ar": "مجرى المدخل"
+          },
+          "geometry": {
+            "widthMm": 400,
+            "heightMm": 300,
+            "lengthMm": 450,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 150
+          },
+          "description": null
+        },
+        {
+          "id": "family-tee",
+          "type": "tee",
+          "productSlug": "tees-branches",
+          "name": {
+            "fr": "Té avec piquage",
+            "en": "Tee with take-off",
+            "ar": "وصلة T مع مأخذ"
+          },
+          "geometry": {
+            "widthMm": 400,
+            "heightMm": 300,
+            "lengthMm": 700,
+            "branchWidthMm": 250,
+            "branchHeightMm": 200,
+            "branchPositionMm": 350,
+            "branchLengthMm": 180,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 150
+          },
+          "description": null
+        },
+        {
+          "id": "family-y",
+          "type": "y",
+          "productSlug": "tees-branches",
+          "name": {
+            "fr": "Dérivation en Y",
+            "en": "Y-branch fitting",
+            "ar": "وصلة تفرّع Y"
+          },
+          "geometry": {
+            "widthMm": 400,
+            "heightMm": 300,
+            "trunkLengthMm": 600,
+            "branchWidthMm": 250,
+            "branchLengthMm": 550,
+            "branchAngleDeg": 45,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 150
+          },
+          "description": {
+            "fr": "Une entrée se divise en deux branches inclinées. La géométrie et le sens du flux sont illustratifs ; ils ne constituent pas un dimensionnement aéraulique.",
+            "en": "One inlet divides into two angled branches. Geometry and airflow direction are illustrative and do not constitute an HVAC design.",
+            "ar": "ينقسم المدخل إلى فرعين مائلين. الشكل واتجاه التدفق توضيحيان ولا يمثلان تصميماً هندسياً للشبكة."
+          }
+        },
+        {
+          "id": "tee-outlet",
+          "type": "straight",
+          "productSlug": "rectangular-duct",
+          "name": {
+            "fr": "Sortie du té",
+            "en": "Tee outlet duct",
+            "ar": "مجرى مخرج T"
+          },
+          "geometry": {
+            "widthMm": 250,
+            "heightMm": 200,
+            "lengthMm": 450,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 150
+          },
+          "description": null
+        },
+        {
+          "id": "y-left",
+          "type": "straight",
+          "productSlug": "rectangular-duct",
+          "name": {
+            "fr": "Sortie Y — branche 1",
+            "en": "Y outlet — branch 1",
+            "ar": "مخرج Y — الفرع 1"
+          },
+          "geometry": {
+            "widthMm": 250,
+            "heightMm": 300,
+            "lengthMm": 350,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 150
+          },
+          "description": null
+        },
+        {
+          "id": "y-right",
+          "type": "straight",
+          "productSlug": "rectangular-duct",
+          "name": {
+            "fr": "Sortie Y — branche 2",
+            "en": "Y outlet — branch 2",
+            "ar": "مخرج Y — الفرع 2"
+          },
+          "geometry": {
+            "widthMm": 250,
+            "heightMm": 300,
+            "lengthMm": 350,
+            "demo": true
+          },
+          "explode": {
+            "distanceMm": 150
+          },
+          "description": null
+        }
+      ],
+      "connections": [
+        [
+          "family-inlet.outlet",
+          "family-tee.inlet"
+        ],
+        [
+          "family-tee.outlet",
+          "family-y.inlet"
+        ],
+        [
+          "family-tee.branch",
+          "tee-outlet.inlet"
+        ],
+        [
+          "family-y.outlet",
+          "y-left.inlet"
+        ],
+        [
+          "family-y.branch",
+          "y-right.inlet"
         ]
       ]
     }
