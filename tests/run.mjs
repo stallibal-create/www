@@ -42,7 +42,7 @@ const results = []; let current = '';
 async function test(name, fn) {
   current = name; const t0 = Date.now();
   try { await fn(); results.push({ name, ok: true, ms: Date.now() - t0 }); console.log(`  ✓ ${name} (${Date.now() - t0} ms)`); }
-  catch (e) { results.push({ name, ok: false, err: e.message }); console.log(`  ✗ ${name}\n      ${String(e.message).split('\n').join('\n      ')}`); }
+  catch (e) { results.push({ name, ok: false, err: e.message }); console.log(`  ✗ ${name}\n      ${String(e.message).split('\n').join('\n      ')}`); for (const ctx of browser.contexts()) await ctx.close(); }
 }
 
 // ---------- servers ----------
@@ -68,7 +68,7 @@ for (const base of [A, B, C, D]) for (let i = 0; i < 50; i++) { try { if ((await
 
 const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
 const DIST = join(ROOT, 'dist');
-const pages = walk(DIST).filter(f => f.endsWith('index.html') && f !== join(DIST, 'index.html')).map(f => f.slice(DIST.length).replace(/index\.html$/, ''));
+const pages = walk(DIST).filter(f => f.endsWith('index.html') && f !== join(DIST, 'index.html')).map(f => f.slice(DIST.length).replace(/index\.html$/, '')).filter(p => !/\/assembly\/(?:spiral|branches|high-temperature)\/$/.test(p)); // legacy meta-refresh pages have no normal page UI
 
 // test fixtures
 const PDF = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n');
@@ -93,6 +93,9 @@ async function newPage(opts = {}, b = browser) {
   // the welcome intro plays once per tab session; every test except the intro's own starts after it
   if (!intro) await ctx.addInitScript(() => { try { sessionStorage.setItem('libalstal-intro', '1'); } catch { /* storage blocked */ } });
   const page = await ctx.newPage(); page.errors = [];
+  // Site controls are ready at DOMContentLoaded; remote map/media requests need not finish.
+  const navigate = page.goto.bind(page);
+  page.goto = (url, options = {}) => navigate(url, { waitUntil: 'domcontentloaded', ...options });
   page.on('pageerror', e => page.errors.push(e.message));
   page.on('console', m => {
     if (m.type() !== 'error' || CDN.test(m.text()) || /ERR_TUNNEL|Failed to load resource/.test(m.text())) return;
@@ -132,7 +135,7 @@ await test('all internal links and assets resolve (no dead links)', async () => 
 await test('external links are only the declared ones', async () => {
   const ext = new Set();
   for (const p of pages) for (const m of (await (await fetch(A + p)).text()).matchAll(/<a\b[^>]*href="(https?:\/\/[^"]+)"/g)) if (!m[1].startsWith('https://www.libalstal.example')) ext.add(m[1]);
-  assert.deepEqual([...ext].sort(), ['https://wa.me/213561631942', 'https://www.facebook.com/Libalstal/', 'https://www.google.com/maps/search/?api=1&amp;query=Zaouia%20Center%2C%20Beni%20Tamou%2C%20Blida%2C%20Algeria'].sort());
+  assert.deepEqual([...ext].sort(), ['https://wa.me/213561631942', 'https://www.facebook.com/Libalstal/', 'https://www.google.com/maps?cid=14870507933311400548'].sort());
 });
 await test('root redirects by Accept-Language; unknown paths 404 in the right language', async () => {
   const r = await fetch(A + '/', { redirect: 'manual', headers: { 'Accept-Language': 'ar-DZ,ar;q=0.9' } });
@@ -145,7 +148,7 @@ await test('root redirects by Accept-Language; unknown paths 404 in the right la
 await test('SEO files: sitemap with hreflang, robots, canonical, no draft pages indexed', async () => {
   const sm = await (await fetch(A + '/sitemap.xml')).text();
   assert.match(sm, /hreflang="ar"/); assert.doesNotMatch(sm, /projects\/modele/);
-  assert.equal((sm.match(/<url>/g) || []).length, pages.filter(p => !p.includes('/projects/modele')).length);
+  assert.equal((sm.match(/<url>/g) || []).length, pages.filter(p => !p.includes('/projects/modele') && !p.endsWith('/assembly/high-temperature/')).length);
   assert.match(sm, /\/fr\/assembly\//, 'v14: the 3D assembly page is public and in the sitemap');
   assert.match(await (await fetch(A + '/robots.txt')).text(), /Sitemap: https:\/\/www\.libalstal\.example\/sitemap\.xml/);
   const home = await (await fetch(A + '/en/')).text();
@@ -308,7 +311,7 @@ await test('product filter updates cards, count and URL', async () => {
   await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), 11);
   await p.context().close();
 });
-await test('v5.3 brochure content: specs as printed, 9 references (no defence sites), contacts; no RC, no gmail, no fire claim', async () => {
+await test('v5.3 brochure content: specs as printed, 8 references (no defence sites), contacts; no RC, no gmail, no fire claim', async () => {
   const get = async path => (await fetch(A + path)).text();
   const rect = await get('/fr/products/rectangular-duct/'), spiral = await get('/fr/products/spiral-round-duct/');
   for (const t of ['0,4 à 2 mm', 'longueurs standard 1 m et 1,25 m', 'acier galvanisée']) assert.ok(rect.includes(t), `rectangular: ${t}`);
@@ -317,7 +320,7 @@ await test('v5.3 brochure content: specs as printed, 9 references (no defence si
   for (const l of ['fr', 'en', 'ar']) {
     for (const path of [`/${l}/`, `/${l}/projects/`]) {
       const h = await get(path);
-      assert.equal((h.match(/<li[^>]*>\s*<span class="ref-sector"/g) || []).length, 9, `${path}: 9 references`);
+      assert.equal((h.match(/class="ref-sector"/g) || []).length, 8, `${path}: 8 references`);
       assert.doesNotMatch(h, /ERSSMS|Hammaguir|militaire|military|عسكري/i, `${path}: defence sites not named`);
       assert.doesNotMatch(h, /Alziwar|Alnaaja|Tipasa/i, `${path}: brochure spellings normalised`);
     }
@@ -377,26 +380,29 @@ await test('reduced motion: content visible without animation', async () => {
 });
 
 console.log('\nSocial dock');
-await test('social dock: on every page, Facebook only (from site.json), 48 px disc on the inline-end edge, tooltip on hover and focus', async () => {
-  for (const p of pages) {
+await test('social dock: configured links and pending profiles, 48 px discs on the inline-end edge, tooltip on hover and focus', async () => {
+  for (const p of pages.filter(p => !p.endsWith('/assembly/high-temperature/'))) {
     const h = await (await fetch(A + p)).text();
     assert.equal((h.match(/<nav class="social-dock/g) || []).length, 1, p);
     assert.match(h, /<a class="sd-btn sd-facebook" href="https:\/\/www\.facebook\.com\/Libalstal\/" target="_blank" rel="noopener noreferrer">/, p);
-    assert.doesNotMatch(h, /sd-instagram|sd-tiktok|sd-toggle/, p);
+    assert.match(h, /class="sd-btn sd-instagram is-pending" role="img"/, p);
+    assert.match(h, /class="sd-btn sd-tiktok is-pending" role="img"/, p);
+    assert.match(h, /class="sd-btn sd-toggle"/, p);
   }
   const pg = await newPage(); await pg.goto(A + '/fr/products/');
-  const btn = pg.locator('.sd-facebook');
+  const btn = pg.locator('.sd-btn.sd-facebook');
   assert.equal(await btn.getAttribute('aria-label'), null);
-  assert.equal((await pg.evaluate(() => { const a = document.querySelector('.sd-facebook'); return a.textContent.trim(); })), 'Facebook (nouvel onglet)');
+  assert.equal((await pg.evaluate(() => { const a = document.querySelector('.sd-btn.sd-facebook'); return a.textContent.trim(); })), 'Facebook (nouvel onglet)');
   const bb = await btn.boundingBox();
   assert.ok(bb.width >= 44 && bb.height >= 44, JSON.stringify(bb));
-  assert.ok(bb.x + bb.width > 1440 - 80 && Math.abs(bb.y + bb.height / 2 - 900 / 2) < 120, 'right edge, vertically centred ' + JSON.stringify(bb));
-  const tipOpacity = () => pg.evaluate(() => getComputedStyle(document.querySelector('.sd-facebook .sd-tip')).opacity);
+  const dockBox = await pg.locator('.social-dock').boundingBox();
+  assert.ok(bb.x + bb.width > 1440 - 80 && Math.abs(dockBox.y + dockBox.height / 2 - 900 / 2) < 1, 'right edge, vertically centred ' + JSON.stringify(dockBox));
+  const tipOpacity = () => pg.evaluate(() => getComputedStyle(document.querySelector('.sd-btn.sd-facebook .sd-tip')).opacity);
   await pg.waitForTimeout(1300); // entrance finished
   assert.equal(await tipOpacity(), '0');
   await btn.hover(); await pg.waitForTimeout(350);
   assert.equal(await tipOpacity(), '1');
-  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-facebook')).backgroundColor), 'rgb(0, 102, 204)');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-btn.sd-facebook')).backgroundColor), 'rgb(0, 102, 204)');
   await pg.mouse.move(10, 10); await pg.waitForTimeout(350);
   await btn.focus(); await pg.waitForTimeout(350);
   assert.equal(await tipOpacity(), '1', 'keyboard focus shows the tooltip too');
@@ -405,21 +411,21 @@ await test('social dock: on every page, Facebook only (from site.json), 48 px di
 });
 await test('social dock in Arabic: mirrored to the left edge, tooltip toward the content, labels in Arabic', async () => {
   const pg = await newPage(); await pg.goto(A + '/ar/');
-  assert.equal(await pg.getAttribute('.social-dock', 'aria-label'), 'LIBALSTAL على مواقع التواصل الاجتماعي');
-  const bb = await pg.locator('.sd-facebook').boundingBox();
+  assert.equal(await pg.getAttribute('.social-dock', 'aria-label'), 'تواصل مع LIBALSTAL والشبكات الاجتماعية');
+  const bb = await pg.locator('.sd-btn.sd-facebook').boundingBox();
   assert.ok(bb.x < 80, 'left edge in RTL ' + JSON.stringify(bb));
-  await pg.waitForTimeout(1300); await pg.hover('.sd-facebook'); await pg.waitForTimeout(350);
-  const tip = await pg.locator('.sd-facebook .sd-tip').boundingBox();
+  await pg.waitForTimeout(1300); await pg.hover('.sd-btn.sd-facebook'); await pg.waitForTimeout(350);
+  const tip = await pg.locator('.sd-btn.sd-facebook .sd-tip').boundingBox();
   assert.ok(tip.x > bb.x + bb.width, 'tooltip on the right of the disc in RTL');
   await pg.context().close();
 });
 await test('social dock on phones: bottom corner above the safe area, clears the footer, hides while typing, no overflow', async () => {
-  const pg = await newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await pg.goto(A + '/fr/contact/');
+  const pg = await newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await pg.goto(A + '/fr/contact/', { waitUntil: 'domcontentloaded' }); // social controls do not depend on the external map iframe
   await pg.waitForTimeout(1300); // entrance finished
-  const bb = await pg.locator('.sd-facebook').boundingBox();
+  const bb = await pg.locator('.sd-toggle').boundingBox();
   assert.ok(bb.x + bb.width <= 390 - 12 && bb.x + bb.width > 390 - 80 && bb.y + bb.height <= 844 - 12 && bb.y > 844 - 120, JSON.stringify(bb));
   await pg.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await pg.waitForTimeout(300);
-  const [dock, copy] = await Promise.all([pg.locator('.sd-facebook').boundingBox(), pg.locator('.site-footer .copy').boundingBox()]);
+  const [dock, copy] = await Promise.all([pg.locator('.sd-toggle').boundingBox(), pg.locator('.site-footer .copy').boundingBox()]);
   assert.ok(copy.y + copy.height <= dock.y || copy.x + copy.width <= dock.x, 'copyright line not covered ' + JSON.stringify({ dock, copy }));
   await pg.evaluate(() => window.scrollTo(0, 0));
   await pg.focus('#f-name');
@@ -438,13 +444,14 @@ await test('social dock with three profiles (test URLs): phone toggle opens, Esc
   const serve = async ctx => ctx.route(A + '/fr/', async r => r.fulfill({ contentType: 'text/html; charset=utf-8', headers: Object.fromEntries([...(await fetch(A + '/fr/')).headers].filter(([k]) => !['content-encoding', 'content-length', 'vary'].includes(k))),
     body: (await (await fetch(A + '/fr/')).text()).replace(/<nav class="social-dock[\s\S]*?<\/nav>/, dock) }));
   let pg = await newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await serve(pg.context()); await pg.goto(A + '/fr/');
+  await pg.waitForSelector('.social-dock.is-ready');
   const t = pg.locator('.sd-toggle');
-  assert.equal(await t.isVisible(), true); assert.equal(await pg.isVisible('.sd-instagram'), false);
+  assert.equal(await t.isVisible(), true); assert.equal(await pg.isVisible('.sd-btn.sd-instagram'), false);
   const tb = await t.boundingBox(); assert.ok(tb.width >= 44 && tb.height >= 44);
   await t.click(); await pg.waitForTimeout(400);
   assert.equal(await t.getAttribute('aria-expanded'), 'true'); assert.equal(await t.getAttribute('aria-label'), 'Masquer les réseaux sociaux');
-  for (const k of ['facebook', 'instagram', 'tiktok']) assert.equal(await pg.isVisible('.sd-' + k), true, k);
-  const ys = await Promise.all(['facebook', 'instagram', 'tiktok'].map(k => pg.locator('.sd-' + k).boundingBox().then(b => b.y)));
+  for (const k of ['facebook', 'instagram', 'tiktok']) assert.equal(await pg.isVisible('.sd-btn.sd-' + k), true, k);
+  const ys = await Promise.all(['facebook', 'instagram', 'tiktok'].map(k => pg.locator('.sd-btn.sd-' + k).boundingBox().then(b => b.y)));
   assert.ok(ys.every(y => y > 400 && y < tb.y), 'stack opens upward above the toggle ' + JSON.stringify({ ys, toggle: tb.y }));
   assert.equal(Math.round((await t.boundingBox()).y), Math.round(tb.y), 'the toggle does not move when the stack opens');
   await pg.keyboard.press('Escape');
@@ -454,10 +461,10 @@ await test('social dock with three profiles (test URLs): phone toggle opens, Esc
   assert.deepEqual(pg.errors, []); await pg.context().close();
   pg = await newPage({ reducedMotion: 'reduce' }); await serve(pg.context()); await pg.goto(A + '/fr/');
   assert.equal(await pg.isVisible('.sd-toggle'), false);
-  for (const k of ['facebook', 'instagram', 'tiktok']) assert.equal(await pg.isVisible('.sd-' + k), true, k);
+  for (const k of ['facebook', 'instagram', 'tiktok']) assert.equal(await pg.isVisible('.sd-btn.sd-' + k), true, k);
   assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-list li')).animationName), 'none');
-  await pg.hover('.sd-instagram');
-  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-instagram')).transform), 'none', 'no movement with reduced motion');
+  await pg.hover('.sd-btn.sd-instagram');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-btn.sd-instagram')).transform), 'none', 'no movement with reduced motion');
   await pg.context().close();
 });
 
@@ -473,9 +480,40 @@ await test('assembly pages (public since v14): indexable, in the sitemap, linked
     assert.match(h, new RegExp(`rel="canonical" href="https://www\\.libalstal\\.example/${l}/assembly/"`));
     assert.ok(h.includes(ASM_DEMO[l]) && h.includes(ASM_PENDING[l]), l);
     assert.match(h, /<svg class="asm-svg"[^>]*role="img" aria-labelledby="asm-svg-t"/);
-    assert.equal((h.match(/class="asm-part"/g) || []).length, 8);
+    assert.equal((h.match(/class="asm-part"/g) || []).length, 15);
     assert.match(h, new RegExp(`href="/${l}/contact/\\?product=tees-branches"`));
     assert.match(await (await fetch(`${A}/${l}/`)).text(), new RegExp(`href="/${l}/assembly/"`), `${l} home links to the 3D assembly`);
+  }
+});
+await test('unified assembly: rectangular, spiral, tee and Y parts; accessible icon controls in FR/EN/AR', async () => {
+  const labels = {fr:'Désenfumage',en:'Smoke extraction',ar:'استخراج الدخان'};
+  for (const l of ['fr','en','ar']) {
+    const p = await newPage({viewport:{width:l==='ar'?390:1280,height:844},reducedMotion:'reduce'});
+    await p.goto(`${A}/${l}/assembly/`);
+    assert.equal(await p.locator('.asm-systems').count(),0);
+    assert.equal(await p.locator('.asm-pick').count(),15);
+    const controls=p.locator('.asm-effects-controls button');
+    assert.equal(await controls.count(),4);
+    for(const control of await controls.all()) {
+      assert.ok(await control.getAttribute('aria-label'));
+      assert.equal((await control.textContent()).trim(),'');
+      assert.equal(await control.locator('svg').count(),1);
+    }
+    assert.equal(await p.locator('.asm-heat').getAttribute('aria-label'),labels[l]);
+    for(const id of ['flange-1','y-1','rect-round-1','round-1','tee-1']) {
+      await p.locator(`.asm-pick[data-part="${id}"]`).click();
+      assert.ok(await p.locator(`#part-${id}`).isVisible());
+    }
+    await p.locator('.asm-heat').click();
+    assert.equal(await p.locator('.asm-heat').getAttribute('aria-pressed'),'true');
+    assert.ok(await p.locator('.asm-heat-note').isVisible());
+    const pause=p.locator('.asm-pause');
+    const old=await pause.getAttribute('aria-label');await pause.click();
+    assert.notEqual(await pause.getAttribute('aria-label'),old);
+    assert.equal(await pause.locator('svg').count(),1,'pause toggle keeps its icon');
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    assert.deepEqual(p.errors,[]);
+    await p.context().close();
   }
 });
 await test('home story "Du plan au métal": 4 steps and 4 titled drawings in FR/EN/AR; live on scroll; readable without JS', async () => {
@@ -535,7 +573,7 @@ await test('production: assembly modules, import map and CSP load without violat
     const [v, T, oc, g] = await Promise.all([import('/assets/js/assembly/viewer.js'), import('three'), import('three/addons/controls/OrbitControls.js'), import('/assets/js/assembly/geometry.js')]);
     return { createViewer: typeof v.createViewer, revision: T.REVISION, orbit: typeof oc.OrbitControls, types: g.PART_TYPES.length };
   });
-  assert.deepEqual(mods, { createViewer: 'function', revision: '170', orbit: 'function', types: 6 });
+  assert.deepEqual(mods, { createViewer: 'function', revision: '170', orbit: 'function', types: 13 });
   assert.deepEqual(refused, []); assert.deepEqual(p.errors, []);
   await p.context().close();
 });
@@ -688,7 +726,7 @@ await test('WebGL disabled: static drawing, full part list and sheets still work
   await p.goto(A + '/en/assembly/'); await p.locator('.asm-view').scrollIntoViewIfNeeded();
   await p.waitForFunction(() => document.querySelector('.asm-view').dataset.state === 'fallback', null, { timeout: 5000 });
   assert.match((await asmState(p)).status, /not available on this device/);
-  assert.ok(await p.isVisible('.asm-svg')); assert.equal(await p.locator('.asm-pick').count(), 8);
+  assert.ok(await p.isVisible('.asm-svg')); assert.equal(await p.locator('.asm-pick').count(), 15);
   assert.deepEqual(reqs.filter(u => /viewer\.js|three/.test(u)), [], 'no 3D download without WebGL');
   await p.click('.asm-pick >> nth=7'); assert.ok(await p.isVisible('#part-branch-1'));
   assert.ok((await p.textContent('#part-branch-1')).includes('Specification pending'));
@@ -868,9 +906,17 @@ await introTest('skip: the button reveals the page at once; refresh and repeat n
   const p = await newPage({ intro: true });
   await p.goto(A + '/fr/');
   await p.waitForTimeout(600);
-  const t = Date.now(); await p.click('.intro-skip');
-  await p.waitForFunction(() => !document.getElementById('intro'), null, { timeout: 2000 });
-  assert.ok(Date.now() - t < 800, `skip took ${Date.now() - t} ms`);
+  // Measure click-event → removal in the page, excluding Playwright's actionability/scroll wait.
+  await p.evaluate(() => {
+    let started;
+    document.querySelector('.intro-skip').addEventListener('click', () => { started = performance.now(); }, { capture: true, once: true });
+    const observer = new MutationObserver(() => { if (started !== undefined && !document.getElementById('intro')) { window.__introSkipMs = performance.now() - started; observer.disconnect(); } });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+  await p.click('.intro-skip');
+  await p.waitForFunction(() => Number.isFinite(window.__introSkipMs), null, { timeout: 2000 });
+  const skipMs = await p.evaluate(() => window.__introSkipMs);
+  assert.ok(skipMs < 800, `skip took ${skipMs} ms`);
   assert.equal((await introState(p)).end, 'skip');
   await p.reload(); assert.deepEqual((await introState(p)).on, false, 'refresh: page directly');
   assert.equal(await p.isVisible('#intro'), false);
