@@ -9,6 +9,7 @@
 // flange at every connection. The body has two material groups, "sheet" and "flange". With `details`, construction
 // cues are added on top (groups "hardware" and "gasket" too); they never change the body or its connectors.
 
+import { buildY, yLayout, buildProfileFrame } from './fittings.js';
 import { vAdd, vSub, vScale, vDot, vCross, vNorm, vLen } from './units.js';
 
 /** @typedef {import('./units.js').Vec3} Vec3 */
@@ -43,16 +44,19 @@ export const GEOMETRY_SCHEMA = {
   'round-straight': { diameterMm: 'mm', lengthMm: 'mm' },
   'round-elbow': { diameterMm: 'mm', innerRadiusMm: 'mm' },
   'round-reducer': { inletDiameterMm: 'mm', outletDiameterMm: 'mm', lengthMm: 'mm' },
+  'rect-round': { inletWidthMm: 'mm', inletHeightMm: 'mm', outletDiameterMm: 'mm', lengthMm: 'mm' },
   straight: { widthMm: 'mm', heightMm: 'mm', lengthMm: 'mm' },
   branch: { widthMm: 'mm', heightMm: 'mm', lengthMm: 'mm' },
   elbow90: { widthMm: 'mm', heightMm: 'mm', innerRadiusMm: 'mm', bendPlane: ['horizontal', 'vertical'] },
   reducer: { inletWidthMm: 'mm', inletHeightMm: 'mm', outletWidthMm: 'mm', outletHeightMm: 'mm', lengthMm: 'mm' },
   tee: { widthMm: 'mm', heightMm: 'mm', lengthMm: 'mm', branchWidthMm: 'mm', branchHeightMm: 'mm', branchPositionMm: 'mm', branchLengthMm: 'mm' },
   flange: { widthMm: 'mm', heightMm: 'mm' },
+  'profile-frame': { widthMm: 'mm', heightMm: 'mm' },
+  y: { widthMm: 'mm', heightMm: 'mm', trunkLengthMm: 'mm', branchWidthMm: 'mm', branchLengthMm: 'mm', branchAngleDeg: 'deg' },
 };
 export const PART_TYPES = Object.keys(GEOMETRY_SCHEMA);
 /** Connector names per part type. */
-export const CONNECTORS = { 'spiral-straight': ['inlet', 'outlet'], 'round-straight': ['inlet', 'outlet'], 'round-elbow': ['inlet', 'outlet'], 'round-reducer': ['inlet', 'outlet'], straight: ['inlet', 'outlet'], branch: ['inlet', 'outlet'], elbow90: ['inlet', 'outlet'], reducer: ['inlet', 'outlet'], tee: ['inlet', 'outlet', 'branch'], flange: ['inlet', 'outlet'] };
+export const CONNECTORS = { 'spiral-straight': ['inlet', 'outlet'], 'round-straight': ['inlet', 'outlet'], 'round-elbow': ['inlet', 'outlet'], 'round-reducer': ['inlet', 'outlet'], straight: ['inlet', 'outlet'], branch: ['inlet', 'outlet'], elbow90: ['inlet', 'outlet'], reducer: ['inlet', 'outlet'], tee: ['inlet', 'outlet', 'branch'], flange: ['inlet', 'outlet'], 'profile-frame': ['inlet', 'outlet'], y: ['inlet', 'outlet', 'branch'], 'rect-round': ['inlet', 'outlet'] };
 
 const isMm = x => typeof x === 'number' && Number.isFinite(x) && x > 0;
 
@@ -66,7 +70,7 @@ export function validatePart(c, s) {
   if (!g || typeof g !== 'object') return [...err, 'geometry missing'];
   for (const [k, kind] of Object.entries(schema)) {
     if (Array.isArray(kind)) { if (!kind.includes(g[k])) err.push(`geometry.${k} must be one of ${kind.join(', ')}`); }
-    else if (!isMm(g[k])) err.push(`geometry.${k} must be a positive number of mm`);
+    else if (!isMm(g[k])) err.push(`geometry.${k} must be a positive number of ${kind === 'deg' ? 'degrees' : 'mm'}`);
   }
   for (const k of Object.keys(g)) if (k !== 'demo' && !(k in schema)) err.push(`geometry.${k} is not a ${c.type} parameter`);
   if (err.length) return err;
@@ -78,6 +82,12 @@ export function validatePart(c, s) {
   if ('lengthMm' in schema && g.lengthMm <= 2 * D) err.push(`lengthMm (${g.lengthMm}) must exceed both end flanges (2 × ${D} mm)`);
   if (c.type === 'elbow90' && g.innerRadiusMm < t + F + D) err.push(`innerRadiusMm (${g.innerRadiusMm}) must be at least sheet + flange width + flange depth (${t + F + D} mm) or the end flanges collide`);
   if (c.type === 'reducer' && g.inletWidthMm === g.outletWidthMm && g.inletHeightMm === g.outletHeightMm) err.push('reducer inlet and outlet sections are identical (use a straight duct)');
+  if (c.type === 'y') {
+    if (g.branchAngleDeg < 20 || g.branchAngleDeg > 65) err.push('Y half-angle must be between 20 and 65 degrees');
+    if (yLayout(g).neckX <= 2 * D) err.push('Y trunk is too short for the branch width and angle');
+    if (g.branchLengthMm < 2 * (F + D)) err.push('Y branches are too short for their frames');
+    if (g.branchWidthMm > g.widthMm) err.push('Y branch width must not exceed inlet width');
+  }
   if (c.type === 'tee') {
     if (g.branchHeightMm + 2 * t > g.heightMm) err.push(`branch height ${g.branchHeightMm} + walls does not fit the main duct height ${g.heightMm}`);
     if (g.branchPositionMm - g.branchWidthMm / 2 - t < D || g.branchPositionMm + g.branchWidthMm / 2 + t > g.lengthMm - D) err.push('branch opening overlaps an end flange (check branchPositionMm / branchWidthMm / lengthMm)');
@@ -105,6 +115,8 @@ export function connectorsFor(c, s) {
     }
     case 'straight': case 'branch':
       return { inlet: { o: [0, 0, 0], n: NX, u: Y, w: g.widthMm, h: g.heightMm }, outlet: { o: [g.lengthMm, 0, 0], n: X, u: Y, w: g.widthMm, h: g.heightMm } };
+    case 'rect-round':
+      return { inlet: { o: [0,0,0], n: NX, u: Y, w: g.inletWidthMm, h: g.inletHeightMm }, outlet: { o: [g.lengthMm,0,0], n: X, u: Y, w: g.outletDiameterMm, h: g.outletDiameterMm } };
     case 'reducer':
       return { inlet: { o: [0, 0, 0], n: NX, u: Y, w: g.inletWidthMm, h: g.inletHeightMm }, outlet: { o: [g.lengthMm, 0, 0], n: X, u: Y, w: g.outletWidthMm, h: g.outletHeightMm } };
     case 'elbow90': {
@@ -119,7 +131,11 @@ export function connectorsFor(c, s) {
         outlet: { o: [g.lengthMm, 0, 0], n: X, u: Y, w: g.widthMm, h: g.heightMm },
         branch: { o: [g.branchPositionMm, 0, g.widthMm / 2 + g.branchLengthMm], n: [0, 0, 1], u: Y, w: g.branchWidthMm, h: g.branchHeightMm },
       };
-    case 'flange':
+    case 'y': {
+      const layout = yLayout(g);
+      return { inlet: { o: [0, 0, 0], n: NX, u: Y, w: g.widthMm, h: g.heightMm }, outlet: layout.outlet, branch: layout.branch };
+    }
+    case 'flange': case 'profile-frame':
       return { inlet: { o: [0, 0, 0], n: NX, u: Y, w: g.widthMm, h: g.heightMm }, outlet: { o: [s.flangeDepthMm, 0, 0], n: X, u: Y, w: g.widthMm, h: g.heightMm } };
   }
   throw new GeometryError(`unknown part type "${c.type}"`);
@@ -161,7 +177,7 @@ function meshBuilder(keepQuads) {
   }
   const quad = (mat, a, b, c, d, out, detail = false) => strip(mat, [[a, b], [d, c]], () => out, detail);
   /** Flat triangle turned to face `out` (detail only). uv (mm) from the planar basis [origin, e1, e2], default its first edge. */
-  function tri(mat, a, b, c, out, basis) {
+  function tri(mat, a, b, c, out, basis, preview = false) {
     let n = vCross(vSub(b, a), vSub(c, a));
     if (vDot(n, out) < 0) { [b, c] = [c, b]; n = vScale(n, -1); }
     n = vNorm(n);
@@ -169,6 +185,7 @@ function meshBuilder(keepQuads) {
     const B = buf[mat], base = B.pos.length / 3;
     for (const p of [a, b, c]) { const d = vSub(p, o); B.pos.push(...p); B.nor.push(...n); B.uv.push(vDot(d, u1), vDot(d, u2)); }
     B.idx.push(base, base + 1, base + 2);
+    if (keepQuads && preview) quads.push({ p: [a, b, c], n, mat });
   }
   /** Flat convex polygon with shared vertices (detail only), turned to face `out`. */
   function poly(mat, pts, out) {
@@ -224,7 +241,7 @@ function prism(m, mat, base, axis, e1, e2, r, sides, h0, h1, rot = 0) {
 
 /** Gasket (mating-face ring + joint line on the outer edge) and, on the back face, a corner piece with its nut
  *  at each corner. f = connection frame, dirIn = into the part. */
-function flangeDetails(m, f, dirIn, t, F, D) {
+function flangeDetails(m, f, dirIn, t, F, D, corners = true) {
   const P = DETAIL, out = vScale(dirIn, -1);
   const g0 = { ...f, p: vAdd(f.p, vScale(out, P.gasketMm)) }, gb = { ...f, p: vAdd(f.p, vScale(dirIn, P.gasketBandMm)) };
   const gi = t + P.gasketInsetMm, go = t + F - P.gasketInsetMm, gr = t + F + P.gasketBandRaiseMm;
@@ -233,6 +250,7 @@ function flangeDetails(m, f, dirIn, t, F, D) {
     m.quad('gasket', corner(g0, a, gi), corner(g0, b, gi), corner(g0, b, go), corner(g0, a, go), out, true);
     m.quad('gasket', corner(f, a, gr), corner(f, b, gr), corner(gb, b, gr), corner(gb, a, gr), sideDir(f, i), true);
   }
+  if (!corners) return;
   const back = vAdd(f.p, vScale(dirIn, D)), T = P.cornerPlateMm;
   for (const c of CORNERS) {
     const ey = vScale(f.y, c[0]), ez = vScale(f.z, c[1]);
@@ -291,11 +309,11 @@ function elbowFrame(g, a) {
 }
 
 // Hollow circular skins and annular rims. Every section has a real open airway.
-function circularTube(m, frames, wall, mat = 'sheet', sides = 48) {
+function circularTube(m, frames, wall, mat = 'sheet', sides = 48, angles = Array.from({length:sides},(_,i)=>i*2*Math.PI/sides)) {
   const radial = (f, a) => vAdd(vScale(f.y, Math.cos(a)), vScale(f.z, Math.sin(a)));
   const point = (f, a, grow) => vAdd(f.p, vScale(radial(f, a), f.w / 2 + grow));
   for (let i = 0; i < sides; i++) {
-    const a = i * 2 * Math.PI / sides, b = (i + 1) * 2 * Math.PI / sides;
+    const a = angles[i], b = i + 1 === sides ? 2 * Math.PI : angles[i+1];
     for (const [grow, sign] of [[wall, 1], [0, -1]]) m.strip(mat, frames.map(f => [point(f, a, grow), point(f, b, grow)]), k => vScale(radial(frames[k], (a + b) / 2), sign));
     for (const [f, sign] of [[frames[0], -1], [frames.at(-1), 1]]) m.quad(mat, point(f, a, 0), point(f, b, 0), point(f, b, wall), point(f, a, wall), vScale(f.x, sign));
   }
@@ -344,6 +362,29 @@ export function buildPart(c, s, { segments = 16, keepQuads = false, details = fa
   switch (c.type) {
     case 'spiral-straight': case 'round-straight': case 'round-elbow': case 'round-reducer':
       circularPart(m, c, s, segments); break;
+    case 'rect-round': {
+      // Hollow loft from the rectangular perimeter to a circle; the joint planes remain exact.
+      const L = g.lengthMm, radius = g.outletDiameterMm / 2;
+      const angles = [...Array.from({length:48},(_,i)=>i*2*Math.PI/48), ...[1,-1].flatMap(y=>[1,-1].map(z=>(Math.atan2(z*g.inletWidthMm,y*g.inletHeightMm)+2*Math.PI)%(2*Math.PI)))].sort((a,b)=>a-b).filter((a,i,arr)=>i===0||a-arr[i-1]>1e-10);
+      const count=angles.length;
+      const point = (i, end, grow) => {
+        const a = angles[i], cy = Math.cos(a), cz = Math.sin(a);
+        const rr = end ? radius + grow : Math.min((g.inletHeightMm / 2 + grow) / Math.max(1e-12, Math.abs(cy)), (g.inletWidthMm / 2 + grow) / Math.max(1e-12, Math.abs(cz)));
+        return [end ? L : 0, cy * rr, cz * rr];
+      };
+      for (let i=0;i<count;i++) {
+        const j=(i+1)%count, a=(angles[i]+(j===0?2*Math.PI:angles[j]))/2, normal=[0,Math.cos(a),Math.sin(a)];
+        m.quad('sheet',point(i,false,t),point(j,false,t),point(j,true,t),point(i,true,t),normal);
+        m.quad('sheet',point(i,false,0),point(j,false,0),point(j,true,0),point(i,true,0),vScale(normal,-1));
+        for (const end of [false,true]) m.quad('sheet',point(i,end,0),point(j,end,0),point(j,end,t),point(i,end,t),end?X:NX);
+      }
+      const inlet=frame([0,0,0],X,Y,g.inletWidthMm,g.inletHeightMm);
+      flangeRing(m,inlet,X,t,F,D);
+      if(details) flangeDetails(m,inlet,X,t,F,D);
+      const end=frame([L,0,0],X,Y,g.outletDiameterMm+2*t,g.outletDiameterMm+2*t);
+      circularTube(m,[end,{...end,p:[L-D,0,0]}],F,'flange',count,angles);
+      break;
+    }
     case 'straight': case 'branch': case 'reducer': {
       const [w0, h0, w1, h1] = c.type === 'reducer' ? [g.inletWidthMm, g.inletHeightMm, g.outletWidthMm, g.outletHeightMm] : [g.widthMm, g.heightMm, g.widthMm, g.heightMm];
       const f0 = frame([0, 0, 0], X, Y, w0, h0), f1 = frame([g.lengthMm, 0, 0], X, Y, w1, h1);
@@ -398,6 +439,20 @@ export function buildPart(c, s, { segments = 16, keepQuads = false, details = fa
         for (const k of [0, 2]) seam(m, [s0, s1], CORNERS[k], t);
         crossBreaks(m, L, W, H, t, D, [1]); // the +Z side carries the branch opening
       }
+      break;
+    }
+    case 'y': {
+      buildY(m, g, t);
+      for (const k of Object.values(connectors)) {
+        const f = frame(k.o, k.n, k.u, k.w, k.h), inward = vScale(k.n, -1);
+        flangeRing(m, f, inward, t, F, D);
+        if (details) flangeDetails(m, f, inward, t, F, D);
+      }
+      break;
+    }
+    case 'profile-frame': {
+      buildProfileFrame(m, g, s);
+      if (details) flangeDetails(m, frame([0, 0, 0], X, Y, g.widthMm, g.heightMm), X, t, F, D, false);
       break;
     }
     case 'flange': {

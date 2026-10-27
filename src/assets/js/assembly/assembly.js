@@ -18,7 +18,7 @@ export class AssemblyError extends Error {}
 
 /** Default viewing direction (from the assembly centre towards the camera), shared by the static SVG preview
  *  and the 3D view so the canvas replaces the drawing without a jump. @type {Vec3} */
-export const DEFAULT_VIEW_DIR = [1, 0.8, 0.62];
+export const DEFAULT_VIEW_DIR = [0.4, 0.9, 1];
 
 /** "duct-1.outlet" → ["duct-1", "outlet"] */
 export function parseRef(ref) {

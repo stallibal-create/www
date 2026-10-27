@@ -29,7 +29,9 @@ function init() {
   let heatMode = params.get('heat') === '1', effectsPaused = reducedMotion.matches, cutaway = true;
   function applyIllustration() {
     airButton.setAttribute('aria-pressed', String(!heatMode)); heatButton.setAttribute('aria-pressed', String(heatMode));
-    pauseButton.setAttribute('aria-pressed', String(effectsPaused)); pauseButton.textContent = effectsPaused ? pauseButton.dataset.play : pauseButton.dataset.pause;
+    pauseButton.setAttribute('aria-pressed', String(effectsPaused)); const pauseLabel = effectsPaused ? pauseButton.dataset.play : pauseButton.dataset.pause;
+    pauseButton.setAttribute('aria-label', pauseLabel); pauseButton.title = pauseLabel;
+    pauseButton.querySelector('path').setAttribute('d', effectsPaused ? 'M8 5l11 7-11 7z' : 'M8 5v14M16 5v14');
     cutawayButton.setAttribute('aria-pressed', String(cutaway));
     fig.classList.toggle('is-heat', heatMode); fig.classList.toggle('is-cutaway', cutaway);
     for (const link of document.querySelectorAll('.asm-systems[aria-label] a')) {

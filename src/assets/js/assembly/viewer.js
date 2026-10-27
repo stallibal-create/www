@@ -84,13 +84,13 @@ export function buildScene(THREE, assembly, segments, material, baked = null) {
     root.add(mesh); meshes.set(c.id, mesh);
   }
   root.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(root);
+  const box = new THREE.Box3().setFromObject(root, true);
   const center = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
   return { root, meshes, geometries: [...cache.values()], center, size, box, radius: size.length() / 2 };
 }
 
 /** Share of the frame the home view fills (largest of width / height). */
-export const HOME_FILL = 0.8;
+export const HOME_FILL = 0.76;
 
 /** Camera distance along `dir` (unit vector from the centre) at which the projected assembly fills `fill` of the
  *  frame. Fitted to the real vertices, not to a bounding sphere (which left the assembly at about half the frame).
