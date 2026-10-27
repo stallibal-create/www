@@ -26,10 +26,10 @@ function withJson(edit) {
   return out.buffer.slice(out.byteOffset, out.byteOffset + out.byteLength);
 }
 
-const boxes = meshes => new Map([...meshes].map(([id, m]) => [id, new THREE.Box3().setFromObject(m)]));
+const boxes = meshes => new Map([...meshes].map(([id, m]) => [id, new THREE.Box3().setFromObject(m, true)]));
 const near = (a, b, tol = 2e-4) => a.min.distanceTo(b.min) <= tol && a.max.distanceTo(b.max) <= tol;
 
-test('the GLB holds exactly the eight assembly parts, with the four detail materials and texture coordinates', () => {
+test('the GLB holds exactly the fifteen assembly parts, with the four detail materials and texture coordinates', () => {
   const parts = readGlb(glb());
   assert.deepEqual([...parts.keys()].sort(), asm.components.map(c => c.id).sort());
   for (const [id, prims] of parts) {
@@ -38,7 +38,8 @@ test('the GLB holds exactly the eight assembly parts, with the four detail mater
       assert.ok([0, 1, 2, 3].includes(p.slot));
       assert.equal(p.positions.length, p.normals.length); assert.equal(p.uvs.length, (p.positions.length / 3) * 2); assert.equal(p.indices.length % 3, 0);
     }
-    assert.ok(prims.some(p => p.slot === 2) && prims.some(p => p.slot === 3), `${id}: bolts and gasket exported`);
+    const c = asm.components.find(c => c.id === id);
+    if (!c.geometry.diameterMm && !c.geometry.inletDiameterMm) assert.ok(prims.some(p => p.slot === 2) && prims.some(p => p.slot === 3), `${id}: bolts and gasket exported`);
   }
 });
 

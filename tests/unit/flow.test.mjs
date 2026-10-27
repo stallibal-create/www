@@ -7,7 +7,7 @@ import { createFlowEffects } from '../../src/assets/js/assembly/flow-effects.js'
 import { solveAssembly, worldConnector } from '../../src/assets/js/assembly/assembly.js';
 import { connectorsFor } from '../../src/assets/js/assembly/geometry.js';
 const site=JSON.parse(readFileSync(new URL('../../content/site.json',import.meta.url)));
-for(const [name,a] of [['rectangular',site.ductAssembly],['spiral',site.ductSystems.spiral]]){
+for(const [name,a] of [['rectangular',site.ductAssembly],...Object.entries(site.ductSystems)]){
  test(`${name}: flow follows every part inlet/outlet and the branch airway`,()=>{
   const solved=solveAssembly(a);
   for(const c of a.components){
@@ -16,7 +16,7 @@ for(const [name,a] of [['rectangular',site.ductAssembly],['spiral',site.ductSyst
     const got=worldAirwayPoint(c,T,t),want=worldConnector(T,con[k]).o;
     assert.ok(Math.hypot(...got.map((v,i)=>v-want[i]))<1e-6,`${c.id}.${k}`);
    }
-   if(c.type==='tee')assert.deepEqual(sampleAirway(c,1,true).p,con.branch.o);
+   if(['tee','y'].includes(c.type))assert.deepEqual(sampleAirway(c,1,true).p,con.branch.o);
   }
   for(const p of airwayPaths(a))for(const f of p.samples){assert.ok(f.p.every(Number.isFinite));assert.ok(f.w>0&&f.h>0);}
  });

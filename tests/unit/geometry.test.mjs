@@ -12,6 +12,7 @@ const P = {
   'round-straight': { diameterMm: 400, lengthMm: 700 },
   'round-elbow': { diameterMm: 400, innerRadiusMm: 200 },
   'round-reducer': { inletDiameterMm: 400, outletDiameterMm: 300, lengthMm: 400 },
+  'rect-round': { inletWidthMm: 300, inletHeightMm: 300, outletDiameterMm: 250, lengthMm: 450 },
   straight: { widthMm: 400, heightMm: 300, lengthMm: 1000 },
   branch: { widthMm: 250, heightMm: 200, lengthMm: 600 },
   elbow90: { widthMm: 400, heightMm: 300, innerRadiusMm: 150, bendPlane: 'horizontal' },
@@ -19,6 +20,8 @@ const P = {
   reducer: { inletWidthMm: 400, inletHeightMm: 300, outletWidthMm: 300, outletHeightMm: 200, lengthMm: 400 },
   tee: { widthMm: 400, heightMm: 300, lengthMm: 700, branchWidthMm: 250, branchHeightMm: 200, branchPositionMm: 350, branchLengthMm: 150 },
   flange: { widthMm: 300, heightMm: 200 },
+  'profile-frame': { widthMm: 300, heightMm: 200 },
+  y: { widthMm: 400, heightMm: 300, trunkLengthMm: 600, branchWidthMm: 250, branchLengthMm: 550, branchAngleDeg: 45 },
 };
 const part = (type, geometry) => ({ id: 'p', type: type === 'elbowV' ? 'elbow90' : type, geometry: { ...geometry, demo: true } });
 const cases = Object.entries(P).map(([k, g]) => [k, part(k, g)]);
@@ -79,8 +82,8 @@ for (const [name, c] of cases) {
       for (let i = 0; i < m.positions.length / 3; i++) { const p = pt(m, i); if (Math.abs(vDot(vSub(p, k.o), k.n)) < TOL) inPlane.push(p); }
       const sideAxis = vCross(k.n, k.u);
       const minHalfW = Math.min(...inPlane.map(p => Math.max(Math.abs(vDot(vSub(p, k.o), sideAxis)) - k.w / 2, Math.abs(vDot(vSub(p, k.o), k.u)) - k.h / 2)));
-      if (c.geometry.diameterMm || c.geometry.inletDiameterMm) near(Math.min(...inPlane.map(p => Math.hypot(vDot(vSub(p, k.o), sideAxis), vDot(vSub(p, k.o), k.u)) - k.w / 2)), 0);
-      else if (c.type !== 'flange') near(minHalfW, 0); // duct rim begins exactly at the internal edge
+      if (c.geometry.diameterMm || c.geometry.inletDiameterMm || (c.type === 'rect-round' && cn === 'outlet')) near(Math.min(...inPlane.map(p => Math.hypot(vDot(vSub(p, k.o), sideAxis), vDot(vSub(p, k.o), k.u)) - k.w / 2)), 0);
+      else if (!['flange', 'profile-frame'].includes(c.type)) near(minHalfW, 0); // duct rim begins exactly at the internal edge
     }
   });
 }

@@ -77,12 +77,12 @@ test('reduced-motion commands jump to exact final states', () => {
   assert.equal(m.reassemble(true).factor, 0);
 });
 
-test('all eight part positions return to the solved installed transform after interruption', () => {
+test('all fifteen part positions return to the solved installed transform after interruption', () => {
   const solved = solveAssembly(assembly), offsets = explodeOffsets(assembly, solved), m = createMotion();
   for (let i = 0; i < 50; i++) {
     m.playIntro(); advance(m, 2300 + (i % 4) * 250);
     const partiallySeparated = [...solved.order].map(id => poseAt(solved.parts.get(id).installed, offsets.get(id), m.state().factor));
-    assert.ok(partiallySeparated.length === 8);
+    assert.ok(partiallySeparated.length === 15);
     m.interrupt();
     for (const id of solved.order) assert.deepEqual(poseAt(solved.parts.get(id).installed, offsets.get(id), m.state().factor), solved.parts.get(id).installed);
   }
