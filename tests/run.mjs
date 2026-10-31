@@ -285,7 +285,7 @@ await test('product renders: every card and product page shows its illustrative 
   const p = await newPage();
   await p.goto(A + '/fr/products/');
   const cards = await p.$$eval('#product-grid .card-render img', imgs => imgs.map(i => i.getAttribute('srcset')));
-  assert.equal(cards.length, 11, 'a render on every product card');
+  assert.equal(cards.length, 12, 'a render on every product card');
   for (const l of ['fr', 'en', 'ar']) {
     await p.goto(`${A}/${l}/products/elbows/`);
     await p.waitForFunction(() => { const i = document.querySelector('.drawing-render img'); return i.complete && i.naturalWidth > 0; }, null, { timeout: 10000 });
@@ -308,7 +308,7 @@ await test('product filter updates cards, count and URL', async () => {
   assert.equal(await p.textContent('.count'), '3 produits');
   assert.match(p.url(), /#cat=fit$/);
   await p.reload(); assert.equal(await p.locator('.card:visible').count(), 3, 'state from hash');
-  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), 11);
+  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), 12);
   await p.context().close();
 });
 await test('v5.3 brochure content: specs as printed, 8 references (no defence sites), contacts; no RC, no gmail, no fire claim', async () => {
@@ -480,7 +480,7 @@ await test('assembly pages (public since v14): indexable, in the sitemap, linked
     assert.match(h, new RegExp(`rel="canonical" href="https://www\\.libalstal\\.example/${l}/assembly/"`));
     assert.ok(h.includes(ASM_DEMO[l]) && h.includes(ASM_PENDING[l]), l);
     assert.match(h, /<svg class="asm-svg"[^>]*role="img" aria-labelledby="asm-svg-t"/);
-    assert.equal((h.match(/class="asm-part"/g) || []).length, 15);
+    assert.equal((h.match(/class="asm-part"/g) || []).length, 19);
     assert.match(h, new RegExp(`href="/${l}/contact/\\?product=tees-branches"`));
     assert.match(await (await fetch(`${A}/${l}/`)).text(), new RegExp(`href="/${l}/assembly/"`), `${l} home links to the 3D assembly`);
   }
@@ -491,7 +491,7 @@ await test('unified assembly: rectangular, spiral, tee and Y parts; accessible i
     const p = await newPage({viewport:{width:l==='ar'?390:1280,height:844},reducedMotion:'reduce'});
     await p.goto(`${A}/${l}/assembly/`);
     assert.equal(await p.locator('.asm-systems').count(),0);
-    assert.equal(await p.locator('.asm-pick').count(),15);
+    assert.equal(await p.locator('.asm-pick').count(),19);
     const controls=p.locator('.asm-effects-controls button');
     assert.equal(await controls.count(),4);
     for(const control of await controls.all()) {
@@ -500,7 +500,7 @@ await test('unified assembly: rectangular, spiral, tee and Y parts; accessible i
       assert.equal(await control.locator('svg').count(),1);
     }
     assert.equal(await p.locator('.asm-heat').getAttribute('aria-label'),labels[l]);
-    for(const id of ['flange-1','y-1','rect-round-1','round-1','tee-1']) {
+    for(const id of ['flange-1','y-1','rect-round-1','round-1','tee-1','damper-manual-1','damper-motorised-1','round-damper-manual-1','round-damper-motorised-1']) {
       await p.locator(`.asm-pick[data-part="${id}"]`).click();
       assert.ok(await p.locator(`#part-${id}`).isVisible());
     }
@@ -573,7 +573,7 @@ await test('production: assembly modules, import map and CSP load without violat
     const [v, T, oc, g] = await Promise.all([import('/assets/js/assembly/viewer.js'), import('three'), import('three/addons/controls/OrbitControls.js'), import('/assets/js/assembly/geometry.js')]);
     return { createViewer: typeof v.createViewer, revision: T.REVISION, orbit: typeof oc.OrbitControls, types: g.PART_TYPES.length };
   });
-  assert.deepEqual(mods, { createViewer: 'function', revision: '170', orbit: 'function', types: 13 });
+  assert.deepEqual(mods, { createViewer: 'function', revision: '170', orbit: 'function', types: 17 });
   assert.deepEqual(refused, []); assert.deepEqual(p.errors, []);
   await p.context().close();
 });
@@ -726,7 +726,7 @@ await test('WebGL disabled: static drawing, full part list and sheets still work
   await p.goto(A + '/en/assembly/'); await p.locator('.asm-view').scrollIntoViewIfNeeded();
   await p.waitForFunction(() => document.querySelector('.asm-view').dataset.state === 'fallback', null, { timeout: 5000 });
   assert.match((await asmState(p)).status, /not available on this device/);
-  assert.ok(await p.isVisible('.asm-svg')); assert.equal(await p.locator('.asm-pick').count(), 15);
+  assert.ok(await p.isVisible('.asm-svg')); assert.equal(await p.locator('.asm-pick').count(), 19);
   assert.deepEqual(reqs.filter(u => /viewer\.js|three/.test(u)), [], 'no 3D download without WebGL');
   await p.click('.asm-pick >> nth=7'); assert.ok(await p.isVisible('#part-branch-1'));
   assert.ok((await p.textContent('#part-branch-1')).includes('Specification pending'));
