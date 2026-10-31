@@ -456,7 +456,7 @@ ${story}
 
 <section class="sec alt" aria-labelledby="prod-h"><div class="wrap">
   <div class="sh rv"><h2 id="prod-h">${esc(H.prodTitle)}</h2><p>${esc(H.prodIntro)}</p></div>
-  <div class="grid rv">${site.products.map(p => productCard(ctx, p)).join('')}</div>
+  <div class="grid catalogue-grid rv">${['rectangular-duct', 'spiral-round-duct', 'elbows', 'control-dampers', 'acoustic-silencers', 'stainless-hoods'].map(slug => site.products.find(p => p.slug === slug)).filter(Boolean).map(p => productCard(ctx, p)).join('')}</div>
   <p class="more"><a class="btn" href="${url(lang, 'products')}">${esc(H.prodMore)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
 </div></section>
 ${ASM_RENDER ? `
