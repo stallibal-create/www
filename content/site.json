@@ -322,6 +322,225 @@
       },
       "datasheet": null,
       "image": null
+    },
+    {
+      "slug": "acoustic-silencers",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/acoustic-silencers.webp"
+    },
+    {
+      "slug": "flexible-connectors",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/flexible-connectors.webp"
+    },
+    {
+      "slug": "plenums",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/plenums.webp"
+    },
+    {
+      "slug": "access-panels",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/access-panels.webp"
+    },
+    {
+      "slug": "sand-traps",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/sand-traps.webp"
+    },
+    {
+      "slug": "rectangular-roof-cowls",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/rectangular-roof-cowls.webp"
+    },
+    {
+      "slug": "round-roof-cowls",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/round-roof-cowls.webp"
+    },
+    {
+      "slug": "external-louvres",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/external-louvres.webp"
+    },
+    {
+      "slug": "damper-accessories",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/damper-accessories.webp"
+    },
+    {
+      "slug": "smooth-round-duct",
+      "cat": "duct",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/smooth-round-duct.webp"
+    },
+    {
+      "slug": "stainless-hoods",
+      "cat": "inox",
+      "specs": {
+        "dimensions": null,
+        "material": {
+          "fr": "Acier inoxydable",
+          "en": "Stainless steel",
+          "ar": "فولاذ مقاوم للصدأ"
+        },
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/stainless-hoods.webp"
+    },
+    {
+      "slug": "stainless-tables",
+      "cat": "inox",
+      "specs": {
+        "dimensions": null,
+        "material": {
+          "fr": "Acier inoxydable",
+          "en": "Stainless steel",
+          "ar": "فولاذ مقاوم للصدأ"
+        },
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/stainless-tables.webp"
+    },
+    {
+      "slug": "stainless-trolleys",
+      "cat": "inox",
+      "specs": {
+        "dimensions": null,
+        "material": {
+          "fr": "Acier inoxydable",
+          "en": "Stainless steel",
+          "ar": "فولاذ مقاوم للصدأ"
+        },
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/stainless-trolleys.webp"
+    },
+    {
+      "slug": "stainless-charcoal-grills",
+      "cat": "inox",
+      "specs": {
+        "dimensions": null,
+        "material": {
+          "fr": "Acier inoxydable",
+          "en": "Stainless steel",
+          "ar": "فولاذ مقاوم للصدأ"
+        },
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": "catalogue/stainless-charcoal-grills.webp"
+    },
+    {
+      "slug": "smoke-extraction-ducts",
+      "cat": "duct",
+      "specs": {
+        "dimensions": null,
+        "material": {
+          "fr": "Tôle d'acier galvanisée",
+          "en": "Galvanised steel sheet",
+          "ar": "صفائح فولاذ مجلفن"
+        },
+        "thickness": {
+          "fr": "1,2–2,0 mm",
+          "en": "1.2–2.0 mm",
+          "ar": "1.2–2.0 mm"
+        },
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
     }
   ],
   "industriesConfirmed": true,
