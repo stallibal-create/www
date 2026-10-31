@@ -1,6 +1,6 @@
 # Informations manquantes — LIBALSTAL
 
-Généré automatiquement par `npm run build` le 2026-10-27. Chaque ligne correspond à un espace réservé visible sur le site.
+Généré automatiquement par `npm run build` le 2026-10-31. Chaque ligne correspond à un espace réservé visible sur le site.
 Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque ligne), puis relancez le build : la ligne disparaît.
 
 ## Savoir-faire
@@ -47,6 +47,20 @@ Renseignez les valeurs dans `content/site.json` (chemin indiqué sous chaque lig
   `products.black-steel-ducts.specs.standard`
 - [ ] Épaisseur — Gaines en acier noir  
   `products.black-steel-ducts.specs.thickness`
+- [ ] Fiche technique PDF — Volets de réglage  
+  `products.control-dampers.datasheet`
+- [ ] Photo produit — Volets de réglage  
+  `products.control-dampers.image`
+- [ ] Dimensions — Volets de réglage  
+  `products.control-dampers.specs.dimensions`
+- [ ] Finition — Volets de réglage  
+  `products.control-dampers.specs.finish`
+- [ ] Matière — Volets de réglage  
+  `products.control-dampers.specs.material`
+- [ ] Norme — Volets de réglage  
+  `products.control-dampers.specs.standard`
+- [ ] Épaisseur — Volets de réglage  
+  `products.control-dampers.specs.thickness`
 - [ ] Fiche technique PDF — Fabrication métallique sur mesure  
   `products.custom-assemblies.datasheet`
 - [ ] Photo produit — Fabrication métallique sur mesure  
