@@ -31,7 +31,7 @@ function zincTextures(size: number, cells: number, repeat: [number, number], amo
   const z = spangle(size, cells, 1702);
   soften(z.color, amount); soften(z.rough, amount);
   const mk = (data: Uint8Array, srgb: boolean) => {
-    const t = new THREE.DataTexture(data, z.size, z.size, THREE.RGBAFormat);
+    const t = new THREE.DataTexture(new Uint8Array(data), z.size, z.size, THREE.RGBAFormat);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.repeat.set(repeat[0], repeat[1]);
     t.anisotropy = 8;
