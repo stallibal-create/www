@@ -299,7 +299,7 @@ function productCard(ctx, p, headingLevel = 3) {
   const it = D.productItems[p.slug];
   return `<article class="card" data-cat="${p.cat}">
   <a class="card-link" href="${url(lang, 'products/' + p.slug)}">
-    ${RENDERS.has(p.slug) ? `<span class="card-fig card-render">${renderImg(p.slug, { sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>` : `<span class="card-fig" aria-hidden="true">${icons[p.slug]}</span>`}
+    ${p.image ? `<span class="card-fig card-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" loading="lazy" decoding="async" alt="${esc(it.name)}"></span>` : RENDERS.has(p.slug) ? `<span class="card-fig card-render">${renderImg(p.slug, { sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>` : `<span class="card-fig" aria-hidden="true">${icons[p.slug]}</span>`}
     <span class="card-cat">${esc(D.products.cats[p.cat])}</span>
     <h${headingLevel} class="card-h">${esc(it.name)}</h${headingLevel}>
     <span class="card-sum">${esc(it.summary)}</span>
@@ -474,7 +474,7 @@ ${rfqBand(ctx)}`;
 function products(ctx) {
   const { lang, D } = ctx;
   const cr = crumbs(ctx, [[D.nav.products, 'products']]);
-  const cats = ['duct', 'fit', 'acc', 'cus'];
+  const cats = ['duct', 'fit', 'acc', 'inox', 'cus'];
   const body = `${pageHead(ctx, D.nav.products, D.products.h1, D.products.intro, cr.html)}
 <section class="sec tight"><div class="wrap">
   <div class="filters" role="group" aria-label="${esc(D.products.filterLabel)}">
@@ -497,11 +497,11 @@ ${rfqBand(ctx)}`;
     const specs = Object.entries(p.specs).map(([k, v]) => `<div><dt>${esc(D.fields[k])}</dt><dd>${ctx.val(v, k, `products.${p.slug}.specs.${k}`, 'toProvide')}</dd></div>`).join('');
     if (!p.datasheet) note(`products.${p.slug}.datasheet`, `Fiche technique PDF — ${DICT.fr.productItems[p.slug].name}`);
     if (!p.image) note(`products.${p.slug}.image`, `Photo produit — ${DICT.fr.productItems[p.slug].name}`);
-    const related = site.products.filter(o => o.cat === p.cat && o.slug !== p.slug);
+    const related = site.products.filter(o => o.cat === p.cat && o.slug !== p.slug).slice(0, 3);
     const body = `<div class="wrap page-head">${c2.html}<p class="eyebrow">${esc(D.products.cats[p.cat])}</p><h1>${esc(it.name)}</h1><p class="lead">${esc(it.summary)}</p></div>
 <section class="sec tight"><div class="wrap two pd">
   <figure class="drawing">
-    ${p.image ? `<img src="/assets/img/${esc(p.image)}" alt="${esc(it.name)}" width="1200" height="900">`
+    ${p.image ? `<div class="drawing-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" fetchpriority="high" decoding="async" alt="${esc(it.name)}"></div>${p.image.startsWith('catalogue/') ? `<figcaption class="small muted">${esc(D.product.catalogueImage)}</figcaption>` : ''}`
       : RENDERS.has(p.slug) ? `<div class="drawing-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div><figcaption class="small muted">${esc(D.product.render)}</figcaption>`
       : `<div class="drawing-fig" aria-hidden="true">${icons[p.slug]}</div><figcaption>${ctx.ph(D.product.imageMissing, 'toProvide')}</figcaption>`}
     <div class="titleblock" aria-hidden="true"><span>LIBALSTAL</span><span>${esc(it.name)}</span><span>${esc(D.products.cats[p.cat])}</span></div>
