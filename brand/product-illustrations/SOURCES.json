@@ -1,0 +1,146 @@
+{
+  "date": "2026-10-31",
+  "notes": "Generated with the built-in image tool using the original catalogue images as product references. References preserved unchanged. Do not treat generated geometry as verified dimensions or specifications. Responsive WebP variants are resized from the generated master.",
+  "assets": [
+    {
+      "slug": "acoustic-silencers",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/acoustic-silencers.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Rectangular galvanized HVAC acoustic silencer, horizontal rectangular sheet-metal box with flat top, folded flange rim, open rectangular front with two thick vertical acoustic splitters and three dark air passages.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "004dada9f34e2395e98cfa51ed4567e6c14ae8fa589c96eb5d502a7467b96ae9"
+    },
+    {
+      "slug": "flexible-connectors",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/flexible-connectors.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Rectangular HVAC flexible connector: two parallel square galvanized flange frames, connected by a short grey flexible fabric sleeve; open center, as reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "cc5515290b76da9007b0fbaad341613ba830a559a2583b4490547fefb753c850"
+    },
+    {
+      "slug": "plenums",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/plenums.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular HVAC plenum box, long horizontal open rectangular grille outlet on front and two vertical round duct spigots on the top, exactly this product type as reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "3f90abc33570b3e922bd66041547c7f511a07324d79c41e725d79ada58984b5e"
+    },
+    {
+      "slug": "access-panels",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/access-panels.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular HVAC inspection access door frame with its flat removable panel resting separately in front, two round quarter-turn latches, as reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "68542001e041d0ddd4dbfe0b7e6f5b38a78fcb6157140b9cb799937664330542"
+    },
+    {
+      "slug": "sand-traps",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/sand-traps.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular sand trap air intake, deep box with front frame, five vertical folded baffle channels and dark narrow passages as reference, no decorative horizontal louvres.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "906bd3745f0f452e4638da869631c10743e14e7e1f8e20d87c0a667fc0fb3310"
+    },
+    {
+      "slug": "rectangular-roof-cowls",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/rectangular-roof-cowls.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular roof ventilation cowl on square roof flashing plate, rectangular vertical base, curved hood with pitched top and protective dark mesh opening as reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "610f59d9c1771242373f03eb9f995260459db6786dd070252c919eefe75558d7"
+    },
+    {
+      "slug": "round-roof-cowls",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/round-roof-cowls.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized round Chinese-hat roof ventilation cowl: round duct neck, mesh screen cylinder, broad conical rain cap, exact general construction as reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "806c60ba6bfc5adb5abe5a7502e69bde136f9ccb20b1b68de3a1e1640e8183b9"
+    },
+    {
+      "slug": "external-louvres",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/external-louvres.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular exterior ventilation louvre grille: rectangular frame and seven parallel horizontal angled weather blades, open dark air gaps, as reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "ee0b104b717ce6548dba2e60b3edf16ebbded72f63467c46ef4c9773e15c553c"
+    },
+    {
+      "slug": "damper-accessories",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/damper-accessories.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: A neatly arranged set of manual HVAC damper control hardware, as reference: long silver stamped lever with square shaft opening, circular two-tab bearing plate with round central opening, short rectangular sleeve adapter, white nylon bushing, one wing nut. Coherent separate components, flat lay slight perspective.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "64aa2f45fdac8aad56afe5131e1256c7ac2762450279fd4584347eddaccf1975"
+    },
+    {
+      "slug": "smooth-round-duct",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/smooth-round-duct.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One straight smooth galvanized circular ventilation duct, long hollow cylinder with longitudinal seam and small crimped joining end, no spiral seam. Both circular openings visible in three-quarter view as reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "19708862eb66229541d117a6db9cc5fc2be889e964bfb359ec22a3861e1e3df4"
+    },
+    {
+      "slug": "stainless-hoods",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/stainless-hoods.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One commercial stainless steel extraction canopy hood, wall-mounted trapezoid form with brushed stainless shell and a row of parallel baffle filters visible underneath. Isolated without wall, seen from slightly below front corner like reference.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "5491c05581adb09706ce07adecc087b6b037fe1f9399ba35721c7d4f22375fe3"
+    },
+    {
+      "slug": "stainless-tables",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/stainless-tables.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One commercial stainless steel sink worktable with one deep rectangular sink on left, flat draining/work surface on right, short rear upstand, four square metal legs and lower bracing rails, as reference. No taps or extra utensils.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "1582d1e3639676001661244d40a1aad0600f0be14ebe7a09fa17a21ccd24287d"
+    },
+    {
+      "slug": "stainless-trolleys",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/stainless-trolleys.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One tall commercial stainless steel bakery tray trolley with open tubular rectangular frame, multiple parallel pairs of horizontal tray rails, three metal trays at varied lower heights, four caster wheels. Exact product type as reference, no food.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "eba99ee53ecd48827151fdc56dfcdcffe5f056fe6eb4b5d54176cdb50e8a6007"
+    },
+    {
+      "slug": "stainless-charcoal-grills",
+      "generator": "OpenAI image generation",
+      "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
+      "sourceReference": "brand/catalogue-products/stainless-charcoal-grills.png",
+      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One commercial stainless steel charcoal grill cabinet with black cooking grate, open lower storage bays, tall stainless extraction canopy supported by four slim upright posts, short round exhaust on top, four short adjustable legs. General construction and proportions as reference, no flames, food, branding or control labels.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "2a7e96b50c38624ac5762355aa5c6993b84f3d018713534883f46d40bc42d899"
+    }
+  ]
+}
