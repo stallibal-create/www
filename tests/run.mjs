@@ -281,11 +281,11 @@ await test('mobile menu: open, Escape closes and returns focus, contact reachabl
   await p.click('.burger'); await p.click('.nav-contact a'); await p.waitForURL('**/en/contact/');
   await p.context().close();
 });
-await test('product renders: every card and product page shows its illustrative render, captioned in FR/EN/AR; capabilities unnumbered', async () => {
+await test('product images: every card has a photo or render; illustrative renders captioned in FR/EN/AR; capabilities unnumbered', async () => {
   const p = await newPage();
   await p.goto(A + '/fr/products/');
-  const cards = await p.$$eval('#product-grid .card-render img', imgs => imgs.map(i => i.getAttribute('srcset')));
-  assert.equal(cards.length, 12, 'a render on every product card');
+  const cards = await p.$$eval('#product-grid .card-fig img', imgs => imgs.map(i => i.getAttribute('srcset')));
+  assert.equal(cards.length, JSON.parse(readFileSync(join(ROOT, 'content/site.json'))).products.length, 'an image on every product card');
   for (const l of ['fr', 'en', 'ar']) {
     await p.goto(`${A}/${l}/products/elbows/`);
     await p.waitForFunction(() => { const i = document.querySelector('.drawing-render img'); return i.complete && i.naturalWidth > 0; }, null, { timeout: 10000 });
@@ -308,7 +308,7 @@ await test('product filter updates cards, count and URL', async () => {
   assert.equal(await p.textContent('.count'), '3 produits');
   assert.match(p.url(), /#cat=fit$/);
   await p.reload(); assert.equal(await p.locator('.card:visible').count(), 3, 'state from hash');
-  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), 12);
+  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), JSON.parse(readFileSync(join(ROOT, 'content/site.json'))).products.length);
   await p.context().close();
 });
 await test('v5.3 brochure content: specs as printed, 8 references (no defence sites), contacts; no RC, no gmail, no fire claim', async () => {
