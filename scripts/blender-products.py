@@ -277,6 +277,14 @@ def duct_pair(kind):
     return [variant(kind, [lambda: part('duct-1', (0, -0.2, 0)), lambda: spiral_duct(f'spiral-{kind}', 0.1, 0.8, (0.05, 0.5, 0))])]
 
 
+def damper_grid():
+    # Place four variants in the camera plane, so no circular body hides a rectangular one.
+    right, up = Vector((.8, .6, 0)), Vector((-.268328, .357771, .894427))
+    for pid, x, y in [('damper-manual-1', -.36, .30), ('damper-motorised-1', .36, .30),
+                      ('round-damper-manual-1', -.36, -.30), ('round-damper-motorised-1', .36, -.30)]:
+        part(pid, tuple(right * x + up * y))
+
+
 PRODUCTS = {
     'assembly': [lambda: [part_obj(p) for p in ASSEMBLY]],
     'spiral-round-duct': [lambda: spiral_duct('spiral-315', 0.1575, 1.25, (0, 0, 0)), lambda: spiral_duct('spiral-200', 0.1, 0.8, (0.05, 0.45, 0))],
@@ -285,6 +293,7 @@ PRODUCTS = {
     'reducers-transitions': [lambda: part('reducer-1', (-0.45, 0.25, 0)), lambda: square_to_round('str', 0.4, 0.3, 0.125, 0.32, (0.45, -0.2, 0))],
     'tees-branches': [lambda: part('tee-1', (-.85, .45, 0)), lambda: part('family-y', (.1, -.25, 0))],
     'flanges-connectors': [lambda: part('flange-1', (-0.18, 0, 0), rz=math.pi / 2), lambda: coupling('coupling-200', 0.1, 0.16, (0.28, -0.18, 0))],
+    'control-dampers': [damper_grid],
     'grilles-dampers': [lambda: grille('grille', 0.62, 0.32, (0, 0, 0))],
     'custom-assemblies': [
         lambda: bent_part('z-bracket', [(-0.16, 0.06), (-0.07, 0.06), (-0.04, -0.06), (0.16, -0.06)], 0.22, (0, 0, 0),

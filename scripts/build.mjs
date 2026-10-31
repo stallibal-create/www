@@ -122,7 +122,7 @@ const IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(IMPORT_MAP).dige
 let ASM_IMPORT_MAP_HASH = '';
 function asmImportMap() {
   const m = JSON.parse(IMPORT_MAP);
-  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion', 'glb', 'spangle', 'flow', 'flow-effects', 'fittings']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
+  for (const n of ['viewer', 'geometry', 'assembly', 'units', 'motion', 'glb', 'spangle', 'flow', 'flow-effects', 'fittings', 'dampers']) m.imports[`/assets/js/assembly/${n}.js`] = A(`/assets/js/assembly/${n}.js`);
   const s = JSON.stringify(m);
   ASM_IMPORT_MAP_HASH = 'sha256-' + createHash('sha256').update(s).digest('base64');
   return s;
@@ -510,7 +510,7 @@ ${rfqBand(ctx)}`;
     <h2 class="h3">${esc(D.product.specs)}</h2>
     <dl class="spec">${specs}</dl>
     <p class="small muted">${esc(D.product.specsNote)}</p>
-    ${['spiral-round-duct', 'black-steel-ducts'].includes(p.slug) ? `<p><a class="btn" href="${url(lang, 'assembly') + (p.slug === 'black-steel-ducts' ? '?heat=1' : '')}">${esc(D.assembly.title)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></p>` : ''}
+    ${['spiral-round-duct', 'black-steel-ducts', 'control-dampers'].includes(p.slug) ? `<p><a class="btn" href="${url(lang, 'assembly') + (p.slug === 'black-steel-ducts' ? '?heat=1' : '')}">${esc(D.assembly.title)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></p>` : ''}
     <h2 class="h3">${esc(D.product.downloads)}</h2>
     <p>${p.datasheet ? `<a class="btn" href="/assets/docs/${esc(p.datasheet)}" download>${esc(D.product.datasheet)}</a>` : site.display?.hideIncomplete ? esc(D.product.datasheetRequest) : ctx.ph(D.product.noDownloads, 'toProvide')}</p>
     <div class="cta-box"><h2 class="h3">${esc(D.product.ctaTitle)}</h2><p>${esc(D.product.ctaText)}</p><a class="btn btn-primary" href="${url(lang, 'contact')}?product=${p.slug}">${esc(D.products.quote)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></div>
@@ -759,10 +759,10 @@ function assembly(ctx, system = 'rectangular') {
     const g = c.geometry, G = T.geo;
     switch (c.type) {
       case 'spiral-straight': return row(G.diameter, mmL(g.diameterMm)) + row(G.length, mmL(g.lengthMm)) + row(G.pitch, mmL(g.pitchMm));
-      case 'round-straight': return row(G.diameter, mmL(g.diameterMm)) + row(G.length, mmL(g.lengthMm));
+      case 'round-damper-manual': case 'round-damper-motorised': case 'round-straight': return row(G.diameter, mmL(g.diameterMm)) + row(G.length, mmL(g.lengthMm));
       case 'round-elbow': return row(G.diameter, mmL(g.diameterMm)) + row(G.innerRadius, mmL(g.innerRadiusMm)) + row(G.angle, ltr('90°'));
       case 'round-reducer': return row(G.inletDiameter, mmL(g.inletDiameterMm)) + row(G.outletDiameter, mmL(g.outletDiameterMm)) + row(G.length, mmL(g.lengthMm));
-      case 'straight': case 'branch': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.length, mmL(g.lengthMm));
+      case 'damper-manual': case 'damper-motorised': case 'straight': case 'branch': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.length, mmL(g.lengthMm));
       case 'elbow90': return row(G.section, mmS(g.widthMm, g.heightMm)) + row(G.innerRadius, mmL(g.innerRadiusMm)) + row(G.angle, ltr('90°'));
       case 'rect-round': return row(G.inlet, mmS(g.inletWidthMm, g.inletHeightMm)) + row(G.outletDiameter, mmL(g.outletDiameterMm)) + row(G.length, mmL(g.lengthMm));
       case 'reducer': return row(G.inlet, mmS(g.inletWidthMm, g.inletHeightMm)) + row(G.outlet, mmS(g.outletWidthMm, g.outletHeightMm)) + row(G.length, mmL(g.lengthMm));
@@ -777,7 +777,7 @@ function assembly(ctx, system = 'rectangular') {
     const p = products.get(c.productSlug), pname = D.productItems[p.slug].name;
     const specs = Object.entries(p.specs).map(([k, v]) => row(D.fields[k], v == null ? pending : esc(tv(v, lang)))).join('');
     const desc = tv(c.description, lang);
-    const heatProduct = products.get('black-steel-ducts');
+    const heatProduct = c.type.includes('damper-') ? p : products.get('black-steel-ducts');
     const heatSpecs = Object.entries(heatProduct.specs).map(([k, v]) => row(D.fields[k], v == null ? pending : esc(tv(v, lang)))).join('');
     return `<article class="asm-part" id="part-${c.id}" data-part="${c.id}" aria-labelledby="part-${c.id}-h">
   <div class="asm-part-top"><p class="eyebrow">${esc(T.types[c.type])}</p><button type="button" class="icon-btn asm-close" aria-label="${esc(T.close)}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2"/></svg></button></div>
@@ -791,11 +791,11 @@ function assembly(ctx, system = 'rectangular') {
   <div class="asm-product-standard"><dl class="spec">${specs}</dl>
   <p><a href="${url(lang, 'products/' + p.slug)}">${esc(T.productLink)}${ctx.colon} ${esc(pname)}</a></p></div>
   <div class="asm-product-heat" hidden><dl class="spec">${heatSpecs}</dl>
-  <p><a href="${url(lang, 'products/black-steel-ducts')}">${esc(T.productLink)}${ctx.colon} ${esc(D.productItems['black-steel-ducts'].name)}</a></p></div>
+  <p><a href="${url(lang, 'products/' + heatProduct.slug)}">${esc(T.productLink)}${ctx.colon} ${esc(D.productItems[heatProduct.slug].name)}</a></p></div>
   <p class="small muted">${esc(D.product.specsNote)}</p>
   <h4>${esc(T.description)}</h4>
   <p>${desc ? esc(desc) : pending}</p>
-  <p><a class="btn btn-primary asm-part-quote" data-normal-href="${url(lang, 'contact')}?product=${p.slug}" data-heat-href="${url(lang, 'contact')}?product=black-steel-ducts" href="${url(lang, 'contact')}?product=${p.slug}">${esc(T.cta)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
+  <p><a class="btn btn-primary asm-part-quote" data-normal-href="${url(lang, 'contact')}?product=${p.slug}" data-heat-href="${url(lang, 'contact')}?product=${heatProduct.slug}" href="${url(lang, 'contact')}?product=${p.slug}">${esc(T.cta)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
 </article>`;
   }).join('\n');
   const list = a.components.map((c, i) => `<li><button type="button" class="asm-pick" data-part="${c.id}" aria-pressed="false" aria-controls="part-${c.id}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span><strong>${esc(tv(c.name, lang))}</strong><span class="asm-pick-sub">${esc(T.types[c.type])} · ${(c.geometry.diameterMm || c.geometry.inletDiameterMm) ? ltr('Ø ' + inletOf(c)[0] + ' mm') : mmS(...inletOf(c))}</span></span></button></li>`).join('');

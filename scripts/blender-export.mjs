@@ -44,7 +44,7 @@ const single = id => {
   for (let i = 0; i < m.uvs.length; i += 2) uvs.push([m.uvs[i] / UV_TILE_MM, m.uvs[i + 1] / UV_TILE_MM]);
   return { id, vertices, normals, uvs, indices: Array.from(m.indices), groups: m.groups };
 };
-fs.writeFileSync(new URL(`products${suffix}.json`, out), JSON.stringify({ demo: true, parts: (system === 'branches' ? asm.components.map(c => c.id) : ['duct-1', 'elbow-1', 'tee-1', 'reducer-1', 'flange-1']).map(single) }));
+fs.writeFileSync(new URL(`products${suffix}.json`, out), JSON.stringify({ demo: true, parts: (system === 'branches' ? asm.components.map(c => c.id) : ['duct-1', 'elbow-1', 'tee-1', 'reducer-1', 'flange-1', 'damper-manual-1', 'damper-motorised-1', 'round-damper-manual-1', 'round-damper-motorised-1']).map(single) }));
 
 // Minimal PNG writer (8-bit RGBA) for the spangle textures.
 const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });

@@ -57,3 +57,5 @@ export const icons = {
 };
 // material variants of the duct families share the rectangular duct drawing
 for (const k of ['stainless-ducts', 'aluminium-ducts', 'black-steel-ducts']) icons[k] = icons['rectangular-duct'];
+
+icons['control-dampers'] = svg(`<rect class="ln" x="28" y="12" width="76" height="70"/><path class="ln" d="M32 26l68 7M32 44l68 7M32 62l68 7M104 46h14"/><rect class="ac" x="118" y="32" width="22" height="28"/>`);
