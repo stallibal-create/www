@@ -1,0 +1,28 @@
+{
+  "replaced": [
+    "fabrication",
+    "duct-yard"
+  ],
+  "keptThirdImage": "src/assets/img/photo-hero/installation-1920.webp",
+  "keptThirdSha256": "dc930731ba8439f645b7a0162d6ab149808acb5beae4d791a3a8af0df3fd78b4",
+  "assets": [
+    {
+      "id": "ductwork",
+      "sourceFile": "WhatsApp Image 2026-10-31 at 17.50.58 (3).jpeg",
+      "generator": "Built-in OpenAI image generation",
+      "processing": "AI-assisted restoration of supplied photograph, responsive crops and WebP conversion. Not a technical drawing or independent proof of equipment ownership.",
+      "prompt": "Retouch this exact client photograph for a professional HVAC website hero. Preserve the actual galvanized rectangular duct installation, its joints and red sealant, suspension rods, existing red pipes, red/white columns and corridor geometry. Improve neutral white balance, exposure, metal clarity and compression noise; straighten perspective gently. Preserve the real construction state, no invented machines, additional duct runs, false scale or new architectural features. Create a crisp high-resolution portrait restoration with the same composition, 1536x2048 or nearest 3:4. Natural silver-grey metal and restrained red, photographic lighting. Do not outpaint a bigger site. No decorative text, logo, numbers or watermark. This restored portrait will be cropped responsively for a website.",
+      "sourceSha256": "08e6c2d7834624faa4441d4f6b3d4791f87d7b2e93bc329d84ea70013bf24084",
+      "publicBase": "src/assets/img/photo-hero/v2/ductwork"
+    },
+    {
+      "id": "metalwork",
+      "sourceFile": "1jrD-MQzJqfVlj8vJkmj3DINpgRmfy-Wj-PHOTO-2026-10-31-14-24-34.jpg",
+      "generator": "Built-in OpenAI image generation",
+      "processing": "AI-assisted restoration of supplied photograph, responsive crops and WebP conversion. Not a technical drawing or independent proof of equipment ownership.",
+      "prompt": "Restore and professionally retouch this exact supplied commercial kitchen photograph. Preserve the actual stainless extraction hoods, oven bodies, stainless counter/sink, stainless wall/ceiling panels, tiles and layout. Improve sharpness and reduce JPEG noise, neutralize grey/green cast, balance harsh ceiling highlights, crisp clean silver metal and subtle natural shadow. Remove only the portable stepladder and small temporary loose items, remove the phone's Galaxy S20 camera-caption overlay at bottom left. Do not add appliances, new equipment, bigger room, false industrial scale or change any duct/hood geometry. Keep exact same scene and camera angle. High-resolution landscape 2048x1536 or nearest 4:3. Sophisticated realistic architectural/industrial photography, no text overlays, no invented logos, no watermarks.",
+      "sourceSha256": "996c931f4ee36152bf63e2a7763b3d1f98815f786f5ee46de2db3596b150c4ee",
+      "publicBase": "src/assets/img/photo-hero/v2/metalwork"
+    }
+  ]
+}
