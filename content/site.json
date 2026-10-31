@@ -309,6 +309,19 @@
       },
       "datasheet": null,
       "image": null
+    },
+    {
+      "slug": "control-dampers",
+      "cat": "acc",
+      "specs": {
+        "dimensions": null,
+        "material": null,
+        "thickness": null,
+        "finish": null,
+        "standard": null
+      },
+      "datasheet": null,
+      "image": null
     }
   ],
   "industriesConfirmed": true,
@@ -717,6 +730,110 @@
           "en": "Demonstration component: illustrative shape and connections. Fabrication is defined by the project requirements.",
           "ar": "عنصر تجريبي: الشكل والوصلات توضيحية. يُحدّد التصنيع وفق متطلبات المشروع."
         }
+      },
+      {
+        "id": "damper-manual-1",
+        "type": "damper-manual",
+        "productSlug": "control-dampers",
+        "name": {
+          "fr": "Volet rectangulaire manuel",
+          "en": "Manual rectangular damper",
+          "ar": "بوابة مستطيلة يدوية"
+        },
+        "geometry": {
+          "demo": true,
+          "widthMm": 250,
+          "heightMm": 200,
+          "lengthMm": 220
+        },
+        "explode": {
+          "distanceMm": 160,
+          "direction": [
+            0,
+            1,
+            0
+          ]
+        },
+        "description": {
+          "fr": "Volet de réglage à levier manuel. Pales et dimensions illustratives, non contractuelles.",
+          "en": "Control damper with manual lever. Blades and dimensions are illustrative, not a verified specification.",
+          "ar": "بوابة تنظيم برافعة يدوية. الشفرات والأبعاد توضيحية وليست مواصفة معتمدة."
+        }
+      },
+      {
+        "id": "damper-motorised-1",
+        "type": "damper-motorised",
+        "productSlug": "control-dampers",
+        "name": {
+          "fr": "Volet rectangulaire motorisé",
+          "en": "Motorised rectangular damper",
+          "ar": "بوابة مستطيلة بمحرك"
+        },
+        "geometry": {
+          "demo": true,
+          "widthMm": 300,
+          "heightMm": 200,
+          "lengthMm": 220
+        },
+        "explode": {
+          "distanceMm": 160,
+          "direction": [
+            0,
+            -1,
+            0
+          ]
+        },
+        "description": {
+          "fr": "Actionneur motorisé illustré. Tension d'alimentation, couple et signal de commande à confirmer selon projet.",
+          "en": "Motor actuator illustrated. Supply voltage, torque and control signal to be confirmed for the project.",
+          "ar": "مشغّل بمحرك توضيحي. جهد التغذية وعزم الدوران وإشارة التحكم تُحدَّد حسب المشروع."
+        }
+      },
+      {
+        "id": "round-damper-manual-1",
+        "type": "round-damper-manual",
+        "productSlug": "control-dampers",
+        "name": {
+          "fr": "Volet circulaire manuel",
+          "en": "Manual round damper",
+          "ar": "بوابة دائرية يدوية"
+        },
+        "geometry": {
+          "demo": true,
+          "diameterMm": 300,
+          "lengthMm": 380
+        },
+        "explode": {
+          "distanceMm": 160
+        },
+        "description": {
+          "fr": "Volet circulaire à lame unique et levier manuel, raccordé au réseau spiralé. Géométrie et dimensions illustratives.",
+          "en": "Single-blade round damper with a manual lever, connected to the spiral ductwork. Illustrative geometry and dimensions.",
+          "ar": "بوابة دائرية بشفرة واحدة وذراع يدوية، متصلة بالمجاري الحلزونية. الشكل والأبعاد توضيحية."
+        }
+      },
+      {
+        "id": "round-damper-motorised-1",
+        "type": "round-damper-motorised",
+        "productSlug": "control-dampers",
+        "name": {
+          "fr": "Volet circulaire motorisé",
+          "en": "Motorised round damper",
+          "ar": "بوابة دائرية بمحرك"
+        },
+        "geometry": {
+          "demo": true,
+          "diameterMm": 250,
+          "lengthMm": 330
+        },
+        "explode": {
+          "distanceMm": 160
+        },
+        "description": {
+          "fr": "Volet circulaire à lame unique avec actionneur motorisé illustratif. Tension, couple et signal de commande à confirmer selon le projet.",
+          "en": "Single-blade round damper with an illustrative motor actuator. Supply voltage, torque and control signal to be confirmed for the project.",
+          "ar": "بوابة دائرية بشفرة واحدة ومشغّل بمحرك توضيحي. جهد التغذية والعزم وإشارة التحكم تُحدَّد حسب المشروع."
+        }
       }
     ],
     "connections": [
@@ -742,7 +859,7 @@
       ],
       [
         "duct-3.outlet",
-        "flange-1.inlet"
+        "damper-motorised-1.inlet"
       ],
       [
         "tee-1.branch",
@@ -758,7 +875,7 @@
       ],
       [
         "rect-round-1.outlet",
-        "round-1.inlet"
+        "round-damper-manual-1.inlet"
       ],
       [
         "round-1.outlet",
@@ -775,6 +892,22 @@
       [
         "round-reduction.outlet",
         "round-3.inlet"
+      ],
+      [
+        "branch-1.outlet",
+        "damper-manual-1.inlet"
+      ],
+      [
+        "damper-motorised-1.outlet",
+        "flange-1.inlet"
+      ],
+      [
+        "round-damper-manual-1.outlet",
+        "round-1.inlet"
+      ],
+      [
+        "round-3.outlet",
+        "round-damper-motorised-1.inlet"
       ]
     ]
   },
