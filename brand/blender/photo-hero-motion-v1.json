@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "fps": 30,
+  "resolution": {
+    "width": 960,
+    "height": 540
+  },
+  "timing": {
+    "fps": 30,
+    "holdMs": 7000,
+    "transitionMs": 800,
+    "titleDurationMs": 1000,
+    "titleStaggerMs": 100
+  },
+  "motion": {
+    "slideDistance": 0.18,
+    "startRotXDeg": -5.0,
+    "line1": {
+      "startFrame": 1,
+      "endFrame": 31
+    },
+    "line2": {
+      "startFrame": 4,
+      "endFrame": 34
+    },
+    "easing": "bezier-auto-clamped"
+  },
+  "objects": {
+    "TitleLine1": {
+      "text": "L’AIR",
+      "curves": [
+        {
+          "dataPath": "location",
+          "arrayIndex": 1,
+          "keyframes": [
+            {
+              "frame": 1.0,
+              "value": 0.3700000047683716,
+              "interpolation": "BEZIER"
+            },
+            {
+              "frame": 31.0,
+              "value": 0.550000011920929,
+              "interpolation": "BEZIER"
+            }
+          ]
+        },
+        {
+          "dataPath": "rotation_euler",
+          "arrayIndex": 0,
+          "keyframes": [
+            {
+              "frame": 1.0,
+              "value": -0.0872664600610733,
+              "interpolation": "BEZIER"
+            },
+            {
+              "frame": 31.0,
+              "value": 0.0,
+              "interpolation": "BEZIER"
+            }
+          ]
+        }
+      ]
+    },
+    "TitleLine2": {
+      "text": "PREND FORME.",
+      "curves": [
+        {
+          "dataPath": "location",
+          "arrayIndex": 1,
+          "keyframes": [
+            {
+              "frame": 4.0,
+              "value": -0.33000001311302185,
+              "interpolation": "BEZIER"
+            },
+            {
+              "frame": 34.0,
+              "value": -0.15000000596046448,
+              "interpolation": "BEZIER"
+            }
+          ]
+        },
+        {
+          "dataPath": "rotation_euler",
+          "arrayIndex": 0,
+          "keyframes": [
+            {
+              "frame": 4.0,
+              "value": -0.0872664600610733,
+              "interpolation": "BEZIER"
+            },
+            {
+              "frame": 34.0,
+              "value": 0.0,
+              "interpolation": "BEZIER"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "description": "Blender-authored typography motion lookdev. The website uses native DOM text (not this raster) which preserves Arabic shaping; this contract documents the intended slide/easing feel for the Remotion composition."
+}
