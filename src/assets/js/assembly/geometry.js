@@ -9,6 +9,7 @@
 // flange at every connection. The body has two material groups, "sheet" and "flange". With `details`, construction
 // cues are added on top (groups "hardware" and "gasket" too); they never change the body or its connectors.
 
+import { buildDamperControls, buildRoundDamperControls } from './dampers.js';
 import { buildY, yLayout, buildProfileFrame } from './fittings.js';
 import { vAdd, vSub, vScale, vDot, vCross, vNorm, vLen } from './units.js';
 
@@ -40,6 +41,10 @@ export class GeometryError extends Error {}
 
 /** Required geometry fields per part type. 'mm' = finite positive number of millimetres; arrays = allowed values. */
 export const GEOMETRY_SCHEMA = {
+  'round-damper-manual': { diameterMm: 'mm', lengthMm: 'mm' },
+  'round-damper-motorised': { diameterMm: 'mm', lengthMm: 'mm' },
+  'damper-manual': { widthMm: 'mm', heightMm: 'mm', lengthMm: 'mm' },
+  'damper-motorised': { widthMm: 'mm', heightMm: 'mm', lengthMm: 'mm' },
   'spiral-straight': { diameterMm: 'mm', lengthMm: 'mm', pitchMm: 'mm' },
   'round-straight': { diameterMm: 'mm', lengthMm: 'mm' },
   'round-elbow': { diameterMm: 'mm', innerRadiusMm: 'mm' },
@@ -56,7 +61,7 @@ export const GEOMETRY_SCHEMA = {
 };
 export const PART_TYPES = Object.keys(GEOMETRY_SCHEMA);
 /** Connector names per part type. */
-export const CONNECTORS = { 'spiral-straight': ['inlet', 'outlet'], 'round-straight': ['inlet', 'outlet'], 'round-elbow': ['inlet', 'outlet'], 'round-reducer': ['inlet', 'outlet'], straight: ['inlet', 'outlet'], branch: ['inlet', 'outlet'], elbow90: ['inlet', 'outlet'], reducer: ['inlet', 'outlet'], tee: ['inlet', 'outlet', 'branch'], flange: ['inlet', 'outlet'], 'profile-frame': ['inlet', 'outlet'], y: ['inlet', 'outlet', 'branch'], 'rect-round': ['inlet', 'outlet'] };
+export const CONNECTORS = { 'round-damper-manual': ['inlet', 'outlet'], 'round-damper-motorised': ['inlet', 'outlet'], 'damper-manual': ['inlet', 'outlet'], 'damper-motorised': ['inlet', 'outlet'], 'spiral-straight': ['inlet', 'outlet'], 'round-straight': ['inlet', 'outlet'], 'round-elbow': ['inlet', 'outlet'], 'round-reducer': ['inlet', 'outlet'], straight: ['inlet', 'outlet'], branch: ['inlet', 'outlet'], elbow90: ['inlet', 'outlet'], reducer: ['inlet', 'outlet'], tee: ['inlet', 'outlet', 'branch'], flange: ['inlet', 'outlet'], 'profile-frame': ['inlet', 'outlet'], y: ['inlet', 'outlet', 'branch'], 'rect-round': ['inlet', 'outlet'] };
 
 const isMm = x => typeof x === 'number' && Number.isFinite(x) && x > 0;
 
@@ -74,6 +79,8 @@ export function validatePart(c, s) {
   }
   for (const k of Object.keys(g)) if (k !== 'demo' && !(k in schema)) err.push(`geometry.${k} is not a ${c.type} parameter`);
   if (err.length) return err;
+  if (c.type.startsWith('round-damper-') && (g.diameterMm < 60 || g.lengthMm < g.diameterMm + 2 * s.flangeDepthMm)) err.push('round damper length must contain the full illustrative blade sweep');
+  if (c.type.startsWith('damper-') && (g.heightMm < 60 || g.widthMm < 60 || g.lengthMm < g.heightMm / 3 + 2 * s.flangeDepthMm)) err.push('damper body is too small for its illustrative blades');
   if (c.type === 'round-reducer' && g.inletDiameterMm === g.outletDiameterMm) err.push('round reducer diameters must differ');
   if (c.type === 'round-elbow' && g.innerRadiusMm < s.sheetMm + s.flangeWidthMm + s.flangeDepthMm) err.push('round elbow inner radius is too small for its joints');
   if (c.type === 'spiral-straight' && g.pitchMm < 20) err.push('spiral pitch must be at least 20 mm in the demonstration');
@@ -107,13 +114,13 @@ export function connectorsFor(c, s) {
   const g = c.geometry;
   const X = [1, 0, 0], NX = [-1, 0, 0], Y = [0, 1, 0];
   switch (c.type) {
-    case 'spiral-straight': case 'round-straight': case 'round-reducer': case 'round-elbow': {
+    case 'round-damper-manual': case 'round-damper-motorised': case 'spiral-straight': case 'round-straight': case 'round-reducer': case 'round-elbow': {
       const d0 = g.diameterMm || g.inletDiameterMm, d1 = g.diameterMm || g.outletDiameterMm;
       const inlet = { o: [0, 0, 0], n: NX, u: Y, w: d0, h: d0 };
       if (c.type === 'round-elbow') { const R = g.innerRadiusMm + d0 / 2; return { inlet, outlet: { o: [R, 0, R], n: [0, 0, 1], u: Y, w: d0, h: d0 } }; }
       return { inlet, outlet: { o: [g.lengthMm, 0, 0], n: X, u: Y, w: d1, h: d1 } };
     }
-    case 'straight': case 'branch':
+    case 'damper-manual': case 'damper-motorised': case 'straight': case 'branch':
       return { inlet: { o: [0, 0, 0], n: NX, u: Y, w: g.widthMm, h: g.heightMm }, outlet: { o: [g.lengthMm, 0, 0], n: X, u: Y, w: g.widthMm, h: g.heightMm } };
     case 'rect-round':
       return { inlet: { o: [0,0,0], n: NX, u: Y, w: g.inletWidthMm, h: g.inletHeightMm }, outlet: { o: [g.lengthMm,0,0], n: X, u: Y, w: g.outletDiameterMm, h: g.outletDiameterMm } };
@@ -360,8 +367,10 @@ export function buildPart(c, s, { segments = 16, keepQuads = false, details = fa
   const m = meshBuilder(keepQuads);
   const X = [1, 0, 0], NX = [-1, 0, 0], Y = [0, 1, 0];
   switch (c.type) {
-    case 'spiral-straight': case 'round-straight': case 'round-elbow': case 'round-reducer':
-      circularPart(m, c, s, segments); break;
+    case 'round-damper-manual': case 'round-damper-motorised': case 'spiral-straight': case 'round-straight': case 'round-elbow': case 'round-reducer':
+      circularPart(m, c, s, segments);
+      if (c.type.startsWith('round-damper-')) buildRoundDamperControls(m,g,c.type === 'round-damper-motorised');
+      break;
     case 'rect-round': {
       // Hollow loft from the rectangular perimeter to a circle; the joint planes remain exact.
       const L = g.lengthMm, radius = g.outletDiameterMm / 2;
@@ -385,7 +394,7 @@ export function buildPart(c, s, { segments = 16, keepQuads = false, details = fa
       circularTube(m,[end,{...end,p:[L-D,0,0]}],F,'flange',count,angles);
       break;
     }
-    case 'straight': case 'branch': case 'reducer': {
+    case 'damper-manual': case 'damper-motorised': case 'straight': case 'branch': case 'reducer': {
       const [w0, h0, w1, h1] = c.type === 'reducer' ? [g.inletWidthMm, g.inletHeightMm, g.outletWidthMm, g.outletHeightMm] : [g.widthMm, g.heightMm, g.widthMm, g.heightMm];
       const f0 = frame([0, 0, 0], X, Y, w0, h0), f1 = frame([g.lengthMm, 0, 0], X, Y, w1, h1);
       tube(m, [f0, f1], t);
@@ -393,8 +402,9 @@ export function buildPart(c, s, { segments = 16, keepQuads = false, details = fa
       if (details) {
         flangeDetails(m, f0, X, t, F, D); flangeDetails(m, f1, NX, t, F, D);
         for (const k of [0, 2]) seam(m, runFrames(D, g.lengthMm - D, g.lengthMm, w0, h0, w1, h1), CORNERS[k], t);
-        if (c.type !== 'reducer') crossBreaks(m, g.lengthMm, w0, h0, t, D);
+        if (!['reducer','damper-manual','damper-motorised'].includes(c.type)) crossBreaks(m, g.lengthMm, w0, h0, t, D);
       }
+      if (c.type.startsWith('damper-')) buildDamperControls(m, g, c.type === 'damper-motorised');
       break;
     }
     case 'elbow90': {
