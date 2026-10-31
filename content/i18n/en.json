@@ -205,6 +205,10 @@
     "black-steel-ducts": {
       "name": "Black steel ducts",
       "summary": "Black steel ducts for industrial applications, including high temperatures according to the project specification."
+    },
+    "control-dampers": {
+      "name": "Control dampers",
+      "summary": "Rectangular or circular control dampers with manual or motorised actuation. Dimensions and actuator characteristics according to project, to be confirmed."
     }
   },
   "product": {
@@ -568,7 +572,11 @@
       "round-reducer": "Round reducer",
       "y": "Y-branch fitting",
       "profile-frame": "Profiles and corner pieces",
-      "rect-round": "Rectangular-to-round transition"
+      "rect-round": "Rectangular-to-round transition",
+      "damper-manual": "Manual rectangular damper",
+      "damper-motorised": "Motorised rectangular damper",
+      "round-damper-manual": "Manual round damper",
+      "round-damper-motorised": "Motorised round damper"
     },
     "explode": "Explode parts",
     "reassemble": "Reassemble",

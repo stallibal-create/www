@@ -205,6 +205,10 @@
     "black-steel-ducts": {
       "name": "Gaines en acier noir",
       "summary": "Gaines en acier noir pour applications industrielles, y compris à températures élevées selon les spécifications du projet."
+    },
+    "control-dampers": {
+      "name": "Volets de réglage",
+      "summary": "Volets de réglage rectangulaires ou circulaires, à commande manuelle ou motorisée. Dimensions et caractéristiques de l'actionneur selon projet, à confirmer."
     }
   },
   "product": {
@@ -568,7 +572,11 @@
       "round-reducer": "Réduction circulaire",
       "y": "Dérivation en Y",
       "profile-frame": "Profilés et équerres",
-      "rect-round": "Transition rectangulaire / circulaire"
+      "rect-round": "Transition rectangulaire / circulaire",
+      "damper-manual": "Volet rectangulaire manuel",
+      "damper-motorised": "Volet rectangulaire motorisé",
+      "round-damper-manual": "Volet circulaire manuel",
+      "round-damper-motorised": "Volet circulaire motorisé"
     },
     "explode": "Éclater les pièces",
     "reassemble": "Réassembler",
