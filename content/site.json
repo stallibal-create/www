@@ -334,7 +334,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/acoustic-silencers.webp"
+      "image": "illustrative/acoustic-silencers.webp"
     },
     {
       "slug": "flexible-connectors",
@@ -347,7 +347,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/flexible-connectors.webp"
+      "image": "illustrative/flexible-connectors.webp"
     },
     {
       "slug": "plenums",
@@ -360,7 +360,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/plenums.webp"
+      "image": "illustrative/plenums.webp"
     },
     {
       "slug": "access-panels",
@@ -373,7 +373,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/access-panels.webp"
+      "image": "illustrative/access-panels.webp"
     },
     {
       "slug": "sand-traps",
@@ -386,7 +386,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/sand-traps.webp"
+      "image": "illustrative/sand-traps.webp"
     },
     {
       "slug": "rectangular-roof-cowls",
@@ -399,7 +399,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/rectangular-roof-cowls.webp"
+      "image": "illustrative/rectangular-roof-cowls.webp"
     },
     {
       "slug": "round-roof-cowls",
@@ -412,7 +412,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/round-roof-cowls.webp"
+      "image": "illustrative/round-roof-cowls.webp"
     },
     {
       "slug": "external-louvres",
@@ -425,7 +425,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/external-louvres.webp"
+      "image": "illustrative/external-louvres.webp"
     },
     {
       "slug": "damper-accessories",
@@ -438,7 +438,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/damper-accessories.webp"
+      "image": "illustrative/damper-accessories.webp"
     },
     {
       "slug": "smooth-round-duct",
@@ -451,7 +451,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/smooth-round-duct.webp"
+      "image": "illustrative/smooth-round-duct.webp"
     },
     {
       "slug": "stainless-hoods",
@@ -468,7 +468,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/stainless-hoods.webp"
+      "image": "illustrative/stainless-hoods.webp"
     },
     {
       "slug": "stainless-tables",
@@ -485,7 +485,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/stainless-tables.webp"
+      "image": "illustrative/stainless-tables.webp"
     },
     {
       "slug": "stainless-trolleys",
@@ -502,7 +502,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/stainless-trolleys.webp"
+      "image": "illustrative/stainless-trolleys.webp"
     },
     {
       "slug": "stainless-charcoal-grills",
@@ -519,7 +519,7 @@
         "standard": null
       },
       "datasheet": null,
-      "image": "catalogue/stainless-charcoal-grills.webp"
+      "image": "illustrative/stainless-charcoal-grills.webp"
     },
     {
       "slug": "smoke-extraction-ducts",
