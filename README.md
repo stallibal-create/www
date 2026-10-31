@@ -35,6 +35,16 @@ The `/fr/assembly/`, `/en/assembly/`, `/ar/assembly/` pages (public since v14) c
 
 Engineering geometry and all demonstration dimensions remain labelled as provisional; real product specifications are read from `content/site.json`. See [V12-REPORT.md](V12-REPORT.md) for implementation details, test results and Android acceptance checks. WebGL animation has not been visually verified in this build environment.
 
+## Homepage photo opening (31 October 2026)
+
+The homepage uses a three-photo opening configured in `content/photo-hero.json`. The rejected welcome video is disabled by `content/intro.json → enabled: false`, even if old video files remain in the archive. The opening uses native HTML text and a small JavaScript carousel; it does not load React, Remotion, a video, or the former home-page 3D hero. The interactive assembly page is unchanged.
+
+Responsive photo variants are in `src/assets/img/photo-hero/`. The source records and restoration prompts are in `brand/photo-hero/v2/SOURCES.json`. The first two slides use restored client photographs of ductwork and stainless extraction metalwork; the third slide uses the supplied illustrative duct-yard image, recorded in `brand/photo-hero/v3/SOURCES.json`. Each slide has its own localized headline and lead, replayed on selection. Light and dark modes use different text and overlay palettes. Original client media is preserved outside the website checkout under `../client-media/2026-10-31/`.
+
+Blender authors the typography motion look-dev and shared timing through `scripts/blender-photo-hero-motion.py`, saving a new numbered `.blend` and JSON contract each run. `video-studio/src/photohero/PhotoHero.tsx` uses those timings and the same copy/images for twelve light/dark Remotion previews: French, English and Arabic, each desktop and mobile. The website keeps text live and accessible, including Arabic shaping. Remotion remains an isolated authoring tool.
+
+The carousel has only transparent previous/next arrows, keyboard controls and translated labels. Numbered selectors, counter and play/pause controls are removed. Escape stops autoplay. Text overlays the photograph on mobile and desktop. It stops autoplay for reduced motion, data saver, focus, hover, hidden tabs and offscreen content. A failed incoming image keeps the previous image visible. Without JavaScript, the first photo, headline and quote links remain available.
+
 ## Quick start
 
 Requirements: **Node.js ≥ 20** (tested on 22). Nothing to install.
