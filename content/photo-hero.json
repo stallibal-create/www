@@ -1,0 +1,172 @@
+{
+  "enabled": true,
+  "fps": 30,
+  "holdMs": 7000,
+  "transitionMs": 800,
+  "copy": {
+    "fr": {
+      "eyebrow": "LIBALSTAL · ventilation & désenfumage",
+      "titleLines": [
+        "L’air",
+        "prend forme."
+      ],
+      "lead": "Fabrication de gaines de ventilation et de désenfumage sur plans.",
+      "quote": "Demander un devis",
+      "products": "Découvrir les produits",
+      "ctaGroupLabel": "Actions",
+      "pause": "Mettre en pause le diaporama",
+      "play": "Reprendre le diaporama",
+      "previous": "Photo précédente",
+      "next": "Photo suivante",
+      "select": "Choisir une photo",
+      "retouched": "Photos retravaillées et visuel illustratif fourni.",
+      "loadError": "Cette photo est indisponible. La photo actuelle reste affichée."
+    },
+    "en": {
+      "eyebrow": "LIBALSTAL · ventilation & smoke extraction",
+      "titleLines": [
+        "Shaping",
+        "airflow."
+      ],
+      "lead": "Fabrication of ventilation and smoke-extraction ductwork from drawings.",
+      "quote": "Request a quote",
+      "products": "Discover the products",
+      "ctaGroupLabel": "Actions",
+      "pause": "Pause the slideshow",
+      "play": "Resume the slideshow",
+      "previous": "Previous photo",
+      "next": "Next photo",
+      "select": "Choose a photo",
+      "retouched": "Retouched photos and supplied illustrative image.",
+      "loadError": "This photo is unavailable. The current photo remains visible."
+    },
+    "ar": {
+      "eyebrow": "LIBALSTAL · التهوية وأنظمة إزالة الدخان",
+      "titleLines": [
+        "نُشكّل",
+        "مسار الهواء."
+      ],
+      "lead": "تصنيع مجاري الهواء للتهوية وإزالة الدخان وفق المخططات.",
+      "quote": "اطلب عرض سعر",
+      "products": "اكتشف المنتجات",
+      "ctaGroupLabel": "إجراءات",
+      "pause": "إيقاف العرض مؤقتًا",
+      "play": "استئناف العرض",
+      "previous": "الصورة السابقة",
+      "next": "الصورة التالية",
+      "select": "اختيار صورة",
+      "retouched": "صور محسنة وصورة توضيحية مقدمة.",
+      "loadError": "هذه الصورة غير متاحة. تبقى الصورة الحالية ظاهرة."
+    }
+  },
+  "slides": [
+    {
+      "id": "installation",
+      "image": "photo-hero/v3/duct-yard",
+      "copy": {
+        "fr": {
+          "label": "Gaines et raccords",
+          "caption": "Illustration de gaines rectangulaires et circulaires dans un parc industriel.",
+          "alt": "Illustration fournie : gaines métalliques rectangulaires et circulaires en extérieur, bâtiments industriels et grue.",
+          "titleLines": [
+            "L’air,",
+            "en mouvement."
+          ],
+          "lead": "Gaines rectangulaires, circulaires et raccords pour vos réseaux aérauliques."
+        },
+        "en": {
+          "label": "Ducts and fittings",
+          "caption": "Illustration of rectangular and circular ducts in an industrial yard.",
+          "alt": "Supplied illustration of rectangular and circular metal ducts outdoors with industrial buildings and a crane.",
+          "titleLines": [
+            "Air,",
+            "in motion."
+          ],
+          "lead": "Rectangular and round ducts and fittings for your air networks."
+        },
+        "ar": {
+          "label": "المجاري والوصلات",
+          "caption": "صورة توضيحية لمجاري هواء مستطيلة ودائرية في ساحة صناعية.",
+          "alt": "صورة توضيحية مقدمة لمجاري هواء معدنية مستطيلة ودائرية في الخارج مع مبان صناعية ورافعة.",
+          "titleLines": [
+            "الهواء،",
+            "في حركة."
+          ],
+          "lead": "مجاري هواء مستطيلة ودائرية ووصلات لشبكات التهوية."
+        }
+      }
+    },
+    {
+      "id": "ductwork",
+      "image": "photo-hero/v2/ductwork",
+      "copy": {
+        "fr": {
+          "label": "Réseaux aérauliques",
+          "caption": "Gaines rectangulaires galvanisées, joints et réseaux de service.",
+          "alt": "Couloir en cours de finition avec gaines rectangulaires galvanisées en plafond, joints rouges et tuyaux de service rouges.",
+          "titleLines": [
+            "Vos plans",
+            "prennent forme."
+          ],
+          "lead": "Ventilation et désenfumage : gaines rectangulaires posées selon vos plans."
+        },
+        "en": {
+          "label": "Air networks",
+          "caption": "Galvanised rectangular ducts, sealed joints and service runs.",
+          "alt": "Unfinished corridor with galvanised rectangular ceiling ducts, red sealed joints and red service pipes.",
+          "titleLines": [
+            "Your plans",
+            "take shape."
+          ],
+          "lead": "Ventilation and smoke extraction: rectangular ductwork installed to your drawings."
+        },
+        "ar": {
+          "label": "شبكات الهواء",
+          "caption": "مجاري هواء مستطيلة مجلفنة، وصلات محكمة وخطوط خدمة.",
+          "alt": "ممر قيد الإنجاز مع مجاري هواء مستطيلة مجلفنة في السقف ووصلات حمراء وأنابيب خدمة حمراء.",
+          "titleLines": [
+            "مخططاتكم،",
+            "تتخذ شكلها."
+          ],
+          "lead": "التهوية وسحب الدخان: مجاري هواء مستطيلة تُركّب وفق مخططاتكم."
+        }
+      }
+    },
+    {
+      "id": "metalwork",
+      "image": "photo-hero/v2/metalwork",
+      "copy": {
+        "fr": {
+          "label": "Travail du métal",
+          "caption": "Hottes et éléments inox sur mesure dans une cuisine professionnelle.",
+          "alt": "Cuisine professionnelle avec hottes d'extraction inox, plans de travail, évier et fours existants.",
+          "titleLines": [
+            "Le métal,",
+            "sur mesure."
+          ],
+          "lead": "Hottes et éléments inox fabriqués sur mesure pour votre cuisine."
+        },
+        "en": {
+          "label": "Metalwork",
+          "caption": "Bespoke stainless hoods and elements in a commercial kitchen.",
+          "alt": "Commercial kitchen with stainless steel extraction hoods, counters, sink and existing ovens.",
+          "titleLines": [
+            "Metal,",
+            "made to measure."
+          ],
+          "lead": "Stainless hoods and elements fabricated to fit your kitchen."
+        },
+        "ar": {
+          "label": "أعمال المعادن",
+          "caption": "شفاطات وعناصر الفولاذ المقاوم للصدأ حسب الطلب في مطبخ تجاري.",
+          "alt": "مطبخ تجاري مع شفاطات الفولاذ المقاوم للصدأ وأسطح عمل ومغسلة وأفران قائمة.",
+          "titleLines": [
+            "المعدن،",
+            "على المقاس."
+          ],
+          "lead": "شفاطات وعناصر الفولاذ المقاوم للصدأ تُصنع حسب مقاس مطبخكم."
+        }
+      }
+    }
+  ]
+}
