@@ -285,7 +285,10 @@
     "render": "تصوير ثلاثي الأبعاد توضيحي — أبعاد للعرض فقط، وليس صورة للمنتج.",
     "renderAlt": "{name} — تصوير ثلاثي الأبعاد توضيحي",
     "datasheetRequest": "البطاقة التقنية متوفرة عند الطلب.",
-    "catalogueImage": "صورة من كتالوج LIBALSTAL."
+    "catalogueImage": "صورة من كتالوج LIBALSTAL.",
+    "illustrativeImage": "صورة توضيحية مُولَّدة — تمثيل استوديو، غير تعاقدي.",
+    "illustrativeAlt": "{name} — صورة توضيحية مُولَّدة",
+    "illustrativeLabel": "صورة توضيحية"
   },
   "capabilities": {
     "title": "الخبرات",

@@ -285,7 +285,10 @@
     "render": "Rendu 3D illustratif — proportions de démonstration, pas une photo du produit.",
     "renderAlt": "{name} — rendu 3D illustratif",
     "datasheetRequest": "Fiche technique disponible sur demande.",
-    "catalogueImage": "Visuel du catalogue LIBALSTAL."
+    "catalogueImage": "Visuel du catalogue LIBALSTAL.",
+    "illustrativeImage": "Image d'illustration générée — représentation studio, non contractuelle.",
+    "illustrativeAlt": "{name} — image d'illustration générée",
+    "illustrativeLabel": "Illustration"
   },
   "capabilities": {
     "title": "Savoir-faire",
