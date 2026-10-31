@@ -22,7 +22,7 @@ rmSync(OUT, { recursive: true, force: true }); mkdirSync(OUT, { recursive: true 
 // so the playback / skip / handoff logic is always exercised. Without either, those tests are reported as skipped.
 const INTRO_REAL = existsSync(join(ROOT, 'src/assets/video/intro/welcome-desktop-fr.webm'));
 let INTRO_FIX = '';
-if (!INTRO_REAL) {
+if (!INTRO_REAL && JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'utf8')).enabled !== false) {
   try {
     const dir = join(OUT, 'intro-fixture'); mkdirSync(dir, { recursive: true });
     const intro = JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'utf8'));
@@ -262,7 +262,7 @@ await test('desktop nav, language switch keeps the page, theme persists', async 
   await p.click('.nav-links a[href="/fr/products/"]');
   await p.waitForURL('**/fr/products/'); assert.equal(await p.textContent('h1'), 'Systèmes de gaines & accessoires');
   assert.equal(await p.getAttribute('.nav-links a[href="/fr/products/"]', 'aria-current'), 'page');
-  await p.click('.lang a[hreflang="ar"]'); await p.waitForURL('**/ar/products/');
+  await p.click('.lang a[hreflang="ar"]', { noWaitAfter: true }); await p.waitForURL('**/ar/products/', { waitUntil: 'domcontentloaded' });
   assert.equal(await p.getAttribute('html', 'dir'), 'rtl'); assert.equal(await p.getAttribute('html', 'lang'), 'ar');
   assert.equal(await p.getAttribute('html', 'data-theme'), 'dark');
   await p.click('.theme-btn'); assert.equal(await p.getAttribute('html', 'data-theme'), 'light');
@@ -348,30 +348,80 @@ await test('product page CTA pre-fills the quote form', async () => {
   assert.match(await p.inputValue('#f-req'), /Product: Elbows/);
   await p.context().close();
 });
-await test('hero welcome video in each page language; plays once muted, holds on the logo, replay; still under reduced motion', async () => {
-  for (const [l, v] of [['fr', 'fr'], ['en', 'en'], ['ar', 'ar']]) {
-    const h = await (await fetch(`${A}/${l}/`)).text();
-    assert.match(h, new RegExp(`/assets/video/welcome-${v}\\.webm`), l); assert.match(h, new RegExp(`welcome-${v}-720\\.mp4`), l);
-    assert.match(h, new RegExp(`poster="/assets/video/welcome-${v}-poster\\.webp`), l);
-    assert.doesNotMatch(h, /hero3d\.js|Rendu 3D conceptuel/, `${l}: no 3D hero any more`);
+await test('photo opening: localized headlines, real links, loaded images and stable manual controls', async () => {
+  for (const lang of ['fr', 'en', 'ar']) {
+    const p = await newPage(); const requests=[];p.on('request',r=>requests.push(r.url()));
+    await p.goto(`${A}/${lang}/`);
+    await p.waitForFunction(()=>document.querySelector('#photo-hero')?.dataset.state==='idle');
+    assert.equal(await p.locator('video,#intro').count(),0);
+    assert.equal(await p.locator('.ph-slide').count(),3);
+    assert.equal(await p.locator('section[aria-labelledby="prod-h"] .card').count(),6);
+    await p.waitForFunction(()=>document.querySelector('.ph-slide.is-current img')?.naturalWidth>0);
+    assert.equal(await p.locator('a.ph-cta').nth(0).getAttribute('href'),`/${lang}/contact/`);
+    assert.equal(await p.locator('a.ph-cta').nth(1).getAttribute('href'),`/${lang}/products/`);
+    await p.evaluate(() => { window.__photoTitleStarts = []; document.querySelector('#photo-hero').addEventListener('animationstart', event => { if (event.target.classList.contains('ph-line-in')) window.__photoTitleStarts.push(document.querySelector('#ph-title').innerText); }); });
+    assert.equal(await p.locator('[data-photo-select]').count(),0);
+    assert.equal(await p.locator('[data-photo-pause]').count(),0);
+    assert.equal(await p.locator('[data-photo-counter]').count(),0);
+    assert.equal(await p.locator('[data-photo-prev]').count(),1);
+    assert.equal(await p.locator('[data-photo-next]').count(),1);
+    const checkSlide = async id => {
+      await p.waitForFunction(id=>{const h=document.querySelector('#photo-hero');return h.dataset.state==='idle'&&h.dataset.current===id;},id);
+      assert.equal(await p.locator('.ph-slide:not([hidden])').count(),1);
+      const selected=p.locator(`[data-photo-id="${id}"]`);
+      const title=(await selected.getAttribute('data-title-first'))+'\n'+(await selected.getAttribute('data-title-second'));
+      assert.equal((await p.locator('#ph-title').innerText()).trim(),title);
+      assert.equal(await p.locator('.ph-lead').textContent(),await selected.getAttribute('data-lead'));
+      assert.ok(await p.evaluate(t=>window.__photoTitleStarts.some(value=>value.trim()===t),title),'headline animates for '+id);
+    };
+    await p.locator('[data-photo-next]').click(); await checkSlide('ductwork');
+    await p.locator('[data-photo-next]').click(); await checkSlide('metalwork');
+    await p.locator('[data-photo-next]').click(); await checkSlide('installation');
+    await p.locator('[data-photo-prev]').click(); await checkSlide('metalwork');
+    assert.ok(!requests.some(u=>/welcome-.*\.(mp4|webm)|hero3d\.js|intro-gate\.js/.test(u)));
+    assert.deepEqual(p.errors,[]);await p.context().close();
   }
-  let p = await newPage();
-  await p.goto(A + '/fr/');
-  const v0 = await p.$eval('.hero-vid', v => ({ muted: v.muted, loop: v.loop, label: v.getAttribute('aria-label') }));
-  assert.equal(v0.muted, true); assert.equal(v0.loop, false); assert.match(v0.label, /Vidéo de bienvenue/);
-  await p.waitForFunction(() => document.querySelector('.hero-vid').currentTime > 0.5, null, { timeout: 10000 });
-  await p.evaluate(() => { const v = document.querySelector('.hero-vid'); v.currentTime = v.duration - 0.05; });
-  await p.waitForFunction(() => document.querySelector('.hero-vid').ended, null, { timeout: 10000 });
-  assert.equal(await p.isVisible('.hero-replay'), true, 'replay offered once it ends');
-  await p.click('.hero-replay');
-  await p.waitForFunction(() => { const v = document.querySelector('.hero-vid'); return !v.paused && v.currentTime < 2; }, null, { timeout: 5000 });
-  assert.deepEqual(p.errors, []);
-  await p.context().close();
-  p = await newPage({ reducedMotion: 'reduce' });
-  await p.goto(A + '/ar/'); await p.waitForTimeout(800);
-  assert.equal(await p.$eval('.hero-vid', v => v.paused && v.currentTime === 0), true, 'no autoplay under reduced motion');
-  assert.equal(await p.isVisible('.hero-replay'), true);
-  await p.context().close();
+});
+await test('photo opening: reduced motion fetches one photo, keeps manual controls and live preference changes', async () => {
+  const p=await newPage({reducedMotion:'reduce'});const images=[];p.on('request',r=>{if(r.resourceType()==='image'&&r.url().includes('/img/photo-hero/'))images.push(r.url());});
+  await p.goto(A+'/fr/',{waitUntil:'networkidle'});
+  assert.ok(images.some(u=>u.includes('duct-yard')));
+  assert.ok(!images.some(u=>/metalwork|v2\/ductwork/.test(u)));
+  assert.equal(await p.locator('[data-photo-pause]').count(),0);
+  assert.equal(await p.evaluate(()=>document.querySelector('#photo-hero').classList.contains('is-static')),true);
+  await p.locator('[data-photo-next]').click();
+  await p.waitForFunction(()=>{const h=document.querySelector('#photo-hero');return h.dataset.state==='idle'&&h.dataset.current==='ductwork';});
+  assert.ok(images.some(u=>u.includes('ductwork')));
+  await p.emulateMedia({reducedMotion:'no-preference'});await p.waitForFunction(()=>!document.querySelector('#photo-hero').classList.contains('is-static'));
+  await p.emulateMedia({reducedMotion:'reduce'});await p.waitForFunction(()=>document.querySelector('#photo-hero').classList.contains('is-static'));
+  assert.deepEqual(p.errors,[]);await p.context().close();
+});
+await test('photo opening: auto-advances after hold, Escape on CTA stops it, reduced motion disables it', async () => {
+  const p=await newPage();await p.goto(A+'/fr/');
+  await p.waitForFunction(()=>document.querySelector('#photo-hero')?.dataset.state==='idle');
+  await p.waitForFunction(()=>document.querySelector('#photo-hero').dataset.current==='ductwork',null,{timeout:12000});
+  await p.locator('a.ph-cta').first().focus();await p.keyboard.press('Escape');
+  assert.equal(await p.locator('#photo-hero').evaluate(e=>e.classList.contains('is-stopped')),true);
+  await p.evaluate(()=>document.activeElement.blur());await p.mouse.move(0,0);
+  const stopped=await p.evaluate(()=>document.querySelector('#photo-hero').dataset.current);
+  await p.waitForTimeout(8000);
+  assert.equal(await p.evaluate(()=>document.querySelector('#photo-hero').dataset.current),stopped,'auto stopped after Escape');
+  assert.deepEqual(p.errors,[]);await p.context().close();
+  const r=await newPage({reducedMotion:'reduce'});await r.goto(A+'/fr/');
+  await r.waitForFunction(()=>document.querySelector('#photo-hero')?.dataset.state==='idle');
+  const cur=await r.evaluate(()=>document.querySelector('#photo-hero').dataset.current);
+  await r.waitForTimeout(8000);
+  assert.equal(await r.evaluate(()=>document.querySelector('#photo-hero').dataset.current),cur,'no auto with reduced motion');
+  assert.deepEqual(r.errors,[]);await r.context().close();
+});
+await test('photo opening: no JavaScript still shows the first photo, title and quote links', async () => {
+  const p=await newPage({javaScriptEnabled:false});await p.goto(A+'/ar/');
+  assert.equal(await p.locator('#ph-title').isVisible(),true);
+  assert.equal(await p.locator('.ph-slide.is-current img').isVisible(),true);
+  assert.equal(await p.locator('.ph-slide:not([hidden])').count(),1);
+  assert.equal(await p.locator('.ph-cta').count(),2);
+  assert.equal(await p.locator('.ph-btn:visible,.ph-sel:visible').count(),0);
+  assert.deepEqual(p.errors,[]);await p.context().close();
 });
 await test('reduced motion: content visible without animation', async () => {
   const p = await newPage({ reducedMotion: 'reduce' }); await p.goto(A + '/fr/');
@@ -430,7 +480,7 @@ await test('social dock on phones: bottom corner above the safe area, clears the
   await pg.evaluate(() => window.scrollTo(0, 0));
   await pg.focus('#f-name');
   assert.equal(await pg.evaluate(() => document.querySelector('.social-dock').classList.contains('is-typing')), true);
-  await pg.waitForTimeout(350);
+  await pg.waitForFunction(() => getComputedStyle(document.querySelector('.social-dock')).visibility === 'hidden');
   assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.social-dock')).visibility), 'hidden');
   await pg.evaluate(() => document.activeElement.blur());
   assert.equal(await pg.evaluate(() => document.querySelector('.social-dock').classList.contains('is-typing')), false);
@@ -549,10 +599,10 @@ await test('hide incomplete (site.json display.hideIncomplete): no placeholders 
 await test('lazy loading: no 3D code elsewhere; on the page nothing 3D until the view approaches', async () => {
   const p = await newPage({ viewport: { width: 390, height: 200 } }); const reqs = [];
   p.on('request', r => reqs.push(new URL(r.url()).pathname));
-  for (const path of ['/fr/products/', '/fr/contact/', '/en/company/']) { await p.goto(A + path, { waitUntil: 'load' }); await p.waitForTimeout(300); }
+  for (const path of ['/fr/products/', '/fr/contact/', '/en/company/']) { await p.goto(A + path, { waitUntil: 'domcontentloaded' }); await p.waitForTimeout(300); }
   assert.deepEqual(reqs.filter(u => /assembly|three/.test(u)), [], 'other pages request no assembly or three.js code');
   reqs.length = 0;
-  await p.goto(A + '/fr/assembly/', { waitUntil: 'load' }); await p.waitForTimeout(1200);
+  await p.goto(A + '/fr/assembly/', { waitUntil: 'domcontentloaded' }); await p.waitForTimeout(1200);
   assert.deepEqual(reqs.filter(u => /viewer\.js|three/.test(u)), [], 'nothing 3D before the view is near');
   assert.equal((await asmState(p)).state, 'preview');
   await p.locator('.asm-view').scrollIntoViewIfNeeded();
@@ -866,7 +916,7 @@ await test('Arabic RTL form works end to end', async () => {
 
 console.log('\nWelcome intro');
 const INTRO_BUILT = (await (await fetch(A + '/fr/')).text()).includes('id="intro"');
-const introTest = (name, fn) => INTRO_BUILT ? test(name, fn) : (console.log(`  - ${name} (skipped: no intro videos and no ffmpeg for fixtures)`), undefined);
+const introTest = (name, fn) => INTRO_BUILT ? test(name, fn) : (console.log(`  - ${name} (retired welcome-video coverage: photographic opening active)`), undefined);
 const introState = p => p.evaluate(() => ({ on: document.documentElement.classList.contains('intro-on'), overlay: !!document.getElementById('intro'), end: document.documentElement.getAttribute('data-intro-end') }));
 await test('intro is only on approved home pages, gated by its videos; never on inner pages', async () => {
   const intro = JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'utf8'));
@@ -981,7 +1031,7 @@ await test(`no horizontal overflow, no JS errors: ${pages.length} pages × 4 vie
     const p = await newPage({ viewport: { width: w, height: h } });
     for (const path of pages) {
       p.errors.length = 0;
-      await p.goto(A + path, { waitUntil: 'load' });
+      await p.goto(A + path, { waitUntil: 'domcontentloaded' });
       const o = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       if (o > 0) bad.push(`${label} ${path} overflow ${o}px`);
       if (p.errors.length) bad.push(`${label} ${path} errors: ${p.errors.join('; ')}`);
