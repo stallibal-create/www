@@ -1,0 +1,105 @@
+{
+  "source": "catalogue yassin (1).pdf",
+  "sha256": "03b3a475268ca8bdfaf85d518b7cbefe12785c8f1d74c37d365d43063b0f35c2",
+  "note": "Embedded images extracted without changing product content. Descriptions use visible catalogue pages, not the outdated hidden text layer.",
+  "images": [
+    {
+      "slug": "acoustic-silencers",
+      "page": 3,
+      "pdfObject": 8077,
+      "width": 400,
+      "height": 265
+    },
+    {
+      "slug": "flexible-connectors",
+      "page": 3,
+      "pdfObject": 8087,
+      "width": 272,
+      "height": 219
+    },
+    {
+      "slug": "plenums",
+      "page": 3,
+      "pdfObject": 8078,
+      "width": 341,
+      "height": 227
+    },
+    {
+      "slug": "access-panels",
+      "page": 3,
+      "pdfObject": 8082,
+      "width": 348,
+      "height": 262
+    },
+    {
+      "slug": "sand-traps",
+      "page": 3,
+      "pdfObject": 8081,
+      "width": 291,
+      "height": 223
+    },
+    {
+      "slug": "rectangular-roof-cowls",
+      "page": 3,
+      "pdfObject": 8076,
+      "width": 437,
+      "height": 297
+    },
+    {
+      "slug": "round-roof-cowls",
+      "page": 4,
+      "pdfObject": 8101,
+      "width": 277,
+      "height": 234
+    },
+    {
+      "slug": "external-louvres",
+      "page": 3,
+      "pdfObject": 8079,
+      "width": 307,
+      "height": 262
+    },
+    {
+      "slug": "damper-accessories",
+      "page": 4,
+      "pdfObject": 8097,
+      "width": 1280,
+      "height": 717
+    },
+    {
+      "slug": "smooth-round-duct",
+      "page": 4,
+      "pdfObject": 8105,
+      "width": 500,
+      "height": 500
+    },
+    {
+      "slug": "stainless-hoods",
+      "page": 2,
+      "pdfObject": 8059,
+      "width": 287,
+      "height": 287
+    },
+    {
+      "slug": "stainless-tables",
+      "page": 2,
+      "pdfObject": 8056,
+      "width": 431,
+      "height": 317
+    },
+    {
+      "slug": "stainless-trolleys",
+      "page": 2,
+      "pdfObject": 8057,
+      "width": 342,
+      "height": 281
+    },
+    {
+      "slug": "stainless-charcoal-grills",
+      "page": 2,
+      "pdfObject": 8060,
+      "width": 360,
+      "height": 427
+    }
+  ]
+}
