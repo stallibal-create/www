@@ -8,6 +8,10 @@ const S = { sheetMm: 3, flangeWidthMm: 30, flangeDepthMm: 30 };
 const T = 3, F = 30, D = 30, OUT = T + F; // sheet and flange stand outside the internal section
 const TOL = 1e-3; // mm, float32 storage
 const P = {
+  'round-damper-manual': { diameterMm: 300, lengthMm: 380 },
+  'round-damper-motorised': { diameterMm: 250, lengthMm: 330 },
+  'damper-manual': { widthMm: 250, heightMm: 200, lengthMm: 220 },
+  'damper-motorised': { widthMm: 300, heightMm: 200, lengthMm: 220 },
   'spiral-straight': { diameterMm: 400, lengthMm: 1000, pitchMm: 140 },
   'round-straight': { diameterMm: 400, lengthMm: 700 },
   'round-elbow': { diameterMm: 400, innerRadiusMm: 200 },

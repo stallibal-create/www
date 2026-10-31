@@ -44,7 +44,7 @@ for (const c of asm.components) {
 
 test('the detailed assembly stays light enough for phones', () => {
   const tris = asm.components.reduce((s, c) => s + buildPart(c, asm.settings, { segments: 16, details: true }).indices.length / 3, 0);
-  assert.ok(tris < 18000, `${tris} triangles`);
+  assert.ok(tris < 22000, `${tris} triangles`);
 });
 
 test('zinc spangle: deterministic, tileable sizes, values in the subtle band the materials expect', () => {

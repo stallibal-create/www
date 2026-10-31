@@ -82,7 +82,7 @@ test('all fifteen part positions return to the solved installed transform after 
   for (let i = 0; i < 50; i++) {
     m.playIntro(); advance(m, 2300 + (i % 4) * 250);
     const partiallySeparated = [...solved.order].map(id => poseAt(solved.parts.get(id).installed, offsets.get(id), m.state().factor));
-    assert.ok(partiallySeparated.length === 15);
+    assert.ok(partiallySeparated.length === 19);
     m.interrupt();
     for (const id of solved.order) assert.deepEqual(poseAt(solved.parts.get(id).installed, offsets.get(id), m.state().factor), solved.parts.get(id).installed);
   }

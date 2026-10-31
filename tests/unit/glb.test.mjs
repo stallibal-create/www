@@ -29,7 +29,7 @@ function withJson(edit) {
 const boxes = meshes => new Map([...meshes].map(([id, m]) => [id, new THREE.Box3().setFromObject(m, true)]));
 const near = (a, b, tol = 2e-4) => a.min.distanceTo(b.min) <= tol && a.max.distanceTo(b.max) <= tol;
 
-test('the GLB holds exactly the fifteen assembly parts, with the four detail materials and texture coordinates', () => {
+test('the GLB holds exactly the nineteen assembly parts, with the four detail materials and texture coordinates', () => {
   const parts = readGlb(glb());
   assert.deepEqual([...parts.keys()].sort(), asm.components.map(c => c.id).sort());
   for (const [id, prims] of parts) {

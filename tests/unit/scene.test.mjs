@@ -24,10 +24,10 @@ const extent = (meshes, camera, step = 1) => {
 };
 
 for (const [profile, segments] of [['desktop', 16], ['mobile', 10]]) {
-  test(`${profile}: all 15 parts are in the scene, each with its own placed mesh`, () => {
+  test(`${profile}: all 19 parts are in the scene, each with its own placed mesh`, () => {
     const { meshes, geometries } = setup(segments);
     assert.deepEqual([...meshes.keys()], asm.components.map(c => c.id));
-    assert.equal(geometries.length, 15);
+    assert.equal(geometries.length, 19);
     for (const m of meshes.values()) assert.ok(m.geometry.index.count > 0 && m.geometry.groups.length >= 1);
   });
   test(`${profile}: home view shows the whole assembly and fills ${HOME_FILL * 100} % of the frame`, () => {
@@ -70,7 +70,7 @@ const motionSetup = () => {
 };
 const place = (camera, center, dir, dist) => { camera.position.copy(center).addScaledVector(dir, dist); camera.lookAt(center); camera.near = dist / 100; camera.far = dist * 30; camera.updateProjectionMatrix(); camera.updateMatrixWorld(); };
 
-test('Explode: every animation frame keeps all 15 parts in the frame, from the home view and from rotated views', () => {
+test('Explode: every animation frame keeps all 19 parts in the frame, from the home view and from rotated views', () => {
   const m = motionSetup();
   const dirs = [m.dir.clone(), ...[45, 90, 135, 180, 225, 270, 315].map(deg => m.dir.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(deg)))];
   for (const dir of dirs) {
@@ -86,7 +86,7 @@ test('Explode: every animation frame keeps all 15 parts in the frame, from the h
   applyPose(m.meshes, m.solved, m.offsets, 0, m.root);
 });
 
-test('Intro: every frame (25 ms steps) keeps all 15 parts in the frame', () => {
+test('Intro: every frame (25 ms steps) keeps all 19 parts in the frame', () => {
   const m = motionSetup();
   const zoom = introZoom(THREE, m.camera, m, m.solved, m.offsets, m.dir, m.d);
   const home = m.dir.clone().multiplyScalar(m.d), mo = createMotion();
