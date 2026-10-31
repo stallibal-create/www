@@ -400,7 +400,7 @@ await test('social dock: configured links and pending profiles, 48 px discs on t
   const tipOpacity = () => pg.evaluate(() => getComputedStyle(document.querySelector('.sd-btn.sd-facebook .sd-tip')).opacity);
   await pg.waitForTimeout(1300); // entrance finished
   assert.equal(await tipOpacity(), '0');
-  await btn.hover(); await pg.waitForFunction(() => getComputedStyle(document.querySelector('.sd-btn.sd-facebook .sd-tip')).opacity === '1');
+  await btn.hover(); await pg.waitForFunction(() => getComputedStyle(document.querySelector('.sd-btn.sd-facebook .sd-tip')).opacity === '1' && getComputedStyle(document.querySelector('.sd-btn.sd-facebook')).backgroundColor === 'rgb(0, 102, 204)');
   assert.equal(await tipOpacity(), '1');
   assert.equal(await pg.evaluate(() => getComputedStyle(document.querySelector('.sd-btn.sd-facebook')).backgroundColor), 'rgb(0, 102, 204)');
   await pg.mouse.move(10, 10); await pg.waitForTimeout(350);
