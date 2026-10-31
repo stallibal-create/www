@@ -13,6 +13,7 @@ import { assemblySvg } from './assembly-svg.mjs';
 import { modelProblems } from './assembly-model.mjs';
 import { storySvgs } from './story-svg.mjs';
 import { socialLinks, missingNetworks, socialDock, socialItems, socialItem, contactIcon } from './social.mjs';
+import { photoHero, photoHeroPreload } from './photo-hero.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -145,11 +146,12 @@ function asmImportMap() {
 // On for a language only when its wording is approved AND every video for it is present: until the renders from
 // video-studio/ are reviewed and installed (npm run install-intro there), the homepage is unchanged.
 const INTRO = JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'utf8'));
+const PHOTO_HERO = JSON.parse(readFileSync(join(ROOT, 'content/photo-hero.json'), 'utf8'));
 const INTRO_DIR = '/assets/video/intro';
 // INTRO_ASSETS_DIR: use videos from another folder (the test suite points it at generated fixtures)
 const INTRO_SRC = process.env.INTRO_ASSETS_DIR || join(ROOT, 'src', INTRO_DIR);
 const introFile = (format, lang, ext) => `${INTRO_DIR}/welcome-${format}-${lang}.${ext}`;
-const introOn = lang => INTRO.langs.includes(lang) && !!INTRO.copy[lang]?.approved
+const introOn = lang => INTRO.enabled !== false && !PHOTO_HERO.enabled && INTRO.langs.includes(lang) && !!INTRO.copy[lang]?.approved
   && Object.keys(INTRO.compositions).every(f => ['mp4', 'webm'].every(x => existsSync(join(INTRO_SRC, `welcome-${f}-${lang}.${x}`))));
 function introMarkup(ctx) {
   const { lang, D } = ctx;
@@ -436,7 +438,7 @@ function home(ctx) {
 </div></section>`;
 
   const body = `
-<section class="hero" aria-labelledby="hero-h">
+${PHOTO_HERO.enabled ? photoHero(ctx, PHOTO_HERO, A) : `<section class="hero" aria-labelledby="hero-h">
   <div class="hero-grid wrap">
     <div class="hero-text">
       <p class="eyebrow">${esc(H.eyebrow)}</p>
@@ -447,7 +449,7 @@ function home(ctx) {
     </div>
     ${visual}
   </div>
-</section>
+</section>`}
 ${story}
 <section class="sec" aria-labelledby="cap-h"><div class="wrap">
   <div class="sh rv"><h2 id="cap-h">${esc(H.capTitle)}</h2><p>${esc(H.capIntro)}</p></div>
@@ -479,13 +481,18 @@ ${qual ? `
   <div class="rv">${projectsList(ctx)}</div>
 </div></section>` : ''}
 ${rfqBand(ctx)}`;
-  const extraHead = `${hv.photo || hasVideo ? '' : `<script type="importmap">${IMPORT_MAP}</script>
+  const extraHead = PHOTO_HERO.enabled
+    ? `${photoHeroPreload(PHOTO_HERO, A)}
+<link rel="stylesheet" href="${A('/assets/css/photo-hero.css')}">
+<script type="module" src="${A('/assets/js/photo-hero.js')}"></script>
+<script defer src="${A('/assets/js/story.js')}"></script>`
+    : `${hv.photo || hasVideo ? '' : `<script type="importmap">${IMPORT_MAP}</script>
 <link rel="modulepreload" href="${A('/assets/js/hero3d.js')}">
 <script type="module" src="${A('/assets/js/hero3d.js')}"></script>`}
 <script defer src="${A('/assets/js/story.js')}"></script>${introOn(lang) ? `
 <script src="${A('/assets/js/intro-gate.js')}"></script>
 <script defer src="${A('/assets/js/intro.js')}"></script>` : ''}`;
-  const beforeHeader = introOn(lang) ? introMarkup(ctx) : '';
+  const beforeHeader = !PHOTO_HERO.enabled && introOn(lang) ? introMarkup(ctx) : '';
   emit(lang, '', page(ctx, { title: '', path: '', bodyClass: 'home', jsonld: [orgLd()], extraHead, beforeHeader }, body));
 }
 
@@ -982,5 +989,5 @@ console.log(`${n} missing items listed in MISSING-INFO.md`);
 console.log(`Font: Montserrat + Cairo for Arabic (${FONT_LOCAL ? 'self-hosted' : 'Google Fonts'})`);
 console.log(`3D assembly model: ${MODEL_NOTE}`);
 console.log(`Three.js: ${THREE_LOCAL ? 'self-hosted' : 'CDN ' + THREE_BASE}`);
-console.log(`Welcome intro: ${LANGS.map(l => `${l} ${introOn(l) ? 'on' : 'off'}`).join(' · ')}${LANGS.some(introOn) ? '' : '  (no approved renders in src/assets/video/intro/ — see video-studio/README.md)'}`);
+console.log(PHOTO_HERO.enabled ? 'Homepage: photographic opening active · welcome video disabled' : `Welcome intro: ${LANGS.map(l => `${l} ${introOn(l) ? 'on' : 'off'}`).join(' · ')}`);
 console.log(pc ? `Precompressed ${pc.files} files: ${Math.round(pc.raw / 1024)} KB → br ${Math.round(pc.br / 1024)} KB / gzip ${Math.round(pc.gz / 1024)} KB` : 'Precompression skipped (PRECOMPRESS=0)');
