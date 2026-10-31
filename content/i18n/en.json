@@ -146,14 +146,15 @@
   "products": {
     "title": "Products",
     "h1": "Duct systems & accessories",
-    "intro": "Rectangular and spiral round ducts, stainless steel, aluminium and black steel ducts, and a complete range of air-distribution accessories. The specifications shown are those provided by Libalstal; others are added once confirmed.",
+    "intro": "Ventilation and smoke-extraction ducts, fittings, air-distribution accessories and stainless steel equipment. The specifications shown are those provided by Libalstal; others are added once confirmed.",
     "filterLabel": "Filter by family",
     "all": "All",
     "cats": {
       "duct": "Ducts",
       "fit": "Fittings",
       "acc": "Accessories",
-      "cus": "Custom"
+      "cus": "Custom",
+      "inox": "Stainless steel equipment"
     },
     "empty": "No products in this family yet.",
     "count": "{n} products",
@@ -180,7 +181,7 @@
     },
     "tees-branches": {
       "name": "Tees, take-offs & Y-branches",
-      "summary": "Tees, take-offs and Y-branches for network branches."
+      "summary": "Ductwork tees and branches, including rectangular and circular tees, rectangular branches, express take-offs and Y-branches."
     },
     "flanges-connectors": {
       "name": "Flanges & connectors",
@@ -188,7 +189,7 @@
     },
     "grilles-dampers": {
       "name": "Grilles, dampers & accessories",
-      "summary": "Grilles, volume dampers and filter holders."
+      "summary": "Ventilation grilles, control dampers and filter holders for air-distribution systems."
     },
     "custom-assemblies": {
       "name": "Custom metal fabrication",
@@ -209,6 +210,66 @@
     "control-dampers": {
       "name": "Control dampers",
       "summary": "Rectangular or circular control dampers with manual or motorised actuation. Dimensions and actuator characteristics according to project, to be confirmed."
+    },
+    "acoustic-silencers": {
+      "name": "Rectangular acoustic silencers",
+      "summary": "Rectangular acoustic silencers intended for installation in ventilation ductwork to reduce the propagation of airborne noise."
+    },
+    "flexible-connectors": {
+      "name": "Flexible connectors",
+      "summary": "Flexible connectors used to join ductwork components, providing a degree of flexibility in the connection and accommodating installation tolerances."
+    },
+    "plenums": {
+      "name": "Plenums and grille plenums",
+      "summary": "Plenums and grille plenums serving as connecting boxes between ductwork and supply or return grilles."
+    },
+    "access-panels": {
+      "name": "Access panels",
+      "summary": "Access panels intended to allow access to the interior of ductwork for inspection and maintenance."
+    },
+    "sand-traps": {
+      "name": "Sand traps",
+      "summary": "Sand traps integrated into ductwork to retain heavy particles and sand carried by the air stream."
+    },
+    "rectangular-roof-cowls": {
+      "name": "Rectangular roof cowls",
+      "summary": "Rectangular roof cowls fitted at the duct termination on roofs to protect the air outlet from weather."
+    },
+    "round-roof-cowls": {
+      "name": "Round roof cowls",
+      "summary": "Round roof cowls fitted at the duct termination on roofs to protect the air outlet from weather."
+    },
+    "external-louvres": {
+      "name": "External louvres",
+      "summary": "External louvres with horizontal blades intended for air intake and exhaust on facades or roofs."
+    },
+    "damper-accessories": {
+      "name": "Damper control accessories",
+      "summary": "Damper control accessories comprising levers and linkages intended for manual operation of dampers."
+    },
+    "smooth-round-duct": {
+      "name": "Smooth round duct",
+      "summary": "Smooth round duct intended for air distribution in ventilation systems, distinct from spiral duct."
+    },
+    "stainless-hoods": {
+      "name": "Stainless steel hoods",
+      "summary": "Stainless steel hoods intended for capturing fumes and vapours above cooking areas."
+    },
+    "stainless-tables": {
+      "name": "Stainless steel tables",
+      "summary": "Stainless steel tables intended as work surfaces in professional kitchens and technical areas."
+    },
+    "stainless-trolleys": {
+      "name": "Stainless steel trolleys",
+      "summary": "Stainless steel trolleys intended for transporting equipment and goods in professional kitchens."
+    },
+    "stainless-charcoal-grills": {
+      "name": "Stainless steel charcoal grills",
+      "summary": "Stainless steel charcoal grills intended for charcoal cooking in professional kitchens."
+    },
+    "smoke-extraction-ducts": {
+      "name": "Galvanised smoke extraction ducts",
+      "summary": "Galvanised steel sheet ducts for smoke-extraction systems. Fire performance requires confirmation with supporting technical documents."
     }
   },
   "product": {
@@ -223,7 +284,8 @@
     "imageMissing": "Product photo",
     "render": "Illustrative 3D render — demonstration proportions, not a product photo.",
     "renderAlt": "{name} — illustrative 3D render",
-    "datasheetRequest": "Technical datasheet available on request."
+    "datasheetRequest": "Technical datasheet available on request.",
+    "catalogueImage": "Image from the LIBALSTAL catalogue."
   },
   "capabilities": {
     "title": "Capabilities",

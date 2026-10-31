@@ -146,14 +146,15 @@
   "products": {
     "title": "Produits",
     "h1": "Systèmes de gaines & accessoires",
-    "intro": "Gaines rectangulaires et circulaires spiralées, gaines inox, aluminium et acier noir, et accessoires aérauliques complets. Les caractéristiques affichées sont celles communiquées par Libalstal ; les autres s'ajoutent dès qu'elles sont confirmées.",
+    "intro": "Gaines de ventilation et de désenfumage, raccords, accessoires aérauliques et équipements inox. Les caractéristiques affichées sont celles communiquées par Libalstal ; les autres s’ajoutent après confirmation.",
     "filterLabel": "Filtrer par famille",
     "all": "Tous",
     "cats": {
       "duct": "Gaines",
       "fit": "Raccords",
       "acc": "Accessoires",
-      "cus": "Sur mesure"
+      "cus": "Sur mesure",
+      "inox": "Équipements inox"
     },
     "empty": "Aucun produit dans cette famille pour l'instant.",
     "count": "{n} produits",
@@ -180,7 +181,7 @@
     },
     "tees-branches": {
       "name": "Tés, piquages & branchements en Y",
-      "summary": "Tés, piquages et dérivations en Y pour les ramifications du réseau."
+      "summary": "Tés et culottes de raccordement pour réseaux de gaines, comprenant tés rectangulaires et circulaires, culottes rectangulaires, piquages express et branches en Y."
     },
     "flanges-connectors": {
       "name": "Brides & raccords",
@@ -188,7 +189,7 @@
     },
     "grilles-dampers": {
       "name": "Grilles, registres & accessoires",
-      "summary": "Grilles, registres de réglage (volume dampers) et porte-filtres."
+      "summary": "Grilles de ventilation, registres de réglage et porte-filtres pour les réseaux aérauliques."
     },
     "custom-assemblies": {
       "name": "Fabrication métallique sur mesure",
@@ -209,6 +210,66 @@
     "control-dampers": {
       "name": "Volets de réglage",
       "summary": "Volets de réglage rectangulaires ou circulaires, à commande manuelle ou motorisée. Dimensions et caractéristiques de l'actionneur selon projet, à confirmer."
+    },
+    "acoustic-silencers": {
+      "name": "Silencieux acoustiques rectangulaires",
+      "summary": "Silencieux acoustiques rectangulaires destinés à être intégrés dans les réseaux de gaines de ventilation pour réduire la propagation du bruit aéraulique."
+    },
+    "flexible-connectors": {
+      "name": "Manchettes souples",
+      "summary": "Manchettes souples utilisées pour raccorder des éléments de gaines en assurant une certaine souplesse de liaison et une compensation des tolérances de montage."
+    },
+    "plenums": {
+      "name": "Plénums et plénums pour grilles",
+      "summary": "Plénums et plénums pour grilles servant de caissons de raccordement entre les gaines et les grilles de soufflage ou de reprise."
+    },
+    "access-panels": {
+      "name": "Trappes de visite",
+      "summary": "Trappes de visite destinées à permettre l'accès à l'intérieur des gaines pour l'inspection et la maintenance."
+    },
+    "sand-traps": {
+      "name": "Pièges à sable",
+      "summary": "Pièges à sable intégrés aux réseaux de gaines pour retenir les particules lourdes et le sable transportés par l'air."
+    },
+    "rectangular-roof-cowls": {
+      "name": "Chapeaux rectangulaires",
+      "summary": "Chapeaux rectangulaires placés en extrémité de gaine en toiture pour protéger la sortie d'air des intempéries."
+    },
+    "round-roof-cowls": {
+      "name": "Chapeaux chinois (circulaires)",
+      "summary": "Chapeaux chinois circulaires placés en extrémité de gaine en toiture pour protéger la sortie d'air des intempéries."
+    },
+    "external-louvres": {
+      "name": "Grilles extérieures",
+      "summary": "Grilles extérieures à lames horizontales destinées aux prises et rejets d'air en façade ou en toiture."
+    },
+    "damper-accessories": {
+      "name": "Accessoires de commande des volets",
+      "summary": "Accessoires de commande des volets comprenant leviers et tringleries destinés à l'actionnement manuel des volets."
+    },
+    "smooth-round-duct": {
+      "name": "Gaines circulaires lisses",
+      "summary": "Gaines circulaires lisses destinées à la distribution d'air dans les réseaux de ventilation, distinctes des gaines spiralées."
+    },
+    "stainless-hoods": {
+      "name": "Hottes inox",
+      "summary": "Hottes en acier inoxydable destinées à la captation des fumées et vapeurs au-dessus des zones de cuisson."
+    },
+    "stainless-tables": {
+      "name": "Tables inox",
+      "summary": "Tables en acier inoxydable destinées aux plans de travail dans les cuisines professionnelles et les locaux techniques."
+    },
+    "stainless-trolleys": {
+      "name": "Chariots inox",
+      "summary": "Chariots en acier inoxydable destinés au transport de matériel et de denrées dans les cuisines professionnelles."
+    },
+    "stainless-charcoal-grills": {
+      "name": "Grils à charbon en inox",
+      "summary": "Grills à charbon en acier inoxydable destinés à la cuisson au charbon dans les cuisines professionnelles."
+    },
+    "smoke-extraction-ducts": {
+      "name": "Gaines de désenfumage galvanisées",
+      "summary": "Gaines en tôle d’acier galvanisée pour les réseaux de désenfumage. Performances au feu à confirmer sur justificatifs techniques."
     }
   },
   "product": {
@@ -223,7 +284,8 @@
     "imageMissing": "Photo produit",
     "render": "Rendu 3D illustratif — proportions de démonstration, pas une photo du produit.",
     "renderAlt": "{name} — rendu 3D illustratif",
-    "datasheetRequest": "Fiche technique disponible sur demande."
+    "datasheetRequest": "Fiche technique disponible sur demande.",
+    "catalogueImage": "Visuel du catalogue LIBALSTAL."
   },
   "capabilities": {
     "title": "Savoir-faire",
