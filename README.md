@@ -274,3 +274,7 @@ Playwright is a dev dependency (pinned in `package.json`). After `npm ci`, insta
 - The product families, capability families, industries list and the 4-step order flow are **descriptive categories, not claims**. Each one that implies a fact (ranges, equipment, process, industries) is visibly flagged "to be confirmed" until the owner validates it.
 - The privacy and legal texts are templates with placeholders. Have them reviewed for the applicable law before publishing.
 - The hero 3D is labelled "conceptual visual" on the page and in the legal notice.
+
+### Catalogue additions (31 October 2026)
+
+The product catalogue includes 27 families, with 15 additions from the supplied LIBALSTAL catalogue. Extracted product visuals and their PDF object/page provenance are retained under `brand/catalogue-products/`; optimized copies are in `src/assets/img/catalogue/`. Catalogue visuals are labelled separately from illustrative 3D renders. The existing 19-part interactive assembly is retained. Unknown dimensions, ratings and certifications remain unset; the printed fire-test reference has not been published as verified evidence.
