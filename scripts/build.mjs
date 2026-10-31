@@ -108,6 +108,19 @@ const renderImg = (slug, { alt = '', sizes, eager = false }) => {
   return `<img src="${at(640)}" srcset="${at(640)} 640w, ${at(1280)} 1280w" sizes="${sizes}" width="1280" height="960" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 };
 
+// Generated HD illustrative studio images (illustrative/<slug>.webp, 1536×1024, 3:2). These replace the low-resolution
+// catalogue scans for the 14 products that have them; the scans stay on disk as provenance only.
+const ILLUSTRATIVE = new Set(site.products.filter(p => p.image?.startsWith('illustrative/')).map(p => p.slug).filter(s => existsSync(join(ROOT, `src/assets/img/illustrative/${s}.webp`))));
+const illustrativeImg = (slug, { alt = '', sizes, eager = false }) => {
+  const at = w => A(`/assets/img/illustrative/${slug}${w ? '-' + w : ''}.webp`);
+  const srcset = ['640', '1280'].every(w => existsSync(join(ROOT, `src/assets/img/illustrative/${slug}-${w}.webp`)))
+    ? ` srcset="${at(640)} 640w, ${at(1280)} 1280w" sizes="${sizes}"` : '';
+  return `<img src="${at()}"${srcset} width="1536" height="1024" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+};
+// Catalogue order: ducts, fittings, accessories, stainless, custom — stable within each family (site.products untouched).
+const CAT_ORDER = ['duct', 'fit', 'acc', 'inox', 'cus'];
+const catalogueProducts = () => [...site.products].sort((a, b) => CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat));
+
 // Typical product render per capability family (home page and Savoir-faire page).
 const CAP_RENDER = { spiral: 'spiral-round-duct', rect: 'rectangular-duct', sheet: 'custom-assemblies', fittings: 'elbows' };
 const ASM_RENDER = ['640', '1280'].every(w => existsSync(join(ROOT, `src/assets/img/products/assembly-${w}.webp`)));
@@ -297,9 +310,14 @@ const pageHead = (ctx, eyebrow, h1, intro, crumbHtml = '') => `<div class="wrap 
 function productCard(ctx, p, headingLevel = 3) {
   const { lang, D, arr } = ctx;
   const it = D.productItems[p.slug];
-  return `<article class="card" data-cat="${p.cat}">
+  const fig = ILLUSTRATIVE.has(p.slug)
+    ? `<span class="card-fig card-illustrative">${illustrativeImg(p.slug, { alt: fmt(D.product.illustrativeAlt, { name: it.name }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}<span class="visual-label">${esc(D.product.illustrativeLabel)}</span></span>`
+    : p.image ? `<span class="card-fig card-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" loading="lazy" decoding="async" alt="${esc(it.name)}"></span>`
+    : RENDERS.has(p.slug) ? `<span class="card-fig card-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>`
+    : `<span class="card-fig" aria-hidden="true">${icons[p.slug]}</span>`;
+  return `<article class="card product-card" data-cat="${p.cat}">
   <a class="card-link" href="${url(lang, 'products/' + p.slug)}">
-    ${p.image ? `<span class="card-fig card-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" loading="lazy" decoding="async" alt="${esc(it.name)}"></span>` : RENDERS.has(p.slug) ? `<span class="card-fig card-render">${renderImg(p.slug, { sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>` : `<span class="card-fig" aria-hidden="true">${icons[p.slug]}</span>`}
+    ${fig}
     <span class="card-cat">${esc(D.products.cats[p.cat])}</span>
     <h${headingLevel} class="card-h">${esc(it.name)}</h${headingLevel}>
     <span class="card-sum">${esc(it.summary)}</span>
@@ -475,14 +493,15 @@ function products(ctx) {
   const { lang, D } = ctx;
   const cr = crumbs(ctx, [[D.nav.products, 'products']]);
   const cats = ['duct', 'fit', 'acc', 'inox', 'cus'];
+  const ordered = catalogueProducts();
   const body = `${pageHead(ctx, D.nav.products, D.products.h1, D.products.intro, cr.html)}
-<section class="sec tight"><div class="wrap">
+<section class="sec tight catalogue-page"><div class="wrap">
   <div class="filters" role="group" aria-label="${esc(D.products.filterLabel)}">
     <button type="button" class="chip" aria-pressed="true" data-filter="all">${esc(D.products.all)}</button>
     ${cats.map(c => `<button type="button" class="chip" aria-pressed="false" data-filter="${c}">${esc(D.products.cats[c])}</button>`).join('')}
   </div>
   <p class="count" role="status" data-template="${esc(D.products.count)}" data-template-one="${esc(D.products.countOne)}">${esc(fmt(site.products.length === 1 ? D.products.countOne : D.products.count, { n: site.products.length }))}</p>
-  <div class="grid" id="product-grid">${site.products.map(p => productCard(ctx, p, 2)).join('')}</div>
+  <div class="grid catalogue-grid" id="product-grid">${ordered.map(p => productCard(ctx, p, 2)).join('')}</div>
   <p class="empty" id="product-empty" hidden>${esc(D.products.empty)}</p>
   <p class="more"><a class="btn" href="${url(lang, 'assembly')}">${esc(D.home.story.cta3d)} <span class="arr" aria-hidden="true">${D.meta.arrow}</span></a></p>
 </div></section>
@@ -501,7 +520,8 @@ ${rfqBand(ctx)}`;
     const body = `<div class="wrap page-head">${c2.html}<p class="eyebrow">${esc(D.products.cats[p.cat])}</p><h1>${esc(it.name)}</h1><p class="lead">${esc(it.summary)}</p></div>
 <section class="sec tight"><div class="wrap two pd">
   <figure class="drawing">
-    ${p.image ? `<div class="drawing-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" fetchpriority="high" decoding="async" alt="${esc(it.name)}"></div>${p.image.startsWith('catalogue/') ? `<figcaption class="small muted">${esc(D.product.catalogueImage)}</figcaption>` : ''}`
+    ${ILLUSTRATIVE.has(p.slug) ? `<div class="drawing-illustrative">${illustrativeImg(p.slug, { alt: fmt(D.product.illustrativeAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div><figcaption class="small muted">${esc(D.product.illustrativeImage)}</figcaption>`
+      : p.image ? `<div class="drawing-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" fetchpriority="high" decoding="async" alt="${esc(it.name)}"></div>${p.image.startsWith('catalogue/') ? `<figcaption class="small muted">${esc(D.product.catalogueImage)}</figcaption>` : ''}`
       : RENDERS.has(p.slug) ? `<div class="drawing-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div><figcaption class="small muted">${esc(D.product.render)}</figcaption>`
       : `<div class="drawing-fig" aria-hidden="true">${icons[p.slug]}</div><figcaption>${ctx.ph(D.product.imageMissing, 'toProvide')}</figcaption>`}
     <div class="titleblock" aria-hidden="true"><span>LIBALSTAL</span><span>${esc(it.name)}</span><span>${esc(D.products.cats[p.cat])}</span></div>
