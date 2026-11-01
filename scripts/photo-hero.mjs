@@ -103,10 +103,6 @@ ${slideMarkup}
             </button>
           </div>
         </div>
-        <div class="ph-caption" aria-live="off">
-          <span class="ph-cap-label">${esc(firstCopy.label)}</span>
-          <span class="ph-cap-src">${esc(C.retouched)}</span>
-        </div>
       </div>
       <p class="ph-status sr" role="status" aria-live="polite" data-photo-status></p>
       <p class="ph-sr-help sr" id="ph-help" data-photo-help>${esc(srInstructions)}</p>

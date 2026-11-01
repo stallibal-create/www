@@ -160,7 +160,39 @@
     "count": "{n} produits",
     "details": "Voir la fiche",
     "quote": "Demander un devis",
-    "countOne": "{n} produit"
+    "countOne": "{n} produit",
+    "partsH1": "Gaines, raccords & accessoires",
+    "partsIntro": "Gaines de ventilation et de désenfumage, raccords et accessoires de distribution d'air. Les caractéristiques affichées sont celles fournies par Libalstal ; les autres sont ajoutées une fois confirmées.",
+    "partsLabel": "Pièces & composants",
+    "finishedLabel": "Produits finis",
+    "switchLabel": "Sections du catalogue",
+    "finished": {
+      "title": "Produits finis",
+      "intro": "Équipement inox professionnel et solutions de chaîne du froid : produits standards et sur mesure pour cuisines professionnelles et locaux techniques.",
+      "otherTitle": "Autres solutions finies",
+      "items": [
+        {
+          "id": "sinks",
+          "title": "Éviers inox",
+          "text": "Éviers et équipements d'hygiène en inox pour cuisines professionnelles et locaux techniques, réalisés sur mesure selon vos besoins."
+        },
+        {
+          "id": "storage",
+          "title": "Meubles & étagères inox",
+          "text": "Meubles, placards et étagères en inox pour cuisines professionnelles et locaux techniques, réalisés sur mesure selon vos besoins."
+        },
+        {
+          "id": "refrigeration",
+          "title": "Réfrigération professionnelle",
+          "text": "Une gamme d'équipements de réfrigération professionnelle pour vos espaces de travail."
+        },
+        {
+          "id": "cold-rooms",
+          "title": "Construction de chambres froides",
+          "text": "LIBALSTAL construit des chambres froides professionnelles conçues autour de votre projet, avec une implantation et des dimensions définies sur mesure."
+        }
+      ]
+    }
   },
   "productItems": {
     "spiral-round-duct": {
@@ -293,7 +325,7 @@
   "capabilities": {
     "title": "Savoir-faire",
     "h1": "Savoir-faire industriel",
-    "intro": "Les familles de fabrication de Libalstal. Gammes, épaisseurs et équipements s'affichent dès qu'ils sont confirmés.",
+    "intro": "Prestations de fabrication, process et pose : de vos plans à la pièce posée.",
     "items": {
       "spiral": {
         "title": "Gaines circulaires spiralées",
@@ -348,6 +380,45 @@
         "Assemblages étanches",
         "Équipe technique expérimentée et service d'installation qualifié",
         "Intervention sur tout le territoire national"
+      ]
+    },
+    "solutions": {
+      "solutionsTitle": "Solutions finies",
+      "productsLink": "Réseaux de gaines et composants",
+      "productsIntro": "Retrouvez les gaines, raccords et accessoires dans le catalogue dédié.",
+      "quoteLink": "Demander un devis",
+      "items": [
+        {
+          "id": "inox",
+          "title": "Équipements professionnels en inox — standard et sur mesure",
+          "text": "Conception et fabrication d'équipements en inox adaptés à vos besoins professionnels.",
+          "examples": [
+            "Tables et plans de travail",
+            "Plonges et équipements d’hygiène",
+            "Meubles, armoires et rayonnages",
+            "Chariots et équipements sur mesure"
+          ]
+        },
+        {
+          "id": "refrigeration",
+          "title": "Réfrigération professionnelle",
+          "text": "Une gamme d'équipements de réfrigération professionnelle pour vos espaces de travail.",
+          "examples": [
+            "Armoires réfrigérées",
+            "Tables réfrigérées",
+            "Vitrines réfrigérées"
+          ]
+        },
+        {
+          "id": "cold-rooms",
+          "title": "Construction de chambres froides professionnelles",
+          "text": "LIBALSTAL construit des chambres froides professionnelles conçues selon votre projet, avec une implantation et des dimensions définies sur mesure.",
+          "examples": [
+            "Chambres froides sur mesure",
+            "Implantation adaptée à votre espace",
+            "Dimensions définies selon votre projet"
+          ]
+        }
       ]
     }
   },

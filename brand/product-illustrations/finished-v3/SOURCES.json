@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-01",
+  "assets": [
+    {
+      "slug": "stainless-tables",
+      "generator": "OpenAI built-in image generation",
+      "kind": "Generic generated product illustration, not verified dimensions or a product photograph.",
+      "subject": "One professional stainless steel WORKTABLE, completely FLAT SOLID UNBROKEN tabletop, rear upstand, four tubular legs and one lower solid shelf. Absolutely NO sink, basin, tap, drain, holes or plumbing.",
+      "source": "brand/product-illustrations/finished-v3/stainless-tables.png",
+      "sha256": "ca2a6b15215b0d33ff71c467ec7cae4dad672e06c42c3fbbfb628c4372305954"
+    },
+    {
+      "slug": "sinks",
+      "generator": "OpenAI built-in image generation",
+      "kind": "Generic generated product illustration, not verified dimensions or a product photograph.",
+      "subject": "One professional stainless steel wash-up sink unit with TWO deep rectangular basins, a clear curved mixer tap, right draining board, tubular legs and lower shelf. Obviously a sink, not a plain table.",
+      "source": "brand/product-illustrations/finished-v3/sinks.png",
+      "sha256": "117ddc2eb3cee8dbe4d756623996454c3d66a2ed5b14fe6c5e8ecee6018eeba5"
+    },
+    {
+      "slug": "storage",
+      "generator": "OpenAI built-in image generation",
+      "kind": "Generic generated product illustration, not verified dimensions or a product photograph.",
+      "subject": "A coherent pair of professional stainless steel storage furniture: one closed double-door floor cupboard and one open four-tier shelving rack, arranged side by side.",
+      "source": "brand/product-illustrations/finished-v3/storage.png",
+      "sha256": "13b919df7422ef7504348c7dd6f98ca9b218fec4b62c6a6256397bb94f0bb244"
+    },
+    {
+      "slug": "refrigeration",
+      "generator": "OpenAI built-in image generation",
+      "kind": "Generic generated product illustration, not verified dimensions or a product photograph.",
+      "subject": "A coherent pair of professional refrigeration equipment: one upright stainless steel refrigerator cabinet with solid door and small generic dark control panel, and one two-door refrigerated preparation counter with flat top. No brands or numbers.",
+      "source": "brand/product-illustrations/finished-v3/refrigeration.png",
+      "sha256": "628734b12af7ac301281162109453221ad524060d2bfecc6ac43059228efdb72"
+    },
+    {
+      "slug": "cold-rooms",
+      "generator": "OpenAI built-in image generation",
+      "kind": "Generic generated product illustration, not verified dimensions or a product photograph.",
+      "subject": "One professional modular insulated cold room as a clean three-quarter architectural cutaway product illustration, white insulated wall panels, sturdy hinged insulated door open showing empty hygienic interior and simple metal shelving, generic refrigeration evaporator high inside. No specifications or labels.",
+      "source": "brand/product-illustrations/finished-v3/cold-rooms.png",
+      "sha256": "0604e5a412edf19eba0837b9a341ec05e5bd9c65f65764e6618cb0cd06b57da2"
+    }
+  ]
+}

@@ -25,7 +25,6 @@ if (root) {
   function announce(text) { status.textContent = text; }
   function sync() {
     root.dataset.current = slides[current].dataset.photoId;
-    root.querySelector('.ph-cap-label').textContent = slides[current].dataset.label;
     const lineEls = root.querySelectorAll('.ph-title .ph-line-in');
     const firstLine = slides[current].dataset.titleFirst || '';
     const secondLine = slides[current].dataset.titleSecond || '';

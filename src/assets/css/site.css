@@ -24,6 +24,7 @@
   --grid-line: rgba(232, 236, 239, .045);
   --hero-glow: rgba(0, 102, 204, .32);
   --sheet-fill: rgba(77, 155, 255, .07);
+  --product-stage: #20262b;
 
   --font: "Montserrat", "Montserrat Fallback", system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans Arabic", "Segoe UI Arabic", Tahoma, sans-serif;
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
@@ -54,6 +55,7 @@
   --grid-line: rgba(43, 47, 51, .07);
   --hero-glow: rgba(0, 102, 204, .16);
   --sheet-fill: rgba(0, 88, 176, .06);
+  --product-stage: #cbd3da;
   color-scheme: light;
 }
 
@@ -234,7 +236,7 @@ a:hover .arr, button:hover .arr { transform: translateX(3px); }
 /* home: the assembled demo run (studio render) next to the way into the 3D page */
 .asm-band .wrap { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; }
 .asm-band-fig { position: relative; margin: 0; border: 1px solid var(--line);
-  background: linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 24px 24px, var(--bg-2); }
+  background: var(--product-stage); }
 .asm-band-fig img { display: block; width: 100%; height: auto; }
 .asm-band .lead { margin-bottom: 1.8rem; }
 @media (max-width: 860px) { .asm-band .wrap { grid-template-columns: minmax(0, 1fr); } }
@@ -246,8 +248,8 @@ a:hover .arr, button:hover .arr { transform: translateX(3px); }
 .cap-grid h3 { margin-bottom: .45rem; }
 .cap-grid p { margin: 0; color: var(--muted); font-size: .95rem; }
 .cap-fig { display: block; border: 1px solid var(--line);
-  background: linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 16px 16px, var(--bg-2); }
-.cap-fig img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; }
+  background: var(--product-stage); }
+.cap-fig img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; }
 .cap-grid li > a { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 50%; text-decoration: none; justify-self: end; }
 .cap-grid li > a:hover { border-color: var(--accent); }
 @media (max-width: 1000px) { .cap-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -273,7 +275,7 @@ a:hover .arr, button:hover .arr { transform: translateX(3px); }
 .card-cat { font: 600 .8rem/1.4 var(--font); color: var(--accent); }
 /* illustrative render on a drawing-sheet grid, bleeding to the card edges */
 .card-render { margin: -1.4rem -1.4rem .9rem; color: inherit; border-bottom: 1px solid var(--line);
-  background: linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 24px 24px, var(--bg-2); }
+  background: var(--product-stage); }
 .card-render img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; }
 [dir="rtl"] .card-cat { letter-spacing: 0; font-size: .82rem; }
 .card-h { margin: 0; font-size: 1.12rem; }
@@ -466,10 +468,8 @@ address { font-style: normal; line-height: 1.9; margin-bottom: 1rem; }
 @media (max-width: 960px) { .asm-layout { grid-template-columns: 1fr; } }
 .asm-view { margin: 0; min-width: 0; }
 /* The stage stays graphite in both themes (a drawing viewport): galvanised steel needs a dark ground to read. */
-.asm-stage { --stage: #1d2125; --stage-line: #353c43; position: relative; aspect-ratio: 4 / 3; border: 1px solid var(--line); overflow: hidden; background:
-  linear-gradient(var(--stage-line) 1px, transparent 1px) 0 0 / 32px 32px,
-  linear-gradient(90deg, var(--stage-line) 1px, transparent 1px) 0 0 / 32px 32px, var(--stage); }
-.asm-stage::before { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--stage) 80%, transparent); }
+.asm-stage { --stage: #1d2125; --stage-line: #353c43; position: relative; aspect-ratio: 4 / 3; border: 1px solid var(--line); overflow: hidden; background: var(--stage); }
+.asm-stage::before { display: none; }
 .asm-preview { position: absolute; inset: 0; display: grid; place-items: center; padding: 8% 5% 5%; }
 .asm-preview svg { width: 100%; height: 100%; }
 .asm-canvas { position: absolute; inset: 0; display: none; }
@@ -524,8 +524,7 @@ html:not(.js) .asm-pick { cursor: default; }
 
 /* ---------- v14: "Du plan au métal" scroll story ---------- */
 .st-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
-.st-stage { margin: 0; border: 1px solid var(--line); background-color: var(--bg-2);
-  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 28px 28px; }
+.st-stage { margin: 0; border: 1px solid var(--line); background: var(--product-stage); background-image: none; }
 .st-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
 .st-fig { display: grid; place-items: center; padding: clamp(.8rem, 3vw, 2rem); background: var(--bg-2); }
 .st-fig svg { display: block; width: 100%; height: 100%; max-height: 100%; }
@@ -810,7 +809,8 @@ html:not(.js) .asm-pick { cursor: default; }
 /* ---------- catalogue: professional duct-system arrangement (scoped; homepage/related cards share .product-card) ---------- */
 /* coherent 3:2 product stages, no clipping, whole object visible */
 .product-card .card-fig { position: relative; overflow: hidden; }
-.product-card .card-illustrative { margin: -1.4rem -1.4rem .9rem; border-bottom: 1px solid var(--line); background: var(--bg-2); }
+.product-card .card-illustrative { margin: -1.4rem -1.4rem .9rem; border-bottom: 1px solid var(--line);
+  background: var(--product-stage); }
 .product-card .card-illustrative img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; }
 .product-card .card-render img { aspect-ratio: 3 / 2; object-fit: contain; }
 .product-card .card-photo { aspect-ratio: 3 / 2; }
@@ -824,7 +824,8 @@ html:not(.js) .asm-pick { cursor: default; }
 [dir="rtl"] .catalogue-grid .product-card .card-cat { letter-spacing: 0; text-transform: none; font-size: .82rem; }
 
 /* detail: illustrative image presentation */
-.drawing-illustrative { padding: 0; background: var(--bg-2); }
+.drawing-illustrative { padding: 0;
+  background: var(--product-stage); }
 .drawing-illustrative img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; }
 .drawing-illustrative + figcaption { margin: 0; padding: .7rem 1.2rem 1rem; }
 
@@ -844,3 +845,16 @@ html:not(.js) .asm-pick { cursor: default; }
 @media (max-width: 640px) { .catalogue-grid { grid-template-columns: minmax(0, 1fr); gap: 1rem; } .catalogue-page .filters .chip { padding: .65rem .8rem; font-size: .78rem; } }
 
 .catalogue-grid .product-card[hidden] { display: none; }
+
+/* Separate the component catalogue from finished equipment. */
+.catalogue-switch { display: flex; flex-wrap: wrap; gap: .75rem; margin-block-end: 2rem; }
+.catalogue-switch .btn { max-width: 100%; white-space: normal; text-align: center; }
+.family-card { padding: 1.5rem; }
+.family-card .card-sum { display: block; margin-block: .75rem 1.5rem; }
+.catalogue-grid + h2 { margin-block: 3rem 1.5rem; }
+.family-card .card-fig { margin: -1.5rem -1.5rem 1.5rem; background: var(--product-stage); }
+@media (min-width: 1001px) {
+  .cap-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cap-grid li.has-fig { grid-template-columns: minmax(0, 1fr) 48px; }
+  .cap-grid .cap-fig { grid-column: 1 / -1; }
+}

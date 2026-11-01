@@ -451,7 +451,6 @@ export const PhotoHero: React.FC<PhotoHeroProps> = ({ lang, mobile, theme = 'dar
           {headline}
           {lead}
           {ctaRow}
-          {caption}
           {selectors}
         </div>
       </AbsoluteFill>
@@ -480,7 +479,6 @@ export const PhotoHero: React.FC<PhotoHeroProps> = ({ lang, mobile, theme = 'dar
         {headline}
         {lead}
         {ctaRow}
-        {caption}
         {selectors}
       </div>
     </AbsoluteFill>

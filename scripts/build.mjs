@@ -167,7 +167,7 @@ function introMarkup(ctx) {
 }
 
 // ---------- layout ----------
-const NAV = ['products', 'capabilities', 'industries', 'projects', 'quality', 'company'];
+const NAV = ['capabilities', 'products', 'industries', 'projects', 'quality', 'company'];
 
 function head(ctx, { title, description, path, noindex = false, jsonld = [], extraHead = '' }) {
   const { lang, D } = ctx;
@@ -235,7 +235,7 @@ function header(ctx, active, path) {
 function footer(ctx, path) {
   const { lang, D, cv } = ctx;
   const c = site.company;
-  const nav = ['products', 'capabilities', 'projects', 'contact'].map(k => `<li><a href="${url(lang, k)}">${esc(D.nav[k])}</a></li>`).join('');
+  const nav = ['capabilities', 'products', 'projects', 'contact'].map(k => `<li><a href="${url(lang, k)}">${esc(D.nav[k])}</a></li>`).join('');
   const langs = LANGS.map(l => `<li><a href="${url(l, path)}" hreflang="${l}" lang="${l}">${esc(DICT[l].meta.langName)}</a></li>`).join('');
   const email = tv(c.email, lang), phone = tv(c.phone, lang);
   return `<footer class="site-footer">
@@ -313,7 +313,7 @@ function productCard(ctx, p, headingLevel = 3) {
   const { lang, D, arr } = ctx;
   const it = D.productItems[p.slug];
   const fig = ILLUSTRATIVE.has(p.slug)
-    ? `<span class="card-fig card-illustrative">${illustrativeImg(p.slug, { alt: fmt(D.product.illustrativeAlt, { name: it.name }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}<span class="visual-label">${esc(D.product.illustrativeLabel)}</span></span>`
+    ? `<span class="card-fig card-illustrative">${illustrativeImg(p.slug, { alt: fmt(D.product.illustrativeAlt, { name: it.name }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>`
     : p.image ? `<span class="card-fig card-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" loading="lazy" decoding="async" alt="${esc(it.name)}"></span>`
     : RENDERS.has(p.slug) ? `<span class="card-fig card-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>`
     : `<span class="card-fig" aria-hidden="true">${icons[p.slug]}</span>`;
@@ -408,10 +408,12 @@ function home(ctx) {
   <figcaption class="hero-tag" data-label3d="${esc(H.heroTag)}">${esc(H.heroTagStatic)}</figcaption>
 </figure>`;
   // capabilities are families, not steps: no numbering; each shows the render of its typical product
-  const caps = site.capabilities.filter(c => c.offered !== false && !(hide && c.offered === null)).map(c => {
-    const r = capRender(c.id);
-    return `<li${r ? ' class="has-fig"' : ''}>${r ? `<span class="cap-fig">${renderImg(r, { sizes: '(max-width: 600px) 30vw, 200px' })}</span>` : ''}<div><h3>${esc(D.capabilities.items[c.id].title)}</h3><p>${esc(D.capabilities.items[c.id].text)}</p></div><a href="${url(lang, 'capabilities')}#${c.id}" aria-label="${esc(D.capabilities.items[c.id].title)} — ${esc(H.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`;
-  }).join('');
+  const inoxCaps = catalogueProducts().filter(p => p.cat === 'inox').map(p => {
+    const it = D.productItems[p.slug];
+    return `<li class="has-fig"><span class="cap-fig">${illustrativeImg(p.slug, { alt: it.name, sizes: '(max-width: 600px) 30vw, 200px' })}</span><div><h3>${esc(it.name)}</h3><p>${esc(it.summary)}</p></div><a href="${url(lang, 'capabilities')}" aria-label="${esc(it.name)} — ${esc(H.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`;
+  });
+  const familyCaps = D.products.finished.items.map(it => `<li class="has-fig"><span class="cap-fig">${illustrativeImg(it.id, { alt: it.title, sizes: '(max-width: 600px) 30vw, 200px' })}</span><div><h3>${esc(it.title)}</h3><p>${esc(it.text)}</p></div><a href="${url(lang, 'capabilities') + '#family-' + it.id}" aria-label="${esc(it.title)} — ${esc(H.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`);
+  const caps = [...inoxCaps, ...familyCaps].slice(0, 3).join('');
   const qItems = site.quality.slice(0, 6).filter(q => !hide || q.evidence);
   const qual = qItems.map(q => `<li><span>${esc(D.quality.items[q.id].t)}</span>${q.evidence ? `<a href="${esc(q.evidence)}">${esc(D.quality.evidenceLink)}</a>` : `<em class="badge">${esc(D.quality.evidenceMissing)}</em>`}</li>`).join('');
   const showInd = !hide || site.industriesConfirmed;
@@ -430,7 +432,7 @@ function home(ctx) {
         <div class="st-fig" data-step="2">${svgs.formed}</div>
         <div class="st-fig" data-step="3">${assemblySvg(site.ductAssembly, { title: S.figNetwork, id: 'st-t4', width: 900 })}</div>
       </div>
-      <figcaption><span class="st-count" aria-hidden="true" data-template="${esc(S.stepOf)}">${esc(fmt(S.stepOf, { n: 1 }))}</span><span class="st-cap">${esc(S.caption)}</span></figcaption>
+      <figcaption><span class="st-count" aria-hidden="true" data-template="${esc(S.stepOf)}">${esc(fmt(S.stepOf, { n: 1 }))}</span></figcaption>
       <div class="st-rail" aria-hidden="true"><span></span></div>
     </figure>
     <ol class="st-steps" role="list">${steps}</ol>
@@ -452,18 +454,19 @@ ${PHOTO_HERO.enabled ? photoHero(ctx, PHOTO_HERO, A) : `<section class="hero" ar
 </section>`}
 ${story}
 <section class="sec" aria-labelledby="cap-h"><div class="wrap">
-  <div class="sh rv"><h2 id="cap-h">${esc(H.capTitle)}</h2><p>${esc(H.capIntro)}</p></div>
+  <div class="sh rv"><h2 id="cap-h">${esc(D.capabilities.h1)}</h2></div>
   <ul class="cap-grid rv" role="list">${caps}</ul>
+  <p class="more"><a class="btn" href="${url(lang, 'capabilities')}">${esc(H.capMore)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
 </div></section>
 
 <section class="sec alt" aria-labelledby="prod-h"><div class="wrap">
   <div class="sh rv"><h2 id="prod-h">${esc(H.prodTitle)}</h2><p>${esc(H.prodIntro)}</p></div>
-  <div class="grid catalogue-grid rv">${['rectangular-duct', 'spiral-round-duct', 'elbows', 'control-dampers', 'acoustic-silencers', 'stainless-hoods'].map(slug => site.products.find(p => p.slug === slug)).filter(Boolean).map(p => productCard(ctx, p)).join('')}</div>
+  <div class="grid catalogue-grid rv">${['rectangular-duct', 'spiral-round-duct', 'elbows'].map(slug => site.products.find(p => p.slug === slug)).filter(p => p && p.cat !== 'inox').map(p => productCard(ctx, p)).join('')}</div>
   <p class="more"><a class="btn" href="${url(lang, 'products')}">${esc(H.prodMore)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
 </div></section>
 ${ASM_RENDER ? `
 <section class="sec asm-band" aria-labelledby="asm-h"><div class="wrap">
-  <figure class="asm-band-fig rv">${renderImg('assembly', { alt: H.asmAlt, sizes: '(max-width: 860px) 92vw, 760px' })}<span class="asm-tag">${esc(D.assembly.demoLabel)}</span></figure>
+  <figure class="asm-band-fig rv">${renderImg('assembly', { alt: H.asmAlt, sizes: '(max-width: 860px) 92vw, 760px' })}</figure>
   <div class="rv"><h2 id="asm-h">${esc(H.asmTitle)}</h2><p class="lead">${esc(H.asmText)}</p><p><a class="btn btn-primary" href="${url(lang, 'assembly')}">${esc(S.cta3d)} <span class="arr" aria-hidden="true">${arr}</span></a></p></div>
 </div></section>` : ''}
 ${qual ? `
@@ -499,21 +502,21 @@ ${rfqBand(ctx)}`;
 function products(ctx) {
   const { lang, D } = ctx;
   const cr = crumbs(ctx, [[D.nav.products, 'products']]);
-  const cats = ['duct', 'fit', 'acc', 'inox', 'cus'];
-  const ordered = catalogueProducts();
-  const body = `${pageHead(ctx, D.nav.products, D.products.h1, D.products.intro, cr.html)}
+  const cats = ['duct', 'fit', 'acc', 'cus'];
+  const ordered = catalogueProducts().filter(p => p.cat !== 'inox');
+  const body = `${pageHead(ctx, D.nav.products, D.products.partsH1, D.products.partsIntro, cr.html)}
 <section class="sec tight catalogue-page"><div class="wrap">
   <div class="filters" role="group" aria-label="${esc(D.products.filterLabel)}">
     <button type="button" class="chip" aria-pressed="true" data-filter="all">${esc(D.products.all)}</button>
     ${cats.map(c => `<button type="button" class="chip" aria-pressed="false" data-filter="${c}">${esc(D.products.cats[c])}</button>`).join('')}
   </div>
-  <p class="count" role="status" data-template="${esc(D.products.count)}" data-template-one="${esc(D.products.countOne)}">${esc(fmt(site.products.length === 1 ? D.products.countOne : D.products.count, { n: site.products.length }))}</p>
+  <p class="count" role="status" data-template="${esc(D.products.count)}" data-template-one="${esc(D.products.countOne)}">${esc(fmt(ordered.length === 1 ? D.products.countOne : D.products.count, { n: ordered.length }))}</p>
   <div class="grid catalogue-grid" id="product-grid">${ordered.map(p => productCard(ctx, p, 2)).join('')}</div>
   <p class="empty" id="product-empty" hidden>${esc(D.products.empty)}</p>
   <p class="more"><a class="btn" href="${url(lang, 'assembly')}">${esc(D.home.story.cta3d)} <span class="arr" aria-hidden="true">${D.meta.arrow}</span></a></p>
 </div></section>
 ${rfqBand(ctx)}`;
-  emit(lang, 'products', page(ctx, { title: D.products.title, description: D.products.intro, path: 'products', active: 'products', jsonld: [cr.ld] }, body));
+  emit(lang, 'products', page(ctx, { title: D.products.title, description: D.products.partsIntro, path: 'products', active: 'products', jsonld: [cr.ld] }, body));
 
   for (const p of site.products) {
     const it = D.productItems[p.slug];
@@ -527,9 +530,9 @@ ${rfqBand(ctx)}`;
     const body = `<div class="wrap page-head">${c2.html}<p class="eyebrow">${esc(D.products.cats[p.cat])}</p><h1>${esc(it.name)}</h1><p class="lead">${esc(it.summary)}</p></div>
 <section class="sec tight"><div class="wrap two pd">
   <figure class="drawing">
-    ${ILLUSTRATIVE.has(p.slug) ? `<div class="drawing-illustrative">${illustrativeImg(p.slug, { alt: fmt(D.product.illustrativeAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div><figcaption class="small muted">${esc(D.product.illustrativeImage)}</figcaption>`
+    ${ILLUSTRATIVE.has(p.slug) ? `<div class="drawing-illustrative">${illustrativeImg(p.slug, { alt: fmt(D.product.illustrativeAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div>`
       : p.image ? `<div class="drawing-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" fetchpriority="high" decoding="async" alt="${esc(it.name)}"></div>${p.image.startsWith('catalogue/') ? `<figcaption class="small muted">${esc(D.product.catalogueImage)}</figcaption>` : ''}`
-      : RENDERS.has(p.slug) ? `<div class="drawing-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div><figcaption class="small muted">${esc(D.product.render)}</figcaption>`
+      : RENDERS.has(p.slug) ? `<div class="drawing-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div>`
       : `<div class="drawing-fig" aria-hidden="true">${icons[p.slug]}</div><figcaption>${ctx.ph(D.product.imageMissing, 'toProvide')}</figcaption>`}
     <div class="titleblock" aria-hidden="true"><span>LIBALSTAL</span><span>${esc(it.name)}</span><span>${esc(D.products.cats[p.cat])}</span></div>
   </figure>
@@ -548,10 +551,28 @@ ${related.length ? `<section class="sec alt" aria-labelledby="rel-h"><div class=
   }
 }
 
+function finishedProducts(ctx) {
+  const { lang, D, arr } = ctx;
+  const F = D.products.finished;
+  const inox = catalogueProducts().filter(p => p.cat === 'inox');
+  const cards = inox.map(p => productCard(ctx, p, 2)).join('');
+  const families = F.items.map(it => `<article class="card family-card" id="family-${esc(it.id)}">
+  <span class="card-fig card-illustrative">${illustrativeImg(it.id, { alt: fmt(D.product.illustrativeAlt, { name: it.title }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>
+  <h3 class="card-h">${esc(it.title)}</h3>
+  <p class="card-sum">${esc(it.text)}</p>
+  <p><a class="btn" href="${url(lang, 'contact')}">${esc(D.products.quote)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
+</article>`).join('');
+  return `<section class="sec tight catalogue-page"><div class="wrap">
+  <div class="grid catalogue-grid">${cards}</div>
+  <h2 class="h3">${esc(F.otherTitle)}</h2>
+  <div class="grid catalogue-grid">${families}</div>
+</div></section>`;
+}
+
 function capabilities(ctx) {
   const { lang, D, val, ph } = ctx;
   const cr = crumbs(ctx, [[D.nav.capabilities, 'capabilities']]);
-  const rows = site.capabilities.map(c => {
+  const rows = site.capabilities.filter(c => c.id === 'install').map(c => {
     const it = D.capabilities.items[c.id];
     let extra = '';
     if ('range' in c && c.range == null) note(`capabilities.${c.id}.range`, `Gamme — ${DICT.fr.capabilities.items[c.id].title}`);
@@ -566,6 +587,7 @@ function capabilities(ctx) {
     ? `<ul class="qa" role="list">${site.equipment.map(e => `<li><span>${esc(tv(e.name, lang))}</span><span class="muted">${esc(tv(e.detail, lang) || '')}</span></li>`).join('')}</ul>`
     : `<p>${ph(D.capabilities.equipmentEmpty)}</p>`;
   const body = `${pageHead(ctx, D.nav.capabilities, D.capabilities.h1, D.capabilities.intro, cr.html)}
+${finishedProducts(ctx)}
 <section class="sec tight"><div class="wrap"><ul class="caps caps-lg" role="list">${rows}</ul></div></section>
 <section class="sec alt" aria-labelledby="why-h"><div class="wrap two">
   <div><h2 id="why-h">${esc(D.capabilities.why.title)}</h2></div>
@@ -809,11 +831,9 @@ function assembly(ctx, system = 'rectangular') {
     return `<article class="asm-part" id="part-${c.id}" data-part="${c.id}" aria-labelledby="part-${c.id}-h">
   <div class="asm-part-top"><p class="eyebrow">${esc(T.types[c.type])}</p><button type="button" class="icon-btn asm-close" aria-label="${esc(T.close)}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2"/></svg></button></div>
   <h3 class="asm-part-h" id="part-${c.id}-h" tabindex="-1">${esc(tv(c.name, lang))}</h3>
-  <p><em class="badge">${esc(T.demoLabel)}</em></p>
   <h4>${esc(T.geometryTitle)}</h4>
   <div class="asm-dim">${(c.geometry.diameterMm || c.geometry.inletDiameterMm) ? `<svg viewBox="0 0 210 150" aria-hidden="true"><circle class="ln" cx="105" cy="65" r="48"/><path class="dim" d="M57 65h96"/><text class="asm-dt" x="105" y="135" text-anchor="middle">Ø ${inletOf(c)[0]} mm</text></svg>` : sectionDrawing(...inletOf(c))}</div>
   <dl class="spec">${geoRows(c)}</dl>
-  <p class="small muted">${esc(T.demoNote)}</p>
   <h4>${esc(T.productTitle)}</h4>
   <div class="asm-product-standard"><dl class="spec">${specs}</dl>
   <p><a href="${url(lang, 'products/' + p.slug)}">${esc(T.productLink)}${ctx.colon} ${esc(pname)}</a></p></div>
@@ -857,14 +877,12 @@ function assembly(ctx, system = 'rectangular') {
     <div class="asm-stage">
       <div class="asm-preview">${assemblySvg(a, { title: T.previewAlt, id: 'asm-svg-t' })}</div>
       <div class="asm-canvas" role="img" aria-label="${esc(T.viewLabel)}"></div>
-      <span class="asm-tag">${esc(T.demoLabel)}</span>
     </div>
     <div class="asm-tools" role="toolbar" aria-label="${esc(T.toolbar)}">${tools}</div>
     <figcaption>
       <p class="asm-status" role="status"></p>
       <p class="small muted asm-help">${esc(T.help)}</p>
-      <p class="small muted">${esc(T.demoNote)}</p>
-    </figcaption>
+        </figcaption>
   </figure>
   <div class="asm-side">
     <section class="asm-panel" aria-labelledby="asm-panel-h"><h2 id="asm-panel-h" class="h3">${esc(T.panelTitle)}</h2><p class="asm-empty">${esc(T.selectPrompt)}</p>
@@ -936,7 +954,8 @@ function rootFiles() {
   // Netlify / Cloudflare Pages formats
   write('_headers', `/*\n${Object.entries({ ...headers, 'Content-Security-Policy': csp + '; upgrade-insecure-requests', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' }).map(([k, v]) => `  ${k}: ${v}`).join('\n')}\n/assets/*\n  Cache-Control: public, max-age=604800\n`);
   const assemblyRedirects = LANGS.flatMap(l => ['spiral', 'branches', 'high-temperature'].map(k => `${url(l, 'assembly/' + k)}  ${url(l, 'assembly')}${k === 'high-temperature' ? '?heat=1' : ''}  301`)).join('\n');
-  write('_redirects', assemblyRedirects + `\n/en/*  /en/404.html  404\n/ar/*  /ar/404.html  404\n/*  /404.html  404\n`);
+  const finishedRedirects = LANGS.map(l => `${url(l, 'finished-products')}  ${url(l, 'capabilities')}  301`).join('\n');
+  write('_redirects', assemblyRedirects + '\n' + finishedRedirects + `\n/en/*  /en/404.html  404\n/ar/*  /ar/404.html  404\n/*  /404.html  404\n`);
 }
 
 function missingReport() {

@@ -1,6 +1,6 @@
 {
   "date": "2026-10-31",
-  "notes": "Generated with the built-in image tool using the original catalogue images as product references. References preserved unchanged. Do not treat generated geometry as verified dimensions or specifications. Responsive WebP variants are resized from the generated master.",
+  "notes": "Generated with the built-in image tool using the original catalogue images as product references. References preserved unchanged. Do not treat generated geometry as verified dimensions or specifications. Responsive WebP variants are resized from the generated master. Transparent cutouts created on 2026-11-01; opaque masters archived under opaque-v1 and edited PNGs under cutouts-v2.",
   "assets": [
     {
       "slug": "acoustic-silencers",
@@ -10,7 +10,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Rectangular galvanized HVAC acoustic silencer, horizontal rectangular sheet-metal box with flat top, folded flange rim, open rectangular front with two thick vertical acoustic splitters and three dark air passages.",
       "width": 1536,
       "height": 1024,
-      "sha256": "004dada9f34e2395e98cfa51ed4567e6c14ae8fa589c96eb5d502a7467b96ae9"
+      "sha256": "6a5f031522022ea20a7381acdf6202816922f9c8d7e0102aa5502ad5d03f5e87",
+      "previousOpaqueSha256": "004dada9f34e2395e98cfa51ed4567e6c14ae8fa589c96eb5d502a7467b96ae9",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/acoustic-silencers.webp",
+        "result": "brand/product-illustrations/cutouts-v2/acoustic-silencers.png",
+        "prompt": "Background extraction edit. Edit target is the attached acoustic-silencers product photo. Remove ONLY the pale white/grey studio background and floor, producing a genuinely transparent RGBA cutout. Preserve the complete exact product geometry, camera angle, proportions, metal highlights, surface texture, perforations, holes, internal dark air passages and fine wire mesh. Remove the background visible through open holes too, without erasing dark internal product surfaces. No new parts, no labels or text, no white floor or white outline/halo, no checkerboard baked into image. Keep soft natural contact shadow only as faint semitransparent alpha. Center full object with safe transparent margins on a 1536x1024 landscape canvas. Do not crop or redesign. This is a precise background removal, not a new product design."
+      }
     },
     {
       "slug": "flexible-connectors",
@@ -20,7 +28,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Rectangular HVAC flexible connector: two parallel square galvanized flange frames, connected by a short grey flexible fabric sleeve; open center, as reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "cc5515290b76da9007b0fbaad341613ba830a559a2583b4490547fefb753c850"
+      "sha256": "78ad439f172db00cf69a6779e53b4c9319132f1812c3140dedb8e839b713ebc7",
+      "previousOpaqueSha256": "cc5515290b76da9007b0fbaad341613ba830a559a2583b4490547fefb753c850",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/flexible-connectors.webp",
+        "result": "brand/product-illustrations/cutouts-v2/flexible-connectors.png",
+        "prompt": "Background extraction edit. Edit target is the attached flexible-connectors product photo. Remove ONLY the pale white/grey studio background and floor, producing a genuinely transparent RGBA cutout. Preserve the complete exact product geometry, camera angle, proportions, metal highlights, surface texture, perforations, holes, internal dark air passages and fine wire mesh. Remove the background visible through open holes too, without erasing dark internal product surfaces. No new parts, no labels or text, no white floor or white outline/halo, no checkerboard baked into image. Keep soft natural contact shadow only as faint semitransparent alpha. Center full object with safe transparent margins on a 1536x1024 landscape canvas. Do not crop or redesign. This is a precise background removal, not a new product design."
+      }
     },
     {
       "slug": "plenums",
@@ -30,7 +46,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular HVAC plenum box, long horizontal open rectangular grille outlet on front and two vertical round duct spigots on the top, exactly this product type as reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "3f90abc33570b3e922bd66041547c7f511a07324d79c41e725d79ada58984b5e"
+      "sha256": "11040b1d28b1b61e6f668fba3324f0a4a1e28ca27e60b3141fdcdd71df413226",
+      "previousOpaqueSha256": "3f90abc33570b3e922bd66041547c7f511a07324d79c41e725d79ada58984b5e",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/plenums.webp",
+        "result": "brand/product-illustrations/cutouts-v2/plenums.png",
+        "prompt": "Background extraction edit. Edit target is the attached plenums product photo. Remove ONLY the pale white/grey studio background and floor, producing a genuinely transparent RGBA cutout. Preserve the complete exact product geometry, camera angle, proportions, metal highlights, surface texture, perforations, holes, internal dark air passages and fine wire mesh. Remove the background visible through open holes too, without erasing dark internal product surfaces. No new parts, no labels or text, no white floor or white outline/halo, no checkerboard baked into image. Keep soft natural contact shadow only as faint semitransparent alpha. Center full object with safe transparent margins on a 1536x1024 landscape canvas. Do not crop or redesign. This is a precise background removal, not a new product design."
+      }
     },
     {
       "slug": "access-panels",
@@ -40,7 +64,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular HVAC inspection access door frame with its flat removable panel resting separately in front, two round quarter-turn latches, as reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "68542001e041d0ddd4dbfe0b7e6f5b38a78fcb6157140b9cb799937664330542"
+      "sha256": "8ffd0fcacfd09a501da10e99bd69b0ed5af697f867de3bdc3d71813febcb237e",
+      "previousOpaqueSha256": "68542001e041d0ddd4dbfe0b7e6f5b38a78fcb6157140b9cb799937664330542",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/access-panels.webp",
+        "result": "brand/product-illustrations/cutouts-v2/access-panels.png",
+        "prompt": "Background extraction edit. Edit target is the attached access-panels product photo. Remove ONLY the pale white/grey studio background and floor, producing a genuinely transparent RGBA cutout. Preserve the complete exact product geometry, camera angle, proportions, metal highlights, surface texture, perforations, holes, internal dark air passages and fine wire mesh. Remove the background visible through open holes too, without erasing dark internal product surfaces. No new parts, no labels or text, no white floor or white outline/halo, no checkerboard baked into image. Keep soft natural contact shadow only as faint semitransparent alpha. Center full object with safe transparent margins on a 1536x1024 landscape canvas. Do not crop or redesign. This is a precise background removal, not a new product design."
+      }
     },
     {
       "slug": "sand-traps",
@@ -50,7 +82,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular sand trap air intake, deep box with front frame, five vertical folded baffle channels and dark narrow passages as reference, no decorative horizontal louvres.",
       "width": 1536,
       "height": 1024,
-      "sha256": "906bd3745f0f452e4638da869631c10743e14e7e1f8e20d87c0a667fc0fb3310"
+      "sha256": "859dca40dd77ca845f7834ac838adf220a26547bf3ae77116821d6519d868c65",
+      "previousOpaqueSha256": "906bd3745f0f452e4638da869631c10743e14e7e1f8e20d87c0a667fc0fb3310",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/sand-traps.webp",
+        "result": "brand/product-illustrations/cutouts-v2/sand-traps.png",
+        "prompt": "Background extraction edit. Edit target is the attached sand-traps product photo. Remove ONLY the pale white/grey studio background and floor, producing a genuinely transparent RGBA cutout. Preserve the complete exact product geometry, camera angle, proportions, metal highlights, surface texture, perforations, holes, internal dark air passages and fine wire mesh. Remove the background visible through open holes too, without erasing dark internal product surfaces. No new parts, no labels or text, no white floor or white outline/halo, no checkerboard baked into image. Keep soft natural contact shadow only as faint semitransparent alpha. Center full object with safe transparent margins on a 1536x1024 landscape canvas. Do not crop or redesign. This is a precise background removal, not a new product design."
+      }
     },
     {
       "slug": "rectangular-roof-cowls",
@@ -60,7 +100,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular roof ventilation cowl on square roof flashing plate, rectangular vertical base, curved hood with pitched top and protective dark mesh opening as reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "610f59d9c1771242373f03eb9f995260459db6786dd070252c919eefe75558d7"
+      "sha256": "b0a9c9572e2af04dd67108a443cfdadfe09bd367165472290491332b308117c5",
+      "previousOpaqueSha256": "610f59d9c1771242373f03eb9f995260459db6786dd070252c919eefe75558d7",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/rectangular-roof-cowls.webp",
+        "result": "brand/product-illustrations/cutouts-v2/rectangular-roof-cowls.png",
+        "prompt": "Background-extraction edit of attached rectangular-roof-cowls product image. Remove ONLY pale white/grey studio background/floor and make true transparent RGBA alpha. Preserve exact original full product geometry and camera, all metallic highlights, hardware, material colour and shadows inside the object. Preserve all parts: especially white plastic parts, handles, thin wires, mesh, wheels, legs, sheet-metal flanges. Background seen through empty holes or open framework must be transparent, but interior product metal surfaces must remain intact. No object redesign, no additions, no text or labels, no opaque floor, no baked checkerboard, no white halo. Faint semitransparent contact shadow is fine. 1536x1024 landscape canvas with full uncropped product and safe transparent margins. Precise clean product cutout."
+      }
     },
     {
       "slug": "round-roof-cowls",
@@ -70,7 +118,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized round Chinese-hat roof ventilation cowl: round duct neck, mesh screen cylinder, broad conical rain cap, exact general construction as reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "806c60ba6bfc5adb5abe5a7502e69bde136f9ccb20b1b68de3a1e1640e8183b9"
+      "sha256": "25d7096243dc4e29f020622fff95bb031e50d9db3d1c45a35c53689bfb5ec332",
+      "previousOpaqueSha256": "806c60ba6bfc5adb5abe5a7502e69bde136f9ccb20b1b68de3a1e1640e8183b9",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/round-roof-cowls.webp",
+        "result": "brand/product-illustrations/cutouts-v2/round-roof-cowls.png",
+        "prompt": "Background extraction edit. Edit target is the attached round-roof-cowls product photo. Remove ONLY the pale white/grey studio background and floor, producing a genuinely transparent RGBA cutout. Preserve the complete exact product geometry, camera angle, proportions, metal highlights, surface texture, perforations, holes, internal dark air passages and fine wire mesh. Remove the background visible through open holes too, without erasing dark internal product surfaces. No new parts, no labels or text, no white floor or white outline/halo, no checkerboard baked into image. Keep soft natural contact shadow only as faint semitransparent alpha. Center full object with safe transparent margins on a 1536x1024 landscape canvas. Do not crop or redesign. This is a precise background removal, not a new product design."
+      }
     },
     {
       "slug": "external-louvres",
@@ -80,7 +136,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: Galvanized rectangular exterior ventilation louvre grille: rectangular frame and seven parallel horizontal angled weather blades, open dark air gaps, as reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "ee0b104b717ce6548dba2e60b3edf16ebbded72f63467c46ef4c9773e15c553c"
+      "sha256": "b0dee3446d34f90fdb34ccfbf0d8187a2377a18dc24573310b53652d1382a271",
+      "previousOpaqueSha256": "ee0b104b717ce6548dba2e60b3edf16ebbded72f63467c46ef4c9773e15c553c",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/external-louvres.webp",
+        "result": "brand/product-illustrations/cutouts-v2/external-louvres.png",
+        "prompt": "Background extraction edit. Edit target is the attached external-louvres product photo. Remove ONLY the pale white/grey studio background and floor, producing a genuinely transparent RGBA cutout. Preserve the complete exact product geometry, camera angle, proportions, metal highlights, surface texture, perforations, holes, internal dark air passages and fine wire mesh. Remove the background visible through open holes too, without erasing dark internal product surfaces. No new parts, no labels or text, no white floor or white outline/halo, no checkerboard baked into image. Keep soft natural contact shadow only as faint semitransparent alpha. Center full object with safe transparent margins on a 1536x1024 landscape canvas. Do not crop or redesign. This is a precise background removal, not a new product design."
+      }
     },
     {
       "slug": "damper-accessories",
@@ -90,7 +154,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: A neatly arranged set of manual HVAC damper control hardware, as reference: long silver stamped lever with square shaft opening, circular two-tab bearing plate with round central opening, short rectangular sleeve adapter, white nylon bushing, one wing nut. Coherent separate components, flat lay slight perspective.",
       "width": 1536,
       "height": 1024,
-      "sha256": "64aa2f45fdac8aad56afe5131e1256c7ac2762450279fd4584347eddaccf1975"
+      "sha256": "924dab46accd88c7b2198129ea323fa5a4b79ac0dd703ca5fee7756ba2a5b2a2",
+      "previousOpaqueSha256": "64aa2f45fdac8aad56afe5131e1256c7ac2762450279fd4584347eddaccf1975",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/damper-accessories.webp",
+        "result": "brand/product-illustrations/cutouts-v2/damper-accessories.png",
+        "prompt": "Background-extraction edit of attached damper-accessories product image. Remove ONLY pale white/grey studio background/floor and make true transparent RGBA alpha. Preserve exact original full product geometry and camera, all metallic highlights, hardware, material colour and shadows inside the object. Preserve all parts: especially white plastic parts, handles, thin wires, mesh, wheels, legs, sheet-metal flanges. Background seen through empty holes or open framework must be transparent, but interior product metal surfaces must remain intact. No object redesign, no additions, no text or labels, no opaque floor, no baked checkerboard, no white halo. Faint semitransparent contact shadow is fine. 1536x1024 landscape canvas with full uncropped product and safe transparent margins. Precise clean product cutout."
+      }
     },
     {
       "slug": "smooth-round-duct",
@@ -100,7 +172,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One straight smooth galvanized circular ventilation duct, long hollow cylinder with longitudinal seam and small crimped joining end, no spiral seam. Both circular openings visible in three-quarter view as reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "19708862eb66229541d117a6db9cc5fc2be889e964bfb359ec22a3861e1e3df4"
+      "sha256": "91d4d55c9096e694cac31a7d9f4460c6f2e0dcb7b95a0e9e56009319dcea4923",
+      "previousOpaqueSha256": "19708862eb66229541d117a6db9cc5fc2be889e964bfb359ec22a3861e1e3df4",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/smooth-round-duct.webp",
+        "result": "brand/product-illustrations/cutouts-v2/smooth-round-duct.png",
+        "prompt": "Background-extraction edit of attached smooth-round-duct product image. Remove ONLY pale white/grey studio background/floor and make true transparent RGBA alpha. Preserve exact original full product geometry and camera, all metallic highlights, hardware, material colour and shadows inside the object. Preserve all parts: especially white plastic parts, handles, thin wires, mesh, wheels, legs, sheet-metal flanges. Background seen through empty holes or open framework must be transparent, but interior product metal surfaces must remain intact. No object redesign, no additions, no text or labels, no opaque floor, no baked checkerboard, no white halo. Faint semitransparent contact shadow is fine. 1536x1024 landscape canvas with full uncropped product and safe transparent margins. Precise clean product cutout."
+      }
     },
     {
       "slug": "stainless-hoods",
@@ -110,17 +190,35 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One commercial stainless steel extraction canopy hood, wall-mounted trapezoid form with brushed stainless shell and a row of parallel baffle filters visible underneath. Isolated without wall, seen from slightly below front corner like reference.",
       "width": 1536,
       "height": 1024,
-      "sha256": "5491c05581adb09706ce07adecc087b6b037fe1f9399ba35721c7d4f22375fe3"
+      "sha256": "16411d4a1cedb6fa86dc8bc6cd8edcbeb6f81da2811fe5acf1b776dbc3c8b909",
+      "previousOpaqueSha256": "5491c05581adb09706ce07adecc087b6b037fe1f9399ba35721c7d4f22375fe3",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/stainless-hoods.webp",
+        "result": "brand/product-illustrations/cutouts-v2/stainless-hoods.png",
+        "prompt": "Background-extraction edit of attached stainless-hoods product image. Remove ONLY pale white/grey studio background/floor and make true transparent RGBA alpha. Preserve exact original full product geometry and camera, all metallic highlights, hardware, material colour and shadows inside the object. Preserve all parts: especially white plastic parts, handles, thin wires, mesh, wheels, legs, sheet-metal flanges. Background seen through empty holes or open framework must be transparent, but interior product metal surfaces must remain intact. No object redesign, no additions, no text or labels, no opaque floor, no baked checkerboard, no white halo. Faint semitransparent contact shadow is fine. 1536x1024 landscape canvas with full uncropped product and safe transparent margins. Precise clean product cutout."
+      }
     },
     {
       "slug": "stainless-tables",
       "generator": "OpenAI image generation",
       "kind": "Generated illustrative studio representation; not a verified product photograph or technical drawing.",
       "sourceReference": "brand/catalogue-products/stainless-tables.png",
-      "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One commercial stainless steel sink worktable with one deep rectangular sink on left, flat draining/work surface on right, short rear upstand, four square metal legs and lower bracing rails, as reference. No taps or extra utensils.",
+      "prompt": "One professional stainless steel WORKTABLE, completely FLAT SOLID UNBROKEN tabletop, rear upstand, four tubular legs and one lower solid shelf. Absolutely NO sink, basin, tap, drain, holes or plumbing.",
       "width": 1536,
       "height": 1024,
-      "sha256": "1582d1e3639676001661244d40a1aad0600f0be14ebe7a09fa17a21ccd24287d"
+      "sha256": "ca2a6b15215b0d33ff71c467ec7cae4dad672e06c42c3fbbfb628c4372305954",
+      "previousOpaqueSha256": "1582d1e3639676001661244d40a1aad0600f0be14ebe7a09fa17a21ccd24287d",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/stainless-tables.webp",
+        "result": "brand/product-illustrations/cutouts-v2/stainless-tables.png",
+        "prompt": "Background-extraction edit of attached stainless-tables product image. Remove ONLY pale white/grey studio background/floor and make true transparent RGBA alpha. Preserve exact original full product geometry and camera, all metallic highlights, hardware, material colour and shadows inside the object. Preserve all parts: especially white plastic parts, handles, thin wires, mesh, wheels, legs, sheet-metal flanges. Background seen through empty holes or open framework must be transparent, but interior product metal surfaces must remain intact. No object redesign, no additions, no text or labels, no opaque floor, no baked checkerboard, no white halo. Faint semitransparent contact shadow is fine. 1536x1024 landscape canvas with full uncropped product and safe transparent margins. Precise clean product cutout."
+      },
+      "previousSinkLikeSha256": "940ca40ed7978946eec3d657bcf4dc08c826056551fdc499816698c39e4b29f8",
+      "replacementSource": "brand/product-illustrations/finished-v3/stainless-tables.png"
     },
     {
       "slug": "stainless-trolleys",
@@ -130,7 +228,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One tall commercial stainless steel bakery tray trolley with open tubular rectangular frame, multiple parallel pairs of horizontal tray rails, three metal trays at varied lower heights, four caster wheels. Exact product type as reference, no food.",
       "width": 1536,
       "height": 1024,
-      "sha256": "eba99ee53ecd48827151fdc56dfcdcffe5f056fe6eb4b5d54176cdb50e8a6007"
+      "sha256": "02837c6ab71cbeaf024a4c9df923488f9340a56c9d1b0592f4b9fff65cd3cff5",
+      "previousOpaqueSha256": "eba99ee53ecd48827151fdc56dfcdcffe5f056fe6eb4b5d54176cdb50e8a6007",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/stainless-trolleys.webp",
+        "result": "brand/product-illustrations/cutouts-v2/stainless-trolleys.png",
+        "prompt": "Background-extraction edit of attached stainless-trolleys product image. Remove ONLY pale white/grey studio background/floor and make true transparent RGBA alpha. Preserve exact original full product geometry and camera, all metallic highlights, hardware, material colour and shadows inside the object. Preserve all parts: especially white plastic parts, handles, thin wires, mesh, wheels, legs, sheet-metal flanges. Background seen through empty holes or open framework must be transparent, but interior product metal surfaces must remain intact. No object redesign, no additions, no text or labels, no opaque floor, no baked checkerboard, no white halo. Faint semitransparent contact shadow is fine. 1536x1024 landscape canvas with full uncropped product and safe transparent margins. Precise clean product cutout."
+      }
     },
     {
       "slug": "stainless-charcoal-grills",
@@ -140,7 +246,15 @@
       "prompt": "Use case product-mockup. One HD 1536x1024 landscape studio CGI product illustration. Retain reference product identity, refine shape and material clarity. Entire product centered with generous margins, neutral product photography composition. Seamless very pale cool grey backdrop, soft grounded shadow, broad neutral studio softbox lighting, restrained realistic metal grain, clean straight edges and mechanically coherent construction. No text, logos, dimensions, numbers, certification marks or watermark. Illustrative general product, reconstruct sharp surfaces rather than scan defects. Subject: One commercial stainless steel charcoal grill cabinet with black cooking grate, open lower storage bays, tall stainless extraction canopy supported by four slim upright posts, short round exhaust on top, four short adjustable legs. General construction and proportions as reference, no flames, food, branding or control labels.",
       "width": 1536,
       "height": 1024,
-      "sha256": "2a7e96b50c38624ac5762355aa5c6993b84f3d018713534883f46d40bc42d899"
+      "sha256": "42b4626f031c356623fe352bb1fce16e5e7b1b5a297d7d65434d4a71d077517f",
+      "previousOpaqueSha256": "2a7e96b50c38624ac5762355aa5c6993b84f3d018713534883f46d40bc42d899",
+      "backgroundEdit": {
+        "date": "2026-11-01",
+        "tool": "Built-in OpenAI image generation",
+        "source": "brand/product-illustrations/opaque-v1/stainless-charcoal-grills.webp",
+        "result": "brand/product-illustrations/cutouts-v2/stainless-charcoal-grills.png",
+        "prompt": "Background-extraction edit of attached stainless-charcoal-grills product image. Remove ONLY pale white/grey studio background/floor and make true transparent RGBA alpha. Preserve exact original full product geometry and camera, all metallic highlights, hardware, material colour and shadows inside the object. Preserve all parts: especially white plastic parts, handles, thin wires, mesh, wheels, legs, sheet-metal flanges. Background seen through empty holes or open framework must be transparent, but interior product metal surfaces must remain intact. No object redesign, no additions, no text or labels, no opaque floor, no baked checkerboard, no white halo. Faint semitransparent contact shadow is fine. 1536x1024 landscape canvas with full uncropped product and safe transparent margins. Precise clean product cutout."
+      }
     }
   ]
 }

@@ -160,7 +160,39 @@
     "count": "{n} products",
     "details": "View details",
     "quote": "Request a quote",
-    "countOne": "{n} product"
+    "countOne": "{n} product",
+    "partsH1": "Ducts, fittings & accessories",
+    "partsIntro": "Ventilation and smoke-extraction ducts, fittings and air-distribution accessories. The specifications shown are those provided by Libalstal; others are added once confirmed.",
+    "partsLabel": "Parts & components",
+    "finishedLabel": "Finished products",
+    "switchLabel": "Catalogue sections",
+    "finished": {
+      "title": "Finished products",
+      "intro": "Professional stainless steel equipment and cold-chain solutions: standard and bespoke products for professional kitchens and technical areas.",
+      "otherTitle": "Other finished solutions",
+      "items": [
+        {
+          "id": "sinks",
+          "title": "Stainless steel sinks",
+          "text": "Stainless steel sinks and hygiene equipment for professional kitchens and technical areas, made to measure to your requirements."
+        },
+        {
+          "id": "storage",
+          "title": "Stainless steel cupboards & shelving",
+          "text": "Stainless steel units, cupboards and shelving for professional kitchens and technical areas, made to measure to your requirements."
+        },
+        {
+          "id": "refrigeration",
+          "title": "Professional refrigeration",
+          "text": "A range of professional refrigeration equipment for your workspaces."
+        },
+        {
+          "id": "cold-rooms",
+          "title": "Cold-room construction",
+          "text": "LIBALSTAL builds professional cold rooms designed around your project, with layout and dimensions defined to measure."
+        }
+      ]
+    }
   },
   "productItems": {
     "spiral-round-duct": {
@@ -293,7 +325,7 @@
   "capabilities": {
     "title": "Capabilities",
     "h1": "Industrial capabilities",
-    "intro": "Libalstal's fabrication families. Ranges, gauges and equipment appear once confirmed.",
+    "intro": "Fabrication services, process and installation: from your drawings to the fitted part.",
     "items": {
       "spiral": {
         "title": "Spiral round ductwork",
@@ -348,6 +380,45 @@
         "Sealed assemblies",
         "Experienced technical team and qualified installation service",
         "Work carried out nationwide"
+      ]
+    },
+    "solutions": {
+      "solutionsTitle": "Finished solutions",
+      "productsLink": "Duct systems and components",
+      "productsIntro": "Explore ducts, fittings and accessories in the dedicated catalogue.",
+      "quoteLink": "Request a quote",
+      "items": [
+        {
+          "id": "inox",
+          "title": "Professional stainless steel equipment — standard and bespoke",
+          "text": "Design and manufacture of stainless steel equipment tailored to your professional needs.",
+          "examples": [
+            "Tables and worktops",
+            "Sinks and hygiene equipment",
+            "Units, cupboards and shelving",
+            "Trolleys and bespoke equipment"
+          ]
+        },
+        {
+          "id": "refrigeration",
+          "title": "Professional refrigeration",
+          "text": "A range of professional refrigeration equipment for your workspaces.",
+          "examples": [
+            "Refrigerated cabinets",
+            "Refrigerated tables",
+            "Refrigerated display cases"
+          ]
+        },
+        {
+          "id": "cold-rooms",
+          "title": "Construction of professional cold rooms",
+          "text": "LIBALSTAL builds professional cold rooms designed around your project, with layout and dimensions defined to measure.",
+          "examples": [
+            "Custom cold rooms",
+            "Layout adapted to your space",
+            "Dimensions defined according to your project"
+          ]
+        }
       ]
     }
   },

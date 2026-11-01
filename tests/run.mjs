@@ -281,23 +281,24 @@ await test('mobile menu: open, Escape closes and returns focus, contact reachabl
   await p.click('.burger'); await p.click('.nav-contact a'); await p.waitForURL('**/en/contact/');
   await p.context().close();
 });
-await test('product images: every card has a photo or render; illustrative renders captioned in FR/EN/AR; capabilities unnumbered', async () => {
+await test('product images: every card has a photo or render; illustrative renders have descriptive alt but no figcaption in FR/EN/AR; capabilities unnumbered', async () => {
   const p = await newPage();
   await p.goto(A + '/fr/products/');
   const cards = await p.$$eval('#product-grid .card-fig img', imgs => imgs.map(i => i.getAttribute('srcset')));
-  assert.equal(cards.length, JSON.parse(readFileSync(join(ROOT, 'content/site.json'))).products.length, 'an image on every product card');
+  assert.equal(cards.length, JSON.parse(readFileSync(join(ROOT, 'content/site.json'))).products.filter(p => p.cat !== 'inox').length, 'an image on every product card');
   for (const l of ['fr', 'en', 'ar']) {
     await p.goto(`${A}/${l}/products/elbows/`);
     await p.waitForFunction(() => { const i = document.querySelector('.drawing-render img'); return i.complete && i.naturalWidth > 0; }, null, { timeout: 10000 });
-    const fig = await p.$eval('.drawing-render img', i => ({ alt: i.alt, src: i.currentSrc, cap: i.closest('figure').querySelector('figcaption').textContent }));
+    const fig = await p.$eval('.drawing-render img', i => ({ alt: i.alt, src: i.currentSrc, cap: i.closest('figure').querySelector('figcaption')?.textContent ?? null }));
     assert.match(fig.src, /\/assets\/img\/products\/elbows-(640|1280)\.webp/, `${l}: render file (${fig.src})`);
     assert.ok(fig.alt.length > 10 && /3D|ثلاثي/.test(fig.alt), `${l}: alt "${fig.alt}"`);
-    assert.ok(/3D|ثلاثي/.test(fig.cap), `${l}: caption says it is an illustration`);
+    assert.equal(fig.cap, null, `${l}: no figcaption on product render`);
   }
   await p.goto(A + '/fr/');
   await p.locator('.cap-grid').scrollIntoViewIfNeeded();
   await p.waitForFunction(() => [...document.querySelectorAll('.cap-fig img')].every(i => i.complete && i.naturalWidth > 0), null, { timeout: 10000 });
   assert.equal(await p.locator('.cap-grid .n').count(), 0, 'capability families are not numbered');
+  assert.equal(await p.locator('.cap-grid .visual-label').count(), 0, 'no visual-label on capability cards');
   assert.deepEqual(p.errors, []);
   await p.context().close();
 });
@@ -308,7 +309,7 @@ await test('product filter updates cards, count and URL', async () => {
   assert.equal(await p.textContent('.count'), '3 produits');
   assert.match(p.url(), /#cat=fit$/);
   await p.reload(); assert.equal(await p.locator('.card:visible').count(), 3, 'state from hash');
-  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), JSON.parse(readFileSync(join(ROOT, 'content/site.json'))).products.length);
+  await p.click('.chip[data-filter="all"]'); assert.equal(await p.locator('.card:visible').count(), JSON.parse(readFileSync(join(ROOT, 'content/site.json'))).products.filter(p => p.cat !== 'inox').length);
   await p.context().close();
 });
 await test('v5.3 brochure content: specs as printed, 8 references (no defence sites), contacts; no RC, no gmail, no fire claim', async () => {
@@ -354,8 +355,11 @@ await test('photo opening: localized headlines, real links, loaded images and st
     await p.goto(`${A}/${lang}/`);
     await p.waitForFunction(()=>document.querySelector('#photo-hero')?.dataset.state==='idle');
     assert.equal(await p.locator('video,#intro').count(),0);
+    assert.equal(await p.locator('.ph-caption').count(),0);
     assert.equal(await p.locator('.ph-slide').count(),3);
     assert.equal(await p.locator('section[aria-labelledby="prod-h"] .card').count(),6);
+    assert.equal(await p.locator('.st-cap').count(),0, `${lang}: no story caption`);
+    assert.equal(await p.locator('#cap-h').evaluate(e => e.parentElement.querySelector('p') === null), true, `${lang}: no capIntro paragraph`);
     await p.waitForFunction(()=>document.querySelector('.ph-slide.is-current img')?.naturalWidth>0);
     assert.equal(await p.locator('a.ph-cta').nth(0).getAttribute('href'),`/${lang}/contact/`);
     assert.equal(await p.locator('a.ph-cta').nth(1).getAttribute('href'),`/${lang}/products/`);
@@ -372,7 +376,7 @@ await test('photo opening: localized headlines, real links, loaded images and st
       const title=(await selected.getAttribute('data-title-first'))+'\n'+(await selected.getAttribute('data-title-second'));
       assert.equal((await p.locator('#ph-title').innerText()).trim(),title);
       assert.equal(await p.locator('.ph-lead').textContent(),await selected.getAttribute('data-lead'));
-      assert.ok(await p.evaluate(t=>window.__photoTitleStarts.some(value=>value.trim()===t),title),'headline animates for '+id);
+      await p.waitForFunction(t=>window.__photoTitleStarts.some(value=>value.trim()===t),title,{timeout:5000});
     };
     await p.locator('[data-photo-next]').click(); await checkSlide('ductwork');
     await p.locator('[data-photo-next]').click(); await checkSlide('metalwork');
@@ -522,13 +526,15 @@ console.log('\n3D assembly (public since v14)');
 const ASM_DEMO = { fr: 'Modèle de démonstration', en: 'Demonstration model', ar: 'نموذج توضيحي' };
 const ASM_PENDING = { fr: 'Spécification à confirmer', en: 'Specification pending', ar: 'المواصفات قيد التأكيد' };
 const asmState = p => p.evaluate(() => ({ state: document.querySelector('.asm-view').dataset.state, status: document.querySelector('.asm-status').textContent }));
-await test('assembly pages (public since v14): indexable, in the sitemap, linked from the home story, demo and pending labels in FR/EN/AR', async () => {
+await test('assembly pages (public since v14): indexable, in the sitemap, linked from the home story, no demo badges or notes, pending specs retained in FR/EN/AR', async () => {
   for (const l of ['fr', 'en', 'ar']) {
     const r = await fetch(`${A}/${l}/assembly/`); assert.equal(r.status, 200);
     const h = await r.text();
     assert.doesNotMatch(h, /<meta name="robots" content="noindex/);
     assert.match(h, new RegExp(`rel="canonical" href="https://www\\.libalstal\\.example/${l}/assembly/"`));
-    assert.ok(h.includes(ASM_DEMO[l]) && h.includes(ASM_PENDING[l]), l);
+    assert.ok(h.includes(ASM_PENDING[l]), l);
+    assert.doesNotMatch(h, /<em class="badge">/);
+    assert.doesNotMatch(h, /class="asm-tag"/);
     assert.match(h, /<svg class="asm-svg"[^>]*role="img" aria-labelledby="asm-svg-t"/);
     assert.equal((h.match(/class="asm-part"/g) || []).length, 19);
     assert.match(h, new RegExp(`href="/${l}/contact/\\?product=tees-branches"`));
