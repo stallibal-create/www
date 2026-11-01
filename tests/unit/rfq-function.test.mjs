@@ -1,7 +1,7 @@
 // Unit tests: the Cloudflare Pages Functions for quote requests (functions/_lib/rfq.js), run in Node with Web APIs.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleRfq, handleStart, handleFinish, notifyMode, uploadsReady, sniff, _resetRateLimit, MAX_FILE, MAX_FORM } from '../../functions/_lib/rfq.js';
+import { handleRfq, handleStart, handleFinish, notifyMode, uploadsReady, sniff, _resetRateLimit, MAX_FILE, MAX_FORM, str, safeName, validate } from '../../functions/_lib/rfq.js';
 import { presign } from '../../functions/_lib/sigv4.js';
 import { onRequestPost, onRequest } from '../../functions/api/rfq/index.js';
 import * as startRoute from '../../functions/api/rfq/start.js';
@@ -82,9 +82,18 @@ test('notifyMode picks webhook first, then complete Resend settings; uploads nee
 });
 
 test('/healthz reports readiness without revealing secrets', async () => {
-  const j = await (healthz({ env: fullEnv(r2(), { RFQ_WEBHOOK_TOKEN: 'tok-secret' }) })).json();
-  assert.deepEqual(j, { ok: true, rfq: 'ready', storage: 'r2', uploads: 'ready', turnstile: 'off' });
+  const req = token => new Request('https://www.libalstal.com/healthz', token ? { headers: { 'x-health-token': token } } : {});
+  const env = fullEnv(r2(), { RFQ_WEBHOOK_TOKEN: 'tok-secret', HEALTHZ_TOKEN: 'h-token' });
+  // public: readiness only, never storage or anti-bot details
+  assert.deepEqual(await (healthz({ request: req(), env })).json(), { ok: true, rfq: 'ready', uploads: 'ready' });
+  assert.deepEqual(await (healthz({ request: req('wrong'), env })).json(), { ok: true, rfq: 'ready', uploads: 'ready' });
+  // with the monitoring token: full detail
+  assert.deepEqual(await (healthz({ request: req('h-token'), env })).json(), { ok: true, rfq: 'ready', uploads: 'ready', storage: 'r2', turnstile: 'off' });
+  // no HEALTHZ_TOKEN configured: an empty or guessed header never unlocks detail
+  const plain = fullEnv(r2());
+  assert.equal((await (healthz({ request: req('undefined'), env: plain })).json()).turnstile, undefined);
   assert.equal((await healthz({ env: webhookEnv() }).json()).uploads, 'off');
+  assert.ok(!JSON.stringify(await (healthz({ request: req('h-token'), env })).json()).includes('tok-secret'));
 });
 
 // ---------- quote without attachments ----------
@@ -368,4 +377,72 @@ test('signature sniffing matches the Node server rules', () => {
   assert.ok(sniff(enc('AC1027xxxx'), 'dwg'));
   assert.ok(sniff(enc('  0\nSECTION\n'), 'dxf'));
   assert.ok(!sniff(enc('MZ'), 'pdf'));
+});
+
+// ---------- audit 2026-11-01: input hygiene regressions ----------
+test('single-line fields lose CR/LF and control characters; requirements keep line breaks', () => {
+  assert.equal(str('ACME\r\nBcc: x@evil.test', 160), 'ACME Bcc: x@evil.test');
+  assert.equal(str('a\tb\u0000c\u007f', 50), 'a b c');
+  assert.equal(str('ligne 1\nligne 2\r\nligne 3\u0000', 500, true), 'ligne 1\nligne 2\r\nligne 3');
+  const v = validate(k => ({ name: 'Jean\r\nDupont', company: 'ACME\r\nBcc: x@evil.test', email: 'a@example.com', country: 'DZ',
+    category: 'other', timeline: '1', consent: 'yes', requirements: 'a\nb' })[k], new Set(['other']));
+  assert.deepEqual(v.bad, []);
+  assert.equal(v.fields.company, 'ACME Bcc: x@evil.test'); assert.equal(v.fields.name, 'Jean Dupont'); assert.equal(v.fields.requirements, 'a\nb');
+});
+
+test('Resend subject never carries a line break, whatever the company field holds', async () => {
+  _resetRateLimit(); const sent = [];
+  const fetchImpl = async (u, o) => { sent.push(JSON.parse(o.body)); return new Response('{}', { status: 200 }); };
+  const env = { RESEND_API_KEY: 'k', RFQ_TO_EMAIL: 'team@example.invalid', RFQ_FROM_EMAIL: 'site@example.invalid' };
+  const body = new URLSearchParams({ name: 'Test', company: 'ACME\r\nBcc: x@evil.test', email: 'a@example.com', country: 'DZ', category: 'other', timeline: '1', consent: 'yes' });
+  const r = await handleRfq(new Request('https://www.libalstal.com/api/rfq', { method: 'POST', body, headers: { 'content-type': 'application/x-www-form-urlencoded', accept: 'application/json', 'cf-connecting-ip': '203.0.113.9' } }),
+    env, { productSlugs: new Set(['other']), fetchImpl, log: () => {} });
+  assert.equal(r.status, 200);
+  assert.doesNotMatch(sent[0].subject, /[\r\n]/);
+});
+
+test('file names: Arabic and accented names stay readable, paths and bidi tricks do not', () => {
+  assert.equal(safeName('مخطط القناة.pdf'), 'مخطط_القناة.pdf');
+  assert.equal(safeName('coupe-étage.dxf'), 'coupe-étage.dxf');
+  assert.equal(safeName('../../etc/passwd.pdf'), '_.._etc_passwd.pdf');
+  assert.equal(safeName('..\\..\\a.dwg'), '_.._a.dwg');
+  assert.equal(safeName('.htaccess.pdf'), 'htaccess.pdf');
+  assert.equal(safeName('invoice\u202Efdp.exe.pdf'), 'invoice_fdp.exe.pdf'); // right-to-left override removed
+  assert.equal(safeName(''), 'file');
+  assert.ok(safeName('a'.repeat(300) + '.pdf').length <= 100);
+});
+
+
+test('file names: truncation preserves Unicode, byte limits and safe leading characters', () => {
+  const astral = '\u{10400}'; // a Unicode letter outside the BMP (emoji remain disallowed)
+  for (const n of [48, 49, 50, 120]) {
+    const name = safeName(astral.repeat(n) + 'a.pdf');
+    assert.doesNotThrow(() => encodeURIComponent(name));
+    assert.ok(name.includes(astral));
+    assert.ok(name.length <= 100);
+    assert.ok(new TextEncoder().encode(name).length <= 240);
+    assert.ok(name.endsWith('.pdf'));
+  }
+  for (const raw of ['漢'.repeat(120) + '.pdf', 'a'.repeat(200) + '...hidden.pdf', 'a\uD800b.pdf', 'a\uDC00b.pdf']) {
+    const name = safeName(raw);
+    assert.doesNotThrow(() => encodeURIComponent(name));
+    assert.ok(name.length <= 100);
+    assert.ok(new TextEncoder().encode(name).length <= 240);
+    assert.ok(!name.startsWith('.'));
+  }
+  assert.equal(safeName('cafe\u0301.pdf'), 'café.pdf');
+  assert.equal(safeName('😀.pdf'), '_.pdf');
+  assert.equal(safeName('.'.repeat(200)), 'file');
+});
+
+test('Pages upload URLs accept a long astral Unicode filename', async () => {
+  const b = r2(), m = mockFetch();
+  const filename = '\u{10400}'.repeat(49) + 'a.pdf';
+  const response = await handleStart(jreq('/start', startBody({ files: [{ name: filename, size: PDF.length }] })), fullEnv(b), o(m));
+  assert.equal(response.status, 200);
+  const result = await response.json();
+  assert.equal(result.uploads.length, 1);
+  const key = decodeURIComponent(new URL(result.uploads[0].url).pathname);
+  assert.ok(key.endsWith(safeName(filename)));
+  assert.ok(key.includes('\u{10400}'));
 });

@@ -1,0 +1,77 @@
+# Quality gate only. No deployment or Cloudflare credentials.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Prepare persistent logs outside tests/output
+        run: |
+          AUDIT_LOG_DIR="$RUNNER_TEMP/libalstal-audit-logs"
+          mkdir -p "$AUDIT_LOG_DIR"
+          printf 'AUDIT_LOG_DIR=%s\n' "$AUDIT_LOG_DIR" >> "$GITHUB_ENV"
+      - name: Install locked dependencies without install scripts
+        run: npm ci --ignore-scripts 2>&1 | tee "$AUDIT_LOG_DIR/npm-ci.log"
+      - name: Audit all dependencies (high and critical gate)
+        id: audit_all
+        continue-on-error: true
+        run: npm audit --audit-level=high 2>&1 | tee "$AUDIT_LOG_DIR/npm-audit-all.log"
+      - name: Audit production dependencies (high and critical gate)
+        id: audit_prod
+        if: ${{ !cancelled() && steps.audit_all.outcome != 'skipped' }}
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high 2>&1 | tee "$AUDIT_LOG_DIR/npm-audit-production.log"
+      - name: Enforce both audit results
+        if: ${{ !cancelled() && steps.audit_all.outcome != 'skipped' }}
+        env:
+          AUDIT_ALL: ${{ steps.audit_all.outcome }}
+          AUDIT_PROD: ${{ steps.audit_prod.outcome }}
+        run: |
+          test "$AUDIT_ALL" = success
+          test "$AUDIT_PROD" = success
+      - name: Build before lint
+        run: npm run build 2>&1 | tee "$AUDIT_LOG_DIR/build.log"
+      - name: Lint
+        run: npm run lint 2>&1 | tee "$AUDIT_LOG_DIR/lint.log"
+      - name: Unit tests
+        run: npm run test:unit 2>&1 | tee "$AUDIT_LOG_DIR/unit-tests.log"
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium 2>&1 | tee "$AUDIT_LOG_DIR/chromium-install.log"
+      - name: Browser tests
+        run: npm test 2>&1 | tee "$AUDIT_LOG_DIR/browser-tests.log"
+      - name: Restore normal build after browser-test configuration
+        run: npm run build 2>&1 | tee "$AUDIT_LOG_DIR/final-build.log"
+      - name: Lint final build
+        run: npm run lint 2>&1 | tee "$AUDIT_LOG_DIR/final-lint.log"
+      - name: Keep verification logs and browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-output
+          path: |
+            ${{ env.AUDIT_LOG_DIR }}/
+            tests/output/
+          retention-days: 7
