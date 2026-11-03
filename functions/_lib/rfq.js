@@ -59,8 +59,24 @@ export function notifyMode(env) {
 }
 export const uploadsReady = env => !!(env.RFQ_BUCKET && env.R2_ACCOUNT_ID && env.R2_BUCKET_NAME && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY);
 
-const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max + 1) : '');
-export const safeName = n => (n || 'file').normalize('NFKD').replace(/[^\w.\-]+/g, '_').replace(/^\.+/, '').slice(-100) || 'file';
+// Single-line fields lose control characters (CR/LF, tabs…) so they can never break an e-mail subject or header;
+// only the free-text requirements keep their line breaks.
+export const str = (v, max, multiline = false) => (typeof v === 'string'
+  ? (multiline ? v.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]+/g, ' ') : v.replace(/[\u0000-\u001F\u007F]+/g, ' ')).trim().slice(0, max + 1) : '');
+// Letters and digits of any script are kept (Arabic file names stay readable); everything else becomes '_'.
+// Bound the filename by complete Unicode code points and UTF-8 bytes (room for prefixes).
+export const safeName = n => {
+  const s = String(n ?? '').normalize('NFC').replace(/[^\p{L}\p{M}\p{N}._-]+/gu, '_');
+  const enc = new TextEncoder();
+  let suffix = '';
+  for (const ch of Array.from(s).reverse()) {
+    const next = ch + suffix;
+    if (next.length > 100 || enc.encode(next).length > 240) break;
+    suffix = next;
+  }
+  suffix = suffix.replace(/^\.+/, '');
+  return suffix || 'file';
+};
 const extOf = n => (String(n).split('.').pop() || '').toLowerCase();
 
 export function sniff(bytes, ext) {
@@ -91,7 +107,7 @@ export function validate(get, productSlugs) {
   const f = {
     name: str(get('name'), 120), company: str(get('company'), 160), email: str(get('email'), 254), phone: str(get('phone'), 40),
     country: str(get('country'), 120), category: str(get('category'), 60), timeline: str(get('timeline'), 2),
-    material: str(get('material'), 200), quantity: str(get('quantity'), 60), requirements: str(get('requirements'), 5000),
+    material: str(get('material'), 200), quantity: str(get('quantity'), 60), requirements: str(get('requirements'), 5000, true),
   };
   const bad = [];
   if (f.name.length < 2 || f.name.length > 120) bad.push('name');

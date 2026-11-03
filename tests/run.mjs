@@ -4,14 +4,15 @@
 import { spawn, execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
-import { readFileSync, readdirSync, statSync, rmSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { readFileSync, readdirSync, statSync, rmSync, mkdirSync, mkdtempSync, writeFileSync, existsSync } from 'node:fs';
+import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { socialDock, socialLinks } from '../scripts/social.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'tests/output');
+const S3_PORT = Number(process.env.TEST_S3_PORT || 4321);
 const require = createRequire(import.meta.url);
 let chromium;
 for (const m of [process.env.PLAYWRIGHT_MODULE, 'playwright', '@playwright/test'].filter(Boolean)) { try { ({ chromium } = require(m)); break; } catch { /* next */ } }
@@ -35,7 +36,7 @@ if (!INTRO_REAL && JSON.parse(readFileSync(join(ROOT, 'content/intro.json'), 'ut
     INTRO_FIX = dir;
   } catch { console.log('(ffmpeg not available: welcome-intro playback tests will be skipped)'); }
 }
-execFileSync(process.execPath, [join(ROOT, 'scripts/build.mjs')], { stdio: 'inherit', env: { ...process.env, SITE_URL: 'https://www.libalstal.example', RFQ_UPLOAD_ORIGIN: 'http://127.0.0.1:4321', ...(INTRO_FIX ? { INTRO_ASSETS_DIR: INTRO_FIX } : {}) } });
+execFileSync(process.execPath, [join(ROOT, 'scripts/build.mjs')], { stdio: 'inherit', env: { ...process.env, SITE_URL: 'https://www.libalstal.example', RFQ_UPLOAD_ORIGIN: `http://127.0.0.1:${S3_PORT}`, ...(INTRO_FIX ? { INTRO_ASSETS_DIR: INTRO_FIX } : {}) } });
 
 // ---------- harness ----------
 const results = []; let current = '';
@@ -59,9 +60,9 @@ const A = 'http://127.0.0.1:4311', B = 'http://127.0.0.1:4312', C = 'http://127.
 startServer(4311, {});                                                              // RFQ not configured
 const srvB = startServer(4312, { RFQ_WEBHOOK_URL: 'http://127.0.0.1:4301/hook', RFQ_WEBHOOK_TOKEN: 'tkn', RFQ_RATE_MAX: '50' });
 startServer(4313, { RFQ_WEBHOOK_URL: 'http://127.0.0.1:4301/hook', RFQ_RATE_MAX: '2' });
-// D: Cloudflare Pages + private R2 stand-in running the real functions/ (tests/pages-sim.mjs), S3 endpoint on 4321
+// D: Cloudflare Pages + private R2 stand-in running the real functions/ (tests/pages-sim.mjs), S3 endpoint on TEST_S3_PORT (default 4321)
 const D = 'http://127.0.0.1:4314';
-{ const p = spawn(process.execPath, [join(ROOT, 'tests/pages-sim.mjs')], { env: { ...process.env, PORT: '4314', S3_PORT: '4321', HOOK: 'http://127.0.0.1:4301/hook' }, stdio: ['ignore', 'pipe', 'pipe'] });
+{ const p = spawn(process.execPath, [join(ROOT, 'tests/pages-sim.mjs')], { env: { ...process.env, PORT: '4314', S3_PORT: String(S3_PORT), HOOK: 'http://127.0.0.1:4301/hook' }, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = ''; p.stdout.on('data', d => (log += d)); p.stderr.on('data', d => (log += d)); p.getLog = () => log; procs.push(p); }
 const sim = async (path, init) => (await fetch(D + path, init)).json();
 for (const base of [A, B, C, D]) for (let i = 0; i < 50; i++) { try { if ((await fetch(base + '/healthz')).ok) break; } catch { /* wait */ } await new Promise(r => setTimeout(r, 100)); }
@@ -105,6 +106,17 @@ async function newPage(opts = {}, b = browser) {
 }
 
 console.log('\nHTTP & server');
+await test('static files never leave dist/ (encoded ../ into a sibling dist-* folder → 403)', async () => {
+  const sib = mkdtempSync(join(ROOT, 'dist-traversal-probe-'));
+  try {
+    writeFileSync(join(sib, 'secret.txt'), 'SIBLING');
+    const sibling = encodeURIComponent(basename(sib));
+    for (const path of [`/..%2F${sibling}%2Fsecret.txt`, '/..%2F..%2Fetc%2Fpasswd', '/..%2Fpackage.json']) {
+      const r = await fetch(A + path); const body = await r.text();
+      assert.equal(r.status, 403, `${path} → ${r.status}`); assert.ok(!body.includes('SIBLING'), path);
+    }
+  } finally { rmSync(sib, { recursive: true, force: true }); }
+});
 await test('Montserrat is loaded and allowed by the CSP', async () => {
   const r = await fetch(A + '/fr/'); const csp = r.headers.get('content-security-policy'); const h = await r.text();
   const local = h.includes('/assets/fonts/montserrat.css');
@@ -260,7 +272,7 @@ await test('desktop nav, language switch keeps the page, theme persists', async 
   const p = await newPage();
   await p.goto(A + '/fr/');
   await p.click('.nav-links a[href="/fr/products/"]');
-  await p.waitForURL('**/fr/products/'); assert.equal(await p.textContent('h1'), 'Systèmes de gaines & accessoires');
+  await p.waitForURL('**/fr/products/'); assert.equal(await p.textContent('h1'), JSON.parse(readFileSync(join(ROOT, 'content/i18n/fr.json'), 'utf8')).products.partsH1);
   assert.equal(await p.getAttribute('.nav-links a[href="/fr/products/"]', 'aria-current'), 'page');
   await p.click('.lang a[hreflang="ar"]', { noWaitAfter: true }); await p.waitForURL('**/ar/products/', { waitUntil: 'domcontentloaded' });
   assert.equal(await p.getAttribute('html', 'dir'), 'rtl'); assert.equal(await p.getAttribute('html', 'lang'), 'ar');
@@ -357,7 +369,7 @@ await test('photo opening: localized headlines, real links, loaded images and st
     assert.equal(await p.locator('video,#intro').count(),0);
     assert.equal(await p.locator('.ph-caption').count(),0);
     assert.equal(await p.locator('.ph-slide').count(),3);
-    assert.equal(await p.locator('section[aria-labelledby="prod-h"] .card').count(),6);
+    assert.equal(await p.locator('section[aria-labelledby="prod-h"] .card').count(),3); // home features rectangular, spiral, elbows
     assert.equal(await p.locator('.st-cap').count(),0, `${lang}: no story caption`);
     assert.equal(await p.locator('#cap-h').evaluate(e => e.parentElement.querySelector('p') === null), true, `${lang}: no capIntro paragraph`);
     await p.waitForFunction(()=>document.querySelector('.ph-slide.is-current img')?.naturalWidth>0);
@@ -523,7 +535,6 @@ await test('social dock with three profiles (test URLs): phone toggle opens, Esc
 });
 
 console.log('\n3D assembly (public since v14)');
-const ASM_DEMO = { fr: 'Modèle de démonstration', en: 'Demonstration model', ar: 'نموذج توضيحي' };
 const ASM_PENDING = { fr: 'Spécification à confirmer', en: 'Specification pending', ar: 'المواصفات قيد التأكيد' };
 const asmState = p => p.evaluate(() => ({ state: document.querySelector('.asm-view').dataset.state, status: document.querySelector('.asm-status').textContent }));
 await test('assembly pages (public since v14): indexable, in the sitemap, linked from the home story, no demo badges or notes, pending specs retained in FR/EN/AR', async () => {
@@ -727,7 +738,7 @@ await test('part list and sheet: keyboard selection, focus moves to the sheet, E
   assert.equal(await p.evaluate(() => document.activeElement.id), 'part-elbow-1-h');
   assert.equal(await p.getAttribute('.asm-pick >> nth=1', 'aria-pressed'), 'true');
   const txt = await p.textContent('#part-elbow-1');
-  for (const s of ['Coude 90°', ASM_DEMO.fr, ASM_PENDING.fr, '400 × 300 mm', '150 mm', 'Demander un devis']) assert.ok(txt.includes(s), s);
+  for (const s of ['Coude 90°', ASM_PENDING.fr, '400 × 300 mm', '150 mm', 'Demander un devis']) assert.ok(txt.includes(s), s);
   await p.keyboard.press('Escape');
   assert.equal(await p.evaluate(() => document.activeElement.dataset.part), 'elbow-1');
   assert.equal(await p.getAttribute('.asm-pick >> nth=1', 'aria-pressed'), 'false');
@@ -796,7 +807,7 @@ await test('Arabic assembly page: RTL, Western digits, no overflow on a 390 px p
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0);
   await p.tap('.asm-pick >> nth=1');
   const card = await p.textContent('#part-elbow-1');
-  assert.ok(card.includes('400 × 300 mm') && card.includes('نموذج توضيحي'));
+  assert.ok(card.includes('400 × 300 mm') && card.includes(ASM_PENDING.ar));
   assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('#part-elbow-1 dd span[dir="ltr"]')).direction), 'ltr');
   assert.ok(await p.evaluate(() => document.querySelector('.asm-pick').getBoundingClientRect().height >= 44));
   assert.deepEqual(p.errors, []);

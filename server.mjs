@@ -8,7 +8,7 @@ import { readFile, stat, mkdir, writeFile, rm } from 'node:fs/promises';
 import { readFileSync, existsSync } from 'node:fs';
 import { Readable, Transform } from 'node:stream';
 import { randomBytes } from 'node:crypto';
-import { join, extname, normalize, dirname } from 'node:path';
+import { join, extname, normalize, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -62,7 +62,9 @@ function rateLimited(ip) {
 }
 setInterval(() => { const now = Date.now(); for (const [k, v] of hits) if (!v.some(t => now - t < RATE_WINDOW)) hits.delete(k); }, 60_000).unref();
 
-const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max + 1) : '');
+// Same rules as functions/_lib/rfq.js: no control characters in single-line fields.
+const str = (v, max, multiline = false) => (typeof v === 'string'
+  ? (multiline ? v.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]+/g, ' ') : v.replace(/[\u0000-\u001F\u007F]+/g, ' ')).trim().slice(0, max + 1) : '');
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{2,}$/;
 
 function sniff(buf, ext) {
@@ -72,7 +74,19 @@ function sniff(buf, ext) {
   if (ext === 'dxf') return head.startsWith('AutoCAD Binary DXF') || /^\s*0\s*\r?\n\s*SECTION/.test(head) || /^\s*999\s*\r?\n/.test(head);
   return false;
 }
-const safeName = n => (n || 'file').normalize('NFKD').replace(/[^\w.\-]+/g, '_').replace(/^\.+/, '').slice(-100) || 'file';
+// Bound the filename by complete Unicode code points and UTF-8 bytes (room for prefixes).
+const safeName = n => {
+  const s = String(n ?? '').normalize('NFC').replace(/[^\p{L}\p{M}\p{N}._-]+/gu, '_');
+  const enc = new TextEncoder();
+  let suffix = '';
+  for (const ch of Array.from(s).reverse()) {
+    const next = ch + suffix;
+    if (next.length > 100 || enc.encode(next).length > 240) break;
+    suffix = next;
+  }
+  suffix = suffix.replace(/^\.+/, '');
+  return suffix || 'file';
+};
 
 function limitStream(max) {
   let n = 0;
@@ -161,7 +175,7 @@ async function handleRfq(req, res) {
   const f = {
     name: str(fd.get('name'), 120), company: str(fd.get('company'), 160), email: str(fd.get('email'), 254), phone: str(fd.get('phone'), 40),
     country: str(fd.get('country'), 120), category: str(fd.get('category'), 60), timeline: str(fd.get('timeline'), 2),
-    material: str(fd.get('material'), 200), quantity: str(fd.get('quantity'), 60), requirements: str(fd.get('requirements'), 5000),
+    material: str(fd.get('material'), 200), quantity: str(fd.get('quantity'), 60), requirements: str(fd.get('requirements'), 5000, true),
   };
   const bad = [];
   if (f.name.length < 2 || f.name.length > 120) bad.push('name');
@@ -260,7 +274,7 @@ async function serveStatic(req, res, pathname) {
     res.writeHead(302, { ...HEADERS, Location: `/${best}/${new URL(req.url, 'http://local').search}`, Vary: 'Accept-Language', 'Cache-Control': 'no-store' }); return res.end();
   }
   let file = normalize(join(DIST, p));
-  if (!file.startsWith(DIST)) return send(res, 403, 'Forbidden', 'text/plain');
+  if (file !== DIST && !file.startsWith(DIST + sep)) return send(res, 403, 'Forbidden', 'text/plain'); // not dist-old/, dist-ssr/…
   try {
     let s = await stat(file);
     if (s.isDirectory()) {
