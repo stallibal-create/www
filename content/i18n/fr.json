@@ -212,7 +212,8 @@
           ]
         }
       ]
-    }
+    },
+    "catalogueDownload": "Télécharger le catalogue"
   },
   "productItems": {
     "spiral-round-duct": {

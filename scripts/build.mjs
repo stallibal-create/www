@@ -309,6 +309,10 @@ function emit(lang, path, html, { index = true } = {}) {
 // ---------- shared blocks ----------
 const pageHead = (ctx, eyebrow, h1, intro, crumbHtml = '') => `<div class="wrap page-head">${crumbHtml}<p class="eyebrow">${esc(eyebrow)}</p><h1>${esc(h1)}</h1>${intro ? `<p class="lead">${esc(intro)}</p>` : ''}</div>`;
 
+function catalogueDownload(ctx) {
+  return `<p class="more"><a class="btn btn-primary" href="${A('/assets/docs/libalstal-catalogue.pdf')}" download="LIBALSTAL-catalogue.pdf">${esc(ctx.D.products.catalogueDownload)} <span class="small">(PDF · 1.9 MB)</span></a></p>`;
+}
+
 function productCard(ctx, p, headingLevel = 3) {
   const { lang, D, arr } = ctx;
   const it = D.productItems[p.slug];
@@ -506,6 +510,7 @@ function products(ctx) {
   const ordered = catalogueProducts().filter(p => p.cat !== 'inox');
   const body = `${pageHead(ctx, D.nav.products, D.products.partsH1, D.products.partsIntro, cr.html)}
 <section class="sec tight catalogue-page"><div class="wrap">
+  ${catalogueDownload(ctx)}
   <div class="filters" role="group" aria-label="${esc(D.products.filterLabel)}">
     <button type="button" class="chip" aria-pressed="true" data-filter="all">${esc(D.products.all)}</button>
     ${cats.map(c => `<button type="button" class="chip" aria-pressed="false" data-filter="${c}">${esc(D.products.cats[c])}</button>`).join('')}
@@ -565,6 +570,7 @@ function finishedProducts(ctx) {
   </a>
 </article>`).join('');
   return `<section class="sec tight catalogue-page"><div class="wrap">
+  ${catalogueDownload(ctx)}
   <div class="grid catalogue-grid">${cards}${families}</div>
 </div></section>`;
 }
