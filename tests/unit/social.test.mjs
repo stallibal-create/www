@@ -15,10 +15,11 @@ test('only real https profile URLs are used, in a fixed order; the rest is repor
   assert.equal(socialLinks(undefined).length, 0);
 });
 
-test('site.json is the single source: Facebook set, Instagram and TikTok left empty (never guessed)', () => {
+test('site.json uses confirmed Facebook and TikTok profiles; Instagram remains unset', () => {
   const social = JSON.parse(readFileSync(new URL('../../content/site.json', import.meta.url), 'utf8')).social;
   assert.equal(social.facebook, 'https://www.facebook.com/Libalstal/');
-  assert.equal(social.instagram, null); assert.equal(social.tiktok, null);
+  assert.equal(social.instagram, null);
+  assert.equal(social.tiktok, 'https://www.tiktok.com/@libalstal');
   const build = readFileSync(new URL('../../scripts/build.mjs', import.meta.url), 'utf8');
   assert.doesNotMatch(build, /c\.facebook|facebook\.com/, 'no profile URL hard-coded in the generator');
 });
