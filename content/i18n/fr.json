@@ -174,22 +174,42 @@
         {
           "id": "sinks",
           "title": "Éviers inox",
-          "text": "Éviers et équipements d'hygiène en inox pour cuisines professionnelles et locaux techniques, réalisés sur mesure selon vos besoins."
+          "text": "Éviers et équipements d'hygiène en inox pour cuisines professionnelles et locaux techniques, réalisés sur mesure selon vos besoins.",
+          "details": [
+            "Pour vos cuisines professionnelles et locaux techniques, nous étudions l'implantation des éviers et équipements d'hygiène en fonction de vos plans et de l'organisation de vos espaces de travail.",
+            "Les dimensions, le nombre de cuves et les équipements associés sont définis avec vous selon votre projet.",
+            "Chaque ensemble est fabriqué sur mesure et peut être coordonné avec les autres équipements inox de votre cuisine."
+          ]
         },
         {
           "id": "storage",
           "title": "Meubles & étagères inox",
-          "text": "Meubles, placards et étagères en inox pour cuisines professionnelles et locaux techniques, réalisés sur mesure selon vos besoins."
+          "text": "Meubles, placards et étagères en inox pour cuisines professionnelles et locaux techniques, réalisés sur mesure selon vos besoins.",
+          "details": [
+            "Meubles, placards et étagères en inox sont conçus pour organiser le rangement dans vos cuisines professionnelles et locaux techniques.",
+            "L'implantation, les dimensions et le nombre de niveaux sont définis selon votre projet et l'espace disponible.",
+            "La fabrication sur mesure permet d'adapter chaque meuble à votre configuration et de coordonner l'ensemble avec vos autres équipements."
+          ]
         },
         {
           "id": "refrigeration",
           "title": "Réfrigération professionnelle",
-          "text": "Une gamme d'équipements de réfrigération professionnelle pour vos espaces de travail."
+          "text": "Une gamme d'équipements de réfrigération professionnelle pour vos espaces de travail.",
+          "details": [
+            "Nous étudions avec vous les équipements de réfrigération professionnelle adaptés à vos espaces de travail et à votre organisation.",
+            "Le choix des équipements et leur implantation sont définis selon votre projet.",
+            "Chaque solution peut être coordonnée avec les autres équipements de votre cuisine ou local technique."
+          ]
         },
         {
           "id": "cold-rooms",
           "title": "Construction de chambres froides",
-          "text": "LIBALSTAL construit des chambres froides professionnelles conçues autour de votre projet, avec une implantation et des dimensions définies sur mesure."
+          "text": "LIBALSTAL construit des chambres froides professionnelles conçues autour de votre projet, avec une implantation et des dimensions définies sur mesure.",
+          "details": [
+            "LIBALSTAL conçoit et construit des chambres froides professionnelles autour de votre projet : implantation, dimensions et organisation définies sur mesure.",
+            "Nous étudions avec vous l'agencement de la chambre froide en fonction de votre espace disponible et de vos besoins d'exploitation.",
+            "La construction sur mesure permet d'adapter la chambre froide à votre configuration et de l'intégrer à votre local technique."
+          ]
         }
       ]
     }

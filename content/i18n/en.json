@@ -174,22 +174,42 @@
         {
           "id": "sinks",
           "title": "Stainless steel sinks",
-          "text": "Stainless steel sinks and hygiene equipment for professional kitchens and technical areas, made to measure to your requirements."
+          "text": "Stainless steel sinks and hygiene equipment for professional kitchens and technical areas, made to measure to your requirements.",
+          "details": [
+            "For your professional kitchens and technical areas, we study the layout of sinks and hygiene equipment based on your drawings and the organisation of your workspaces.",
+            "Dimensions, number of bowls and associated equipment are defined with you according to your project.",
+            "Each unit is made to measure and can be coordinated with the other stainless steel equipment in your kitchen."
+          ]
         },
         {
           "id": "storage",
           "title": "Stainless steel cupboards & shelving",
-          "text": "Stainless steel units, cupboards and shelving for professional kitchens and technical areas, made to measure to your requirements."
+          "text": "Stainless steel units, cupboards and shelving for professional kitchens and technical areas, made to measure to your requirements.",
+          "details": [
+            "Stainless steel units, cupboards and shelving are designed to organise storage in your professional kitchens and technical areas.",
+            "Layout, dimensions and number of levels are defined according to your project and the available space.",
+            "Made-to-measure fabrication lets each unit adapt to your configuration and be coordinated with your other equipment."
+          ]
         },
         {
           "id": "refrigeration",
           "title": "Professional refrigeration",
-          "text": "A range of professional refrigeration equipment for your workspaces."
+          "text": "A range of professional refrigeration equipment for your workspaces.",
+          "details": [
+            "We study with you the professional refrigeration equipment suited to your workspaces and your organisation.",
+            "Equipment selection and layout are defined according to your project.",
+            "Each solution can be coordinated with the other equipment in your kitchen or technical area."
+          ]
         },
         {
           "id": "cold-rooms",
           "title": "Cold-room construction",
-          "text": "LIBALSTAL builds professional cold rooms designed around your project, with layout and dimensions defined to measure."
+          "text": "LIBALSTAL builds professional cold rooms designed around your project, with layout and dimensions defined to measure.",
+          "details": [
+            "LIBALSTAL designs and builds professional cold rooms around your project: layout, dimensions and organisation defined to measure.",
+            "We study with you the cold-room layout according to your available space and your operating needs.",
+            "Made-to-measure construction lets the cold room adapt to your configuration and integrate into your technical area."
+          ]
         }
       ]
     }

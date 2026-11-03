@@ -412,7 +412,7 @@ function home(ctx) {
     const it = D.productItems[p.slug];
     return `<li class="has-fig"><span class="cap-fig">${illustrativeImg(p.slug, { alt: it.name, sizes: '(max-width: 600px) 30vw, 200px' })}</span><div><h3>${esc(it.name)}</h3><p>${esc(it.summary)}</p></div><a href="${url(lang, 'capabilities')}" aria-label="${esc(it.name)} — ${esc(H.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`;
   });
-  const familyCaps = D.products.finished.items.map(it => `<li class="has-fig"><span class="cap-fig">${illustrativeImg(it.id, { alt: it.title, sizes: '(max-width: 600px) 30vw, 200px' })}</span><div><h3>${esc(it.title)}</h3><p>${esc(it.text)}</p></div><a href="${url(lang, 'capabilities') + '#family-' + it.id}" aria-label="${esc(it.title)} — ${esc(H.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`);
+  const familyCaps = D.products.finished.items.map(it => `<li class="has-fig"><span class="cap-fig">${illustrativeImg(it.id, { alt: it.title, sizes: '(max-width: 600px) 30vw, 200px' })}</span><div><h3>${esc(it.title)}</h3><p>${esc(it.text)}</p></div><a href="${url(lang, 'capabilities/' + it.id)}" aria-label="${esc(it.title)} — ${esc(H.capMore)}"><span class="arr" aria-hidden="true">${arr}</span></a></li>`);
   const caps = [...inoxCaps, ...familyCaps].slice(0, 3).join('');
   const qItems = site.quality.slice(0, 6).filter(q => !hide || q.evidence);
   const qual = qItems.map(q => `<li><span>${esc(D.quality.items[q.id].t)}</span>${q.evidence ? `<a href="${esc(q.evidence)}">${esc(D.quality.evidenceLink)}</a>` : `<em class="badge">${esc(D.quality.evidenceMissing)}</em>`}</li>`).join('');
@@ -534,7 +534,6 @@ ${rfqBand(ctx)}`;
       : p.image ? `<div class="drawing-photo"><img class="catalogue-photo" src="${esc(A('/assets/img/' + p.image))}" width="1000" height="750" fetchpriority="high" decoding="async" alt="${esc(it.name)}"></div>${p.image.startsWith('catalogue/') ? `<figcaption class="small muted">${esc(D.product.catalogueImage)}</figcaption>` : ''}`
       : RENDERS.has(p.slug) ? `<div class="drawing-render">${renderImg(p.slug, { alt: fmt(D.product.renderAlt, { name: it.name }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div>`
       : `<div class="drawing-fig" aria-hidden="true">${icons[p.slug]}</div><figcaption>${ctx.ph(D.product.imageMissing, 'toProvide')}</figcaption>`}
-    <div class="titleblock" aria-hidden="true"><span>LIBALSTAL</span><span>${esc(it.name)}</span><span>${esc(D.products.cats[p.cat])}</span></div>
   </figure>
   <div>
     <h2 class="h3">${esc(D.product.specs)}</h2>
@@ -556,16 +555,17 @@ function finishedProducts(ctx) {
   const F = D.products.finished;
   const inox = catalogueProducts().filter(p => p.cat === 'inox');
   const cards = inox.map(p => productCard(ctx, p, 2)).join('');
-  const families = F.items.map(it => `<article class="card family-card" id="family-${esc(it.id)}">
-  <span class="card-fig card-illustrative">${illustrativeImg(it.id, { alt: fmt(D.product.illustrativeAlt, { name: it.title }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>
-  <h3 class="card-h">${esc(it.title)}</h3>
-  <p class="card-sum">${esc(it.text)}</p>
-  <p><a class="btn" href="${url(lang, 'contact')}">${esc(D.products.quote)} <span class="arr" aria-hidden="true">${arr}</span></a></p>
+  const families = F.items.map(it => `<article class="card product-card family-card" id="family-${esc(it.id)}">
+  <a class="card-link" href="${url(lang, 'capabilities/' + it.id)}">
+    <span class="card-fig card-illustrative">${illustrativeImg(it.id, { alt: fmt(D.product.illustrativeAlt, { name: it.title }), sizes: '(max-width: 600px) 92vw, (max-width: 1100px) 46vw, 320px' })}</span>
+    <span class="card-cat">${esc(D.nav.capabilities)}</span>
+    <h2 class="card-h">${esc(it.title)}</h2>
+    <span class="card-sum">${esc(it.text)}</span>
+    <span class="card-more">${esc(D.products.details)} <span class="arr" aria-hidden="true">${arr}</span></span>
+  </a>
 </article>`).join('');
   return `<section class="sec tight catalogue-page"><div class="wrap">
-  <div class="grid catalogue-grid">${cards}</div>
-  <h2 class="h3">${esc(F.otherTitle)}</h2>
-  <div class="grid catalogue-grid">${families}</div>
+  <div class="grid catalogue-grid">${cards}${families}</div>
 </div></section>`;
 }
 
@@ -603,6 +603,24 @@ ${site.equipment.length || !site.display?.hideIncomplete ? `<section class="sec 
 ${rfqBand(ctx)}`;
   note('capabilities.process', 'Valider le déroulé type d\'une commande (page Savoir-faire)');
   emit(lang, 'capabilities', page(ctx, { title: D.capabilities.title, description: D.capabilities.intro, path: 'capabilities', active: 'capabilities', jsonld: [cr.ld] }, body));
+
+  for (const it of D.products.finished.items) {
+    const path = 'capabilities/' + it.id;
+    const c2 = crumbs(ctx, [[D.nav.capabilities, 'capabilities'], [it.title, path]]);
+    const details = (it.details || []).map(p => `<p>${esc(p)}</p>`).join('');
+    const body = `<div class="wrap page-head">${c2.html}<p class="eyebrow">${esc(D.products.finished.title)}</p><h1>${esc(it.title)}</h1><p class="lead">${esc(it.text)}</p></div>
+<section class="sec tight"><div class="wrap two pd">
+  <figure class="drawing">
+    <div class="drawing-illustrative">${illustrativeImg(it.id, { alt: fmt(D.product.illustrativeAlt, { name: it.title }), sizes: '(max-width: 860px) 92vw, 600px', eager: true })}</div>
+  </figure>
+  <div>
+    <h2 class="h3">${esc(D.products.details)}</h2>
+    ${details}
+    <div class="cta-box"><h2 class="h3">${esc(D.product.ctaTitle)}</h2><p>${esc(D.product.ctaText)}</p><a class="btn btn-primary" href="${url(lang, 'contact')}">${esc(D.products.quote)} <span class="arr" aria-hidden="true">${ctx.arr}</span></a></div>
+  </div>
+</div></section>`;
+    emit(lang, path, page(ctx, { title: it.title, description: it.text, path, active: 'capabilities', jsonld: [c2.ld] }, body));
+  }
 }
 
 function industries(ctx) {
