@@ -310,7 +310,7 @@ function emit(lang, path, html, { index = true } = {}) {
 const pageHead = (ctx, eyebrow, h1, intro, crumbHtml = '') => `<div class="wrap page-head">${crumbHtml}<p class="eyebrow">${esc(eyebrow)}</p><h1>${esc(h1)}</h1>${intro ? `<p class="lead">${esc(intro)}</p>` : ''}</div>`;
 
 function catalogueDownload(ctx) {
-  return `<p class="more"><a class="btn btn-primary" href="${A('/assets/docs/libalstal-catalogue.pdf')}" download="LIBALSTAL-catalogue.pdf">${esc(ctx.D.products.catalogueDownload)} <span class="small">(PDF · 1.9 MB)</span></a></p>`;
+  return `<p class="more"><a class="btn btn-primary" href="${A('/assets/docs/libalstal-catalogue.pdf')}" download="LIBALSTAL-catalogue.pdf">${esc(ctx.D.products.catalogueDownload)} <span class="small">(PDF · 2.6 MB)</span></a></p>`;
 }
 
 function productCard(ctx, p, headingLevel = 3) {
