@@ -147,7 +147,7 @@ await test('all internal links and assets resolve (no dead links)', async () => 
 await test('external links are only the declared ones', async () => {
   const ext = new Set();
   for (const p of pages) for (const m of (await (await fetch(A + p)).text()).matchAll(/<a\b[^>]*href="(https?:\/\/[^"]+)"/g)) if (!m[1].startsWith('https://www.libalstal.example')) ext.add(m[1]);
-  assert.deepEqual([...ext].sort(), ['https://wa.me/213561631942', 'https://www.facebook.com/Libalstal/', 'https://www.google.com/maps?cid=14870507933311400548'].sort());
+  assert.deepEqual([...ext].sort(), ['https://wa.me/213561631942', 'https://www.facebook.com/Libalstal/', 'https://www.google.com/maps?cid=14870507933311400548', 'https://www.instagram.com/libalstal/', 'https://www.tiktok.com/@libalstal'].sort());
 });
 await test('root redirects by Accept-Language; unknown paths 404 in the right language', async () => {
   const r = await fetch(A + '/', { redirect: 'manual', headers: { 'Accept-Language': 'ar-DZ,ar;q=0.9' } });
@@ -451,8 +451,8 @@ await test('social dock: configured links and pending profiles, 48 px discs on t
     const h = await (await fetch(A + p)).text();
     assert.equal((h.match(/<nav class="social-dock/g) || []).length, 1, p);
     assert.match(h, /<a class="sd-btn sd-facebook" href="https:\/\/www\.facebook\.com\/Libalstal\/" target="_blank" rel="noopener noreferrer">/, p);
-    assert.match(h, /class="sd-btn sd-instagram is-pending" role="img"/, p);
-    assert.match(h, /class="sd-btn sd-tiktok is-pending" role="img"/, p);
+    assert.match(h, /class="sd-btn sd-instagram" href="https:\/\/www\.instagram\.com\/libalstal\/"/, p);
+    assert.match(h, /class="sd-btn sd-tiktok" href="https:\/\/www\.tiktok\.com\/@libalstal"/, p);
     assert.match(h, /class="sd-btn sd-toggle"/, p);
   }
   const pg = await newPage(); await pg.goto(A + '/fr/products/');

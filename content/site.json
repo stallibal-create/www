@@ -3,7 +3,7 @@
   "social": {
     "_readme": "Every social profile URL used by the site (floating dock, footer, company page, contact, JSON-LD sameAs). Only real https profile URLs; null = inactive icon in footer/dock and listed in MISSING-INFO.md. Never put a guessed URL here.",
     "facebook": "https://www.facebook.com/Libalstal/",
-    "instagram": null,
+    "instagram": "https://www.instagram.com/libalstal/",
     "tiktok": "https://www.tiktok.com/@libalstal",
     "linkedin": null
   },
